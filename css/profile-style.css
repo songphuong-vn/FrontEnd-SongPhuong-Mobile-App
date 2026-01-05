@@ -1050,7 +1050,11 @@
 
 .profile-section:nth-child(6) {
     animation-delay: 0.3s;
-}/* CSS cho phần text chi tiêu mới */
+}
+
+
+
+/* CSS cho phần text chi tiêu mới */
 .user-spending-text {
     text-align: center;
     color: rgba(255, 255, 255, 0.9);
@@ -1089,56 +1093,29 @@
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 8px;
-    /* Thu gọn gap */
     background: white;
     padding: 12px 8px;
-    /* Thu gọn padding */
     border-radius: 24px;
     box-shadow: 0 15px 45px rgba(0, 0, 0, 0.12);
 }
 
-/* Tinh chỉnh lại quick-menu-item khi nằm trong status grid - Gọn nhẹ, không hover */
+/* Override default quick-menu-item styles for status grid - compact and no interactions */
 .order-status-grid .quick-menu-item {
-    background: transparent !important;
-    /* Bỏ hoàn toàn background */
-    padding: 8px 5px !important;
-    /* Thu gọn chiều cao */
-    gap: 4px !important;
-    /* Icon sát với tên hơn */
-    border: none !important;
-    /* Bỏ border */
-    box-shadow: none !important;
-    transition: none !important;
+    background: transparent;
+    padding: 8px 5px;
+    gap: 4px;
+    border: none;
+    box-shadow: none;
+    transition: none;
     cursor: default;
-    /* Bỏ cursor pointer */
+    pointer-events: none;
+    /* Disable all interactions */
 }
 
 .order-status-grid .quick-menu-item span {
-    font-weight: 500 !important;
-    /* Không cần bold */
-    color: var(--profile-text-dark) !important;
+    font-weight: 500;
 }
 
-/* Bỏ hoàn toàn hover effect cho nút */
-.order-status-grid .quick-menu-item:hover {
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    transform: none !important;
-}
-
-/* Bỏ hover effect cho icon */
-.order-status-grid .quick-menu-item:hover .icon {
-    color: var(--profile-primary) !important;
-    transform: none !important;
-}
-
-/* Bỏ hover effect cho text */
-.order-status-grid .quick-menu-item:hover span {
-    color: var(--profile-text-dark) !important;
-}
-
-/* Bỏ hover effect cho badge */
-.order-status-grid .quick-menu-item:hover .notification-badge {
-    border-color: white !important;
+.order-status-grid .quick-menu-item .icon {
+    transition: none;
 }
