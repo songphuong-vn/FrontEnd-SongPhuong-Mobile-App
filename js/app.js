@@ -1317,3 +1317,10 @@ notificationStyle.textContent = `
     }
 `;
 document.head.appendChild(notificationStyle);
+
+// Toggle Footer Section (Collapsible)
+function toggleFooterSection(button) {
+    const content = button.nextElementSibling;
+    button.classList.toggle('active');
+    content.classList.toggle('active');
+}
