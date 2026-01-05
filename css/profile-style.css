@@ -970,7 +970,7 @@
    FOOTER - Optimized & Compact
    ================================ */
 .profile-footer {
-    padding: 16px 0 60px;
+    padding: 16px 0 12px;
     background: #f8f8f8;
     border-top: 3px solid var(--profile-primary);
 }
