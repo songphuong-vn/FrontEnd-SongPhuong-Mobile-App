@@ -826,14 +826,6 @@
                             </div>
                         </div>
 
-                        <!-- Nút Đăng Xuất -->
-                        <div class="profile-section logout-section">
-                            <button class="logout-btn" onclick="logout()">
-                                <i class="icon ion-log-out"></i>
-                                <span>Đăng xuất</span>
-                            </button>
-                        </div>
-
                         <!-- Comprehensive Footer - Reorganized -->
                         <div class="profile-footer">
                             <!-- Collapsible Contact Sections -->
@@ -1011,34 +1003,14 @@
         </div>
 
 
-        <!-- Settings Modal -->
+        <!-- Settings Modal - Compact -->
         <div class="settings-modal" id="settingsModal">
             <div class="settings-overlay" onclick="closeProfileSettings()"></div>
             <div class="settings-content">
-                <div class="settings-header">
-                    <h3>Cài đặt</h3>
-                    <button class="settings-close-btn" onclick="closeProfileSettings()">
-                        <i class="icon ion-close"></i>
-                    </button>
-                </div>
-                <div class="settings-body">
-                    <div class="settings-section">
-                        <h4>Tài khoản</h4>
-                        <button class="settings-item logout-btn" onclick="logout()">
-                            <i class="icon ion-log-out"></i>
-                            <span>Đăng xuất</span>
-                            <i class="icon ion-chevron-right"></i>
-                        </button>
-                    </div>
-                    <!-- Placeholder for future settings -->
-                    <div class="settings-section">
-                        <h4>Khác</h4>
-                        <div class="settings-placeholder">
-                            <i class="icon ion-ios-gear-outline"></i>
-                            <p>Các tùy chọn khác sẽ được cập nhật sau</p>
-                        </div>
-                    </div>
-                </div>
+                <button class="settings-item logout-btn" onclick="logout()">
+                    <i class="icon ion-log-out"></i>
+                    <span>Đăng xuất</span>
+                </button>
             </div>
         </div>
 
