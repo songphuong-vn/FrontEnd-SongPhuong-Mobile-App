@@ -21,8 +21,8 @@
 /* Container chính */
 .user-profile-container {
     background: linear-gradient(180deg, #f0f2ff 0%, #ffffff 40%);
-    min-height: 100vh;
-    padding-bottom: 90px;
+    min-height: auto;
+    padding-bottom: 0;
 }
 
 /* ================================
@@ -970,7 +970,7 @@
    FOOTER - Optimized & Compact
    ================================ */
 .profile-footer {
-    padding: 16px 0 55px;
+    padding: 16px 0 60px;
     background: #f8f8f8;
     border-top: 3px solid var(--profile-primary);
 }
