@@ -1,0 +1,199 @@
+/* ================================
+   SETTINGS MODAL
+   ================================ */
+.settings-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10000;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.settings-modal.active {
+    display: flex;
+}
+
+.settings-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    animation: fadeIn 0.3s ease;
+}
+
+.settings-content {
+    position: relative;
+    background: white;
+    width: 100%;
+    max-height: 70vh;
+    border-radius: 20px 20px 0 0;
+    overflow: hidden;
+    transform: translateY(100%);
+    animation: slideUp 0.3s ease forwards;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.settings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid #f0f0f0;
+    background: linear-gradient(135deg, var(--profile-primary) 0%, #4a4eb7 100%);
+}
+
+.settings-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: white;
+}
+
+.settings-close-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.settings-close-btn .icon {
+    font-size: 24px;
+    color: white;
+}
+
+.settings-close-btn:active {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(0.95);
+}
+
+.settings-body {
+    padding: 20px;
+    max-height: calc(70vh - 77px);
+    overflow-y: auto;
+}
+
+.settings-section {
+    margin-bottom: 24px;
+}
+
+.settings-section:last-child {
+    margin-bottom: 0;
+}
+
+.settings-section h4 {
+    margin: 0 0 12px 0;
+    font-size: 13px;
+    font-weight: 700;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.settings-item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: white;
+    border: 1px solid #f0f0f0;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 8px;
+}
+
+.settings-item:last-child {
+    margin-bottom: 0;
+}
+
+.settings-item .icon:first-child {
+    font-size: 22px;
+    color: var(--profile-primary);
+}
+
+.settings-item span {
+    flex: 1;
+    font-size: 15px;
+    font-weight: 600;
+    color: #333;
+    text-align: left;
+}
+
+.settings-item .icon:last-child {
+    font-size: 18px;
+    color: #ccc;
+}
+
+.settings-item:active {
+    background: #f8f8f8;
+    transform: scale(0.98);
+}
+
+.settings-item.logout-btn {
+    border-color: #fee;
+    background: linear-gradient(135deg, #fff 0%, #fff5f5 100%);
+}
+
+.settings-item.logout-btn .icon:first-child {
+    color: #e74c3c;
+}
+
+.settings-item.logout-btn span {
+    color: #e74c3c;
+}
+
+.settings-item.logout-btn:active {
+    background: #fee;
+}
+
+.settings-placeholder {
+    text-align: center;
+    padding: 32px 20px;
+    color: #999;
+}
+
+.settings-placeholder .icon {
+    font-size: 48px;
+    color: #ddd;
+    margin-bottom: 12px;
+}
+
+.settings-placeholder p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+    }
+
+    to {
+        transform: translateY(0);
+    }
+}

@@ -1324,3 +1324,31 @@ function toggleFooterSection(button) {
     button.classList.toggle('active');
     content.classList.toggle('active');
 }
+
+// ===========================
+// SETTINGS MODAL FUNCTIONS
+// ===========================
+
+/**
+ * Open Profile Settings Modal
+ */
+function openProfileSettings() {
+    const modal = document.getElementById('settingsModal');
+    if (modal) {
+        modal.classList.add('active');
+        // Lock body scroll
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+/**
+ * Close Profile Settings Modal
+ */
+function closeProfileSettings() {
+    const modal = document.getElementById('settingsModal');
+    if (modal) {
+        modal.classList.remove('active');
+        // Unlock body scroll
+        document.body.style.overflow = '';
+    }
+}
