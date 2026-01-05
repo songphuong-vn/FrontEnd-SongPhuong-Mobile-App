@@ -1016,14 +1016,6 @@ function toggleSpendingVisibility() {
 }
 
 /**
- * Open Profile Settings
- */
-function openProfileSettings() {
-    showNotification('Tính năng Cài đặt đang được phát triển', 'info');
-    // TODO: Navigate to settings page or open settings modal
-}
-
-/**
  * Open Favorites
  */
 function openFavorites() {
