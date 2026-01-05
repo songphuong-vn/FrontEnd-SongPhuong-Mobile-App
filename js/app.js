@@ -1507,3 +1507,48 @@ function initFooter() {
 // Call initFooter when DOM loads
 document.addEventListener('DOMContentLoaded', initFooter);
 
+
+// ===========================
+// NAVIGATION SYSTEM
+// ===========================
+
+function switchNav(viewName) {
+    // Hide all views
+    const views = document.querySelectorAll('.app-view');
+    views.forEach(view => {
+        view.style.display = 'none';
+        view.classList.remove('active');
+    });
+
+    // Hide all nav items active state
+    const navItems = document.querySelectorAll('.bottom-nav .nav-item');
+    navItems.forEach(item => {
+        item.classList.remove('active');
+    });
+
+    // Show selected view
+    const selectedView = document.getElementById(viewName + '-view');
+    if (selectedView) {
+        selectedView.style.display = 'block';
+        // Small delay to allow display:block to apply before adding opacity animation class if needed
+        setTimeout(() => selectedView.classList.add('active'), 10);
+    }
+
+    // Set active nav item
+    // Note: onclick handlers are set inline in HTML
+    const activeNavLink = document.querySelector(.bottom-nav .nav-item[onclick*='']);
+    if (activeNavLink) {
+        activeNavLink.classList.add('active');
+    }
+
+    // Special handling for specific views
+    if (viewName === 'home') {
+        // Ensure home view components are reset if needed
+    }
+}
+
+// Initialize default view (Home)
+document.addEventListener('DOMContentLoaded', () => {
+    switchNav('home');
+});
+
