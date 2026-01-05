@@ -970,7 +970,7 @@
    FOOTER - Optimized & Compact
    ================================ */
 .profile-footer {
-    padding: 16px 0 12px;
+    padding: 12px 0 4px;
     background: #f8f8f8;
     border-top: 3px solid var(--profile-primary);
 }
@@ -979,11 +979,11 @@
 .footer-credits {
     display: flex;
     justify-content: space-between;
-    padding: 8px 12px 0;
+    padding: 6px 12px 4px;
     font-size: 9px;
     color: #888;
     border-top: 1px solid #e5e5e5;
-    margin-top: 8px;
+    margin-top: 6px;
     align-items: center;
 }
 
