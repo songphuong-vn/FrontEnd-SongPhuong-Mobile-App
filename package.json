@@ -1,0 +1,22 @@
+{
+  "name": "khach-hang-mobile-app",
+  "version": "1.0.0",
+  "description": "Ứng dụng mobile quản lý khách hàng với Ionic Framework",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 8000 || php -S localhost:8000",
+    "serve": "npx http-server -p 8000 -c-1",
+    "build": "echo 'Build complete'"
+  },
+  "keywords": [
+    "ionic",
+    "mobile",
+    "customer-management",
+    "app"
+  ],
+  "author": "HMD",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}

@@ -1,0 +1,90 @@
+/* Header Menu System - Fixed to top-right of header */
+.header-menu-container {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 20;
+    display: flex;
+    flex-direction: row;
+    /* Items on left, button on right */
+    align-items: center;
+    gap: 10px;
+}
+
+.header-toggle-btn {
+    width: 44px;
+    height: 44px;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: white;
+    font-size: 24px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+    /* Để z-index hoạt động tốt nếu cần */
+    z-index: 2;
+    order: 2;
+    /* Button appears on the right */
+}
+
+.header-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.05);
+}
+
+.header-toggle-btn.active {
+    background: var(--profile-primary);
+    border-color: var(--profile-primary);
+    transform: rotate(180deg);
+}
+
+.header-menu-items {
+    display: flex;
+    gap: 12px;
+    opacity: 0;
+    /* Roll out from right to left: start hidden to the right */
+    transform: translateX(60px) scale(0.8);
+    pointer-events: none;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    visibility: hidden;
+    position: relative;
+    z-index: 1;
+    order: 1;
+    /* Items appear on the left */
+}
+
+.header-menu-items.active {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    pointer-events: auto;
+    visibility: visible;
+}
+
+.menu-item-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #fff;
+    border: none;
+    color: var(--profile-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+}
+
+.menu-item-btn:hover {
+    transform: translateY(-2px);
+    background: var(--profile-primary);
+    color: white;
+}

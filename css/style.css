@@ -1,0 +1,359 @@
+/* ===========================
+   IONIC MOBILE APP - CUSTOM STYLES
+   =========================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f5f5;
+}
+
+/* Header Styles */
+.bar-header {
+    background-color: #2e308a;
+    color: white;
+    box-shadow: 0 2px 5px rgba(37, 150, 190, 0.3);
+}
+
+.bar-header .title {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+/* Tab Styles */
+.tabs {
+    display: flex;
+    justify-content: space-around;
+    background-color: #ffffff;
+    border-bottom: 1px solid #e0e0e0;
+    position: sticky;
+    top: 0;
+}
+
+.tab-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 5px;
+    color: #999;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.tab-item.active {
+    color: #2e308a;
+    border-bottom: 3px solid #2e308a;
+}
+
+.tab-item:hover {
+    background-color: #f9f9f9;
+}
+
+.tab-item .icon {
+    font-size: 24px;
+    margin-bottom: 5px;
+}
+
+.tab-item .tab-title {
+    font-size: 11px;
+    text-align: center;
+}
+
+/* Tab Content */
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease-in;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Card Styles */
+.card {
+    background-color: white;
+    border-radius: 8px;
+    margin: 10px 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.card .item {
+    border-bottom: 1px solid #f0f0f0;
+    padding: 15px;
+}
+
+.card .item:last-child {
+    border-bottom: none;
+}
+
+/* Badge Styles */
+.badge {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-right: 10px;
+    color: white;
+}
+
+.badge-stable {
+    background-color: #666;
+}
+
+.badge-positive {
+    background-color: #27ae60;
+}
+
+.badge-assertive {
+    background-color: #e74c3c;
+}
+
+/* Item Divider */
+.item-divider {
+    background-color: #f5f5f5;
+    border-bottom: 1px solid #ddd;
+    padding: 15px;
+    font-weight: 600;
+    color: #666;
+    font-size: 13px;
+}
+
+/* List Styles */
+.list {
+    background-color: white;
+    border-top: 1px solid #e0e0e0;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.item {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid #f0f0f0;
+    background-color: white;
+    color: #333;
+}
+
+.item:last-child {
+    border-bottom: none;
+}
+
+.item-avatar {
+    display: flex;
+    align-items: center;
+}
+
+.item-avatar img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 15px;
+    object-fit: cover;
+}
+
+.item h2 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+    color: #333;
+}
+
+.item h3 {
+    font-size: 14px;
+    font-weight: 500;
+    margin: 5px 0 0 0;
+}
+
+.item p {
+    font-size: 12px;
+    color: #999;
+    margin: 3px 0 0 0;
+}
+
+/* Input Styles */
+.item-input {
+    display: flex;
+    align-items: center;
+    padding: 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.input-label {
+    min-width: 100px;
+    padding: 15px;
+    color: #999;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+input,
+select,
+textarea {
+    flex: 1;
+    padding: 15px;
+    border: none;
+    font-size: 14px;
+    outline: none;
+    background-color: white;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    background-color: #f9f9f9;
+}
+
+/* Button Styles */
+.button {
+    display: inline-block;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.button-full {
+    display: block;
+    width: 100%;
+    margin: 10px 0;
+}
+
+.button-positive {
+    background-color: #0099ff;
+    color: white;
+}
+
+.button-positive:active {
+    background-color: #0078cc;
+}
+
+.button-assertive {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.button-assertive:active {
+    background-color: #c0392b;
+}
+
+.button .icon {
+    margin-right: 8px;
+}
+
+/* Toggle Styles */
+.item-toggle {
+    justify-content: space-between;
+    align-items: center;
+}
+
+.item-text {
+    flex: 1;
+}
+
+.toggle {
+    display: inline-flex;
+    width: 50px;
+    height: 30px;
+    border-radius: 15px;
+    background-color: #ccc;
+    cursor: pointer;
+    position: relative;
+    transition: background-color 0.3s ease;
+}
+
+.toggle::before {
+    content: '';
+    position: absolute;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background-color: white;
+    top: 2px;
+    left: 2px;
+    transition: left 0.3s ease;
+}
+
+.toggle-positive {
+    background-color: #27ae60;
+}
+
+.toggle-positive::before {
+    left: 22px;
+}
+
+/* Padding Helper */
+.padding {
+    padding: 15px;
+}
+
+/* Scroll Content */
+.scroll-content {
+    min-height: calc(100vh - 150px);
+}
+
+/* Form Styles */
+.form-customer {
+    width: 100%;
+}
+
+/* Media Query for Tablets */
+@media (min-width: 768px) {
+    .tab-item .tab-title {
+        font-size: 12px;
+    }
+
+    .padding {
+        padding: 25px;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+}
+
+/* Utility Classes */
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.mt-10 {
+    margin-top: 10px;
+}
+
+.mb-10 {
+    margin-bottom: 10px;
+}
+
+.mt-20 {
+    margin-top: 20px;
+}
+
+.mb-20 {
+    margin-bottom: 20px;
+}

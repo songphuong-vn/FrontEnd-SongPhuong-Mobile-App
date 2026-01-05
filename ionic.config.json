@@ -1,0 +1,8 @@
+{
+  "name": "khach-hang-mobile-app",
+  "app_id": "com.example.khachhang",
+  "integrations": {
+    "cordova": {}
+  },
+  "projects": {}
+}

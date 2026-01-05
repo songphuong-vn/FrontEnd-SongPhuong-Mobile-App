@@ -1,0 +1,92 @@
+/* CSS cho phần text chi tiêu mới */
+.user-spending-text {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 13px;
+    font-weight: 500;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.toggle-visibility-btn-inline {
+    background: none;
+    border: none;
+    padding: 2px 5px;
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.7);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+}
+
+.toggle-visibility-btn-inline:hover {
+    color: white;
+    transform: scale(1.1);
+}
+
+.toggle-visibility-btn-inline .icon {
+    font-size: 16px;
+}
+
+/* CSS cho grid trạng thái đơn hàng (Order, Delivering, Reviews, Notification) */
+.order-status-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    /* Thu gọn gap */
+    background: white;
+    padding: 12px 8px;
+    /* Thu gọn padding */
+    border-radius: 24px;
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.12);
+}
+
+/* Tinh chỉnh lại quick-menu-item khi nằm trong status grid - Gọn nhẹ, không hover */
+.order-status-grid .quick-menu-item {
+    background: transparent !important;
+    /* Bỏ hoàn toàn background */
+    padding: 8px 5px !important;
+    /* Thu gọn chiều cao */
+    gap: 4px !important;
+    /* Icon sát với tên hơn */
+    border: none !important;
+    /* Bỏ border */
+    box-shadow: none !important;
+    transition: none !important;
+    cursor: default;
+    /* Bỏ cursor pointer */
+}
+
+.order-status-grid .quick-menu-item span {
+    font-weight: 500 !important;
+    /* Không cần bold */
+    color: var(--profile-text-dark) !important;
+}
+
+/* Bỏ hoàn toàn hover effect cho nút */
+.order-status-grid .quick-menu-item:hover {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+/* Bỏ hover effect cho icon */
+.order-status-grid .quick-menu-item:hover .icon {
+    color: var(--profile-primary) !important;
+    transform: none !important;
+}
+
+/* Bỏ hover effect cho text */
+.order-status-grid .quick-menu-item:hover span {
+    color: var(--profile-text-dark) !important;
+}
+
+/* Bỏ hover effect cho badge */
+.order-status-grid .quick-menu-item:hover .notification-badge {
+    border-color: white !important;
+}
