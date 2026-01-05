@@ -1003,14 +1003,36 @@
         </div>
 
 
-        <!-- Settings Modal - Compact -->
+        <!-- Settings Modal -->
         <div class="settings-modal" id="settingsModal">
             <div class="settings-overlay" onclick="closeProfileSettings()"></div>
             <div class="settings-content">
-                <button class="settings-item logout-btn" onclick="logout()">
-                    <i class="icon ion-log-out"></i>
-                    <span>Đăng xuất</span>
-                </button>
+                <div class="settings-header">
+                    <h3>Cài đặt</h3>
+                </div>
+                <div class="settings-body">
+                    <button class="settings-item" onclick="showNotification('Chức năng đang phát triển', 'info')">
+                        <i class="icon ion-ios-gear"></i>
+                        <span>Nút chức năng 1</span>
+                    </button>
+                    <button class="settings-item" onclick="showNotification('Chức năng đang phát triển', 'info')">
+                        <i class="icon ion-ios-gear"></i>
+                        <span>Nút chức năng 2</span>
+                    </button>
+                    <button class="settings-item" onclick="showNotification('Chức năng đang phát triển', 'info')">
+                        <i class="icon ion-ios-gear"></i>
+                        <span>Nút chức năng 3</span>
+                    </button>
+                    <button class="settings-item" onclick="showNotification('Chức năng đang phát triển', 'info')">
+                        <i class="icon ion-ios-gear"></i>
+                        <span>Nút chức năng 4</span>
+                    </button>
+                    <div class="settings-divider"></div>
+                    <button class="settings-item logout-btn" onclick="logout()">
+                        <i class="icon ion-log-out"></i>
+                        <span>Đăng xuất</span>
+                    </button>
+                </div>
             </div>
         </div>
 
