@@ -1344,3 +1344,166 @@ function closeProfileSettings() {
         document.body.style.overflow = '';
     }
 }
+
+// ===========================
+// DYNAMIC FOOTER INJECTION
+// ===========================
+
+const footerHTML = `r
+<div class='profile-footer'>
+    <!-- Collapsible Contact Sections -->
+    <div class='footer-sections'>
+        <!-- Chi nhánh Ðà L?t -->
+        <div class='footer-section'>
+            <button class='footer-section-header' onclick='toggleFooterSection(this)'>
+                <span>SONG PHUONG - ÐÀ L?T</span>
+                <i class='icon ion-chevron-down'></i>
+            </button>
+            <div class='footer-section-content'>
+                <p><i class='icon ion-ios-location'></i> 472-473 Phù Ð?ng Thiên Vuong, P. Lâm Viên, Ðà L?t, Lâm Ð?ng</p>
+                <p><i class='icon ion-ios-telephone'></i> Tel: 0263 999979 - 0849 585810</p>
+                <p><i class='icon ion-ios-email'></i> Email: kinhoanh@songphuong.vn</p>
+                <p><i class='icon ion-ios-clock'></i> 08h00 - 18h30 Th? 2 d?n CN</p>
+            </div>
+        </div>
+        <!-- Chi nhánh HCM -->
+        <div class='footer-section'>
+            <button class='footer-section-header' onclick='toggleFooterSection(this)'>
+                <span>SONG PHUONG - HCM</span>
+                <i class='icon ion-chevron-down'></i>
+            </button>
+            <div class='footer-section-content'>
+                <p><i class='icon ion-ios-location'></i> 694 Ð?ng B?c, Phu?ng Trung M? Tây, TP HCM</p>
+                <p><i class='icon ion-ios-telephone'></i> Tel: 0934 111369 - 0849 585810</p>
+                <p><i class='icon ion-ios-email'></i> Email: kinhoanh@songphuong.vn</p>
+                <p><i class='icon ion-ios-clock'></i> 08h00 - 20h30 Th? 2 d?n CN</p>
+            </div>
+        </div>
+        <!-- Chi nhánh Nha Trang -->
+        <div class='footer-section'>
+            <button class='footer-section-header' onclick='toggleFooterSection(this)'>
+                <span>SONG PHUONG - NHA TRANG</span>
+                <i class='icon ion-chevron-down'></i>
+            </button>
+            <div class='footer-section-content'>
+                <p><i class='icon ion-ios-location'></i> 01 Hoa Lu, Phu?ng Nha Trang, Khánh Hòa</p>
+                <p><i class='icon ion-ios-telephone'></i> Tel: 0905 616999 - 0849 585810</p>
+                <p><i class='icon ion-ios-email'></i> Email: kinhoanh@songphuong.vn</p>
+                <p><i class='icon ion-ios-clock'></i> 08h00 - 18h30 Th? 2 d?n CN</p>
+            </div>
+        </div>
+        <!-- Chi nhánh C?n Tho -->
+        <div class='footer-section'>
+            <button class='footer-section-header' onclick='toggleFooterSection(this)'>
+                <span>TTBH SONG PHUONG - C?N THO</span>
+                <i class='icon ion-chevron-down'></i>
+            </button>
+            <div class='footer-section-content'>
+                <p><i class='icon ion-ios-location'></i> 30 Nguy?n Van Linh, P. Hung L?i, Ninh Ki?u, C?n Tho</p>
+                <p><i class='icon ion-ios-telephone'></i> Tel: 0799 919 911</p>
+                <p><i class='icon ion-ios-email'></i> Email: baohanhct@songphuong.vn</p>
+                <p><i class='icon ion-ios-clock'></i> 08h00 - 18h30 Th? 2 d?n CN</p>
+            </div>
+        </div>
+        <!-- Chi nhánh Ðà N?ng -->
+        <div class='footer-section'>
+            <button class='footer-section-header' onclick='toggleFooterSection(this)'>
+                <span>TTBH SONG PHUONG - ÐÀ N?NG</span>
+                <i class='icon ion-chevron-down'></i>
+            </button>
+            <div class='footer-section-content'>
+                <p><i class='icon ion-ios-location'></i> 40A Hàm Nghi, Q. Thanh Khê, TP Ðà N?ng</p>
+                <p><i class='icon ion-ios-telephone'></i> Tel: 0236 3835566</p>
+                <p><i class='icon ion-ios-email'></i> Email: baohanhdn@songphuong.vn</p>
+                <p><i class='icon ion-ios-clock'></i> 08h00 - 18h30 Th? 2 d?n CN</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Policy Icons Row -->
+    <div class='footer-policies'>
+        <div class='policy-item'>
+            <div class='policy-icon'><i class='icon ion-ios-box'></i></div>
+            <div class='policy-label'>CHÍNH SÁCH GIAO HÀNG</div>
+        </div>
+        <div class='policy-item'>
+            <div class='policy-icon'><i class='icon ion-loop'></i></div>
+            <div class='policy-label'>Ð?I TR? D? DÀNG</div>
+        </div>
+        <div class='policy-item'>
+            <div class='policy-icon'><i class='icon ion-card'></i></div>
+            <div class='policy-label'>THANH TOÁN TI?N L?I</div>
+        </div>
+        <div class='policy-item'>
+            <div class='policy-icon'><i class='icon ion-chatbubbles'></i></div>
+            <div class='policy-label'>H? TR? NHI?T TÌNH</div>
+        </div>
+    </div>
+
+    <!-- Continue with Policy Sections -->
+    <div class='footer-sections'>
+        <!-- Chính sách chung -->
+        <div class='footer-section'>
+            <button class='footer-section-header' onclick='toggleFooterSection(this)'>
+                <span>CHÍNH SÁCH CHUNG</span>
+                <i class='icon ion-chevron-down'></i>
+            </button>
+            <div class='footer-section-content'>
+                <p>Chính sách Giao hàng toàn qu?c</p>
+                <p>Chính sách Ð?i tr? d? dàng</p>
+                <p>Chính sách Thanh toán ti?n l?i</p>
+                <p>Chính sách B?o hành</p>
+                <p>Chính sách B?o m?t thông tin</p>
+            </div>
+        </div>
+        <!-- H? tr? khách hàng -->
+        <div class='footer-section'>
+            <button class='footer-section-header' onclick='toggleFooterSection(this)'>
+                <span>H? TR? KHÁCH HÀNG</span>
+                <i class='icon ion-chevron-down'></i>
+            </button>
+            <div class='footer-section-content'>
+                <p>Hu?ng d?n mua hàng</p>
+                <p>Hu?ng d?n Tr? góp</p>
+                <p>Thanh toán - Giao hàng</p>
+                <p>Tra c?u B?o hành</p>
+                <p>In hóa don di?n t?</p>
+                <p>Góp ý, Khi?u n?i</p>
+            </div>
+        </div>
+        <!-- T?ng dài h? tr? -->
+        <div class='footer-section'>
+            <button class='footer-section-header' onclick='toggleFooterSection(this)'>
+                <span>T?NG ÐÀI H? TR?</span>
+                <i class='icon ion-chevron-down'></i>
+            </button>
+            <div class='footer-section-content'>
+                <p><strong>Hotline:</strong> 0263999979</p>
+                <p><strong>Kinh doanh:</strong> 0849 585810</p>
+                <p><strong>B?o hành:</strong> 02633 604444</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Credits -->
+    <div class='footer-credits'>
+        <div class='credit-left'>
+            © Song Phuong | Máy tính, Laptop, Linh ki?n Chính hãng
+        </div>
+        <div class='credit-right'>
+            Cung c?p b?i: <strong>Hoàng Minh Duong</strong>
+        </div>
+    </div>
+</div>\;
+
+function initFooter() {
+    const targets = ['build-pc-footer-placeholder', 'warranty-footer-placeholder'];
+    targets.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = footerHTML;
+    });
+}
+
+// Call initFooter when DOM loads
+document.addEventListener('DOMContentLoaded', initFooter);
+

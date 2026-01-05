@@ -50,16 +50,18 @@
 /* Header */
 .settings-header {
     text-align: center;
-    margin-bottom: 12px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid #eee;
+    margin: -16px -16px 12px -16px;
+    /* Kéo header ra sát viền */
+    padding: 16px;
+    background: linear-gradient(135deg, var(--profile-primary) 0%, #4a4eb7 100%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .settings-header h3 {
     margin: 0;
     font-size: 16px;
     font-weight: 800;
-    color: #333;
+    color: white;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
