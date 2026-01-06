@@ -1,6 +1,13 @@
 /* ================================
-   FOOTER - Reusable Component
-   ================================ */
+    FOOTER - Reusable Component
+    ================================ */
+
+/* Ensure footer uses app font even on standalone pages */
+.profile-footer,
+.profile-footer * {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
 .profile-footer {
     padding: 12px 0 4px;
     background: #f8f8f8;

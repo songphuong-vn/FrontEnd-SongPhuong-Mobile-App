@@ -477,6 +477,63 @@
                     <div id="warranty-footer-placeholder"></div>
                 </div>
 
+                <!-- Đơn hàng View -->
+                <div id="orders-view" class="app-view">
+                    <div class="section-header-row">
+                        <div>
+                            <p class="section-kicker">Quản lý mua hàng</p>
+                            <h2 class="section-title">Đơn hàng</h2>
+                        </div>
+                        <button class="ghost-button" onclick="openCart()">
+                            <i class="icon ion-ios-cart"></i> Giỏ hàng
+                        </button>
+                    </div>
+                    <div id="orders-list" class="order-card-list"></div>
+                    <div id="orders-empty" class="empty-state" style="display:none;">
+                        <i class="icon ion-ios-box-outline"></i>
+                        <h3>Chưa có đơn hàng</h3>
+                        <p>Bắt đầu mua sắm để thấy đơn hàng của bạn ở đây.</p>
+                    </div>
+                </div>
+
+                <!-- Đang giao View -->
+                <div id="deliveries-view" class="app-view">
+                    <div class="section-header-row">
+                        <div>
+                            <p class="section-kicker">Theo dõi vận chuyển</p>
+                            <h2 class="section-title">Đang giao</h2>
+                        </div>
+                        <button class="ghost-button" onclick="openOrders()">
+                            <i class="icon ion-ios-list-outline"></i> Đơn hàng
+                        </button>
+                    </div>
+                    <div id="deliveries-list" class="delivery-card-list"></div>
+                    <div id="deliveries-empty" class="empty-state" style="display:none;">
+                        <i class="icon ion-android-car"></i>
+                        <h3>Chưa có đơn đang giao</h3>
+                        <p>Kiểm tra lại sau khi đơn hàng được tiếp nhận giao.</p>
+                    </div>
+                </div>
+
+                <!-- Đánh giá View -->
+                <div id="reviews-view" class="app-view">
+                    <div class="section-header-row">
+                        <div>
+                            <p class="section-kicker">Phản hồi sản phẩm</p>
+                            <h2 class="section-title">Đánh giá</h2>
+                        </div>
+                        <button class="ghost-button" onclick="openOrders()">
+                            <i class="icon ion-ios-box"></i> Đơn hàng
+                        </button>
+                    </div>
+                    <div id="reviews-list" class="review-card-list"></div>
+                    <div id="reviews-empty" class="empty-state" style="display:none;">
+                        <i class="icon ion-android-star-outline"></i>
+                        <h3>Không có đánh giá chờ xử lý</h3>
+                        <p>Bạn đã đánh giá hết các sản phẩm gần đây.</p>
+                    </div>
+                </div>
+
                 <!-- Notifications View -->
                 <div id="notifications-view" class="app-view">
                     <div class="notifications-container">
@@ -677,8 +734,7 @@
                             <div class="avatar-container">
                                 <div class="avatar-wrapper">
                                     <div class="avatar-glow"></div>
-                                    <img src="https://ui-avatars.com/api/?name=Nguyen+Van+A&background=2e308a&color=fff&size=140"
-                                        alt="Avatar" class="user-avatar" id="userAvatar">
+                                    <img src="icons/user-default.svg" alt="Avatar" class="user-avatar" id="userAvatar">
                                     <label for="avatarInput" class="avatar-edit-btn">
                                         <i class="icon ion-camera"></i>
                                     </label>
@@ -719,24 +775,24 @@
 
                         <div class="profile-dashboard mt-negative">
                             <div class="order-status-grid">
-                                <div class="quick-menu-item">
+                                <div class="quick-menu-item" onclick="openOrders()">
                                     <div class="quick-menu-icon-wrapper">
                                         <i class="icon ion-ios-box"></i>
-                                        <span class="notification-badge">12</span>
+                                        <span class="notification-badge" id="ordersBadge">12</span>
                                     </div>
                                     <span>Đơn hàng</span>
                                 </div>
-                                <div class="quick-menu-item">
+                                <div class="quick-menu-item" onclick="openDeliveries()">
                                     <div class="quick-menu-icon-wrapper">
                                         <i class="icon ion-android-car"></i>
-                                        <span class="notification-badge">2</span>
+                                        <span class="notification-badge" id="deliveriesBadge">2</span>
                                     </div>
                                     <span>Đang giao</span>
                                 </div>
-                                <div class="quick-menu-item">
+                                <div class="quick-menu-item" onclick="openReviews()">
                                     <div class="quick-menu-icon-wrapper">
                                         <i class="icon ion-android-star"></i>
-                                        <span class="notification-badge">5</span>
+                                        <span class="notification-badge" id="reviewsBadge">5</span>
                                     </div>
                                     <span>Đánh giá</span>
                                 </div>
@@ -8013,6 +8069,41 @@
             </div><!-- modal-content -->
         </div><!-- modal-dialog -->
     </div><!-- modal -->
+
+    <!-- Cart Overlay -->
+    <div id="cart-overlay" class="cart-overlay">
+        <div class="cart-backdrop" onclick="closeCart()"></div>
+        <div class="cart-panel">
+            <div class="cart-panel__header">
+                <div>
+                    <p class="section-kicker">Giỏ hàng</p>
+                    <h3>Danh sách sản phẩm</h3>
+                </div>
+                <button class="ghost-button" onclick="closeCart()"><i class="icon ion-close"></i></button>
+            </div>
+            <div id="cart-items" class="cart-items"></div>
+            <div id="cart-empty" class="empty-state" style="display:none;">
+                <i class="icon ion-ios-cart-outline"></i>
+                <h3>Giỏ hàng trống</h3>
+                <p>Thêm sản phẩm để bắt đầu thanh toán.</p>
+            </div>
+            <div class="cart-summary">
+                <div class="cart-summary-row">
+                    <span>Tạm tính</span>
+                    <strong id="cart-subtotal">0đ</strong>
+                </div>
+                <div class="cart-summary-row">
+                    <span>Phí vận chuyển (ước tính)</span>
+                    <strong id="cart-shipping">0đ</strong>
+                </div>
+                <div class="cart-summary-row total">
+                    <span>Tổng cộng</span>
+                    <strong id="cart-total">0đ</strong>
+                </div>
+                <button class="primary-button full" onclick="showNotification('Thanh toán demo', 'info')">Thanh toán</button>
+            </div>
+        </div>
+    </div>
     <!-- BuildPC Scripts -->
     <script src="js/jquery.min.js"></script>
     <script src="js/bootstrap.bundle.min.js"></script>

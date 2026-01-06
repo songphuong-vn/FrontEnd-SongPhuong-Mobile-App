@@ -179,11 +179,89 @@ function showNotification(message, type = 'info') {
 /**
  * Thêm vào giỏ hàng
  */
-function addToCart(productName, price) {
-    const badge = document.querySelector('.cart-badge');
-    let cartCount = parseInt(badge.textContent) || 0;
-    badge.textContent = cartCount + 1;
+const mockOrders = [
+    {
+        id: 'SP-20250101',
+        date: '05/01/2026',
+        total: 12500000,
+        status: 'Hoàn thành',
+        items: ['CPU Intel Core i7-14700K', 'Mainboard Z790 AORUS Elite'],
+        steps: ['Đã tiếp nhận', 'Đang giao', 'Đã giao'],
+    },
+    {
+        id: 'SP-20250112',
+        date: '06/01/2026',
+        total: 3290000,
+        status: 'Đang giao',
+        items: ['SSD Samsung 990 Pro 2TB'],
+        steps: ['Đã tiếp nhận', 'Đang giao', 'Đang giao cuối'],
+    },
+    {
+        id: 'SP-20250130',
+        date: '02/01/2026',
+        total: 2450000,
+        status: 'Chờ xử lý',
+        items: ['Chuột Logitech G Pro X'],
+        steps: ['Đã tiếp nhận'],
+    },
+];
 
+const mockReviews = [
+    {
+        id: 'RV-01',
+        product: 'RAM Adata XPG D35G 16GB DDR5 5600MHz',
+        hint: 'Chia sẻ hiệu năng và LED RGB',
+    },
+    {
+        id: 'RV-02',
+        product: 'SSD Samsung 990 Pro 2TB NVMe Gen4',
+        hint: 'Tốc độ thực tế và nhiệt độ hoạt động',
+    },
+];
+
+let cartItems = [
+    {
+        id: 'CART-01',
+        name: 'RAM Adata XPG D35G 16GB DDR5 5600MHz RGB',
+        price: 1250000,
+        qty: 1,
+        image: 'https://product.hstatic.net/200000722513/product/ram-adata-xpg-d35g-16gb-ddr5-5600mhz-rgb_1_e81a2113b38e4ef99e13c84a0c95ed72_grande.png',
+    },
+    {
+        id: 'CART-02',
+        name: 'SSD Samsung 990 Pro 2TB NVMe Gen4',
+        price: 3290000,
+        qty: 1,
+        image: 'https://product.hstatic.net/200000722513/product/ssd-samsung-990-pro-2tb-nvme-gen4_1_f7a55fd6fd584d4f8d5a8d40e93e28e8_grande.png',
+    },
+];
+
+function formatCurrency(amount) {
+    return `${(amount || 0).toLocaleString('vi-VN')}đ`;
+}
+
+function setBadgeValue(selector, value) {
+    const el = document.querySelector(selector);
+    if (el) el.textContent = value;
+}
+
+function addToCart(productName, price = 0) {
+    // Nếu đã có item tương tự, tăng số lượng; nếu không, thêm mới tối giản
+    const existing = cartItems.find(item => item.name === productName);
+    if (existing) {
+        existing.qty += 1;
+    } else {
+        cartItems.push({
+            id: `CART-${Date.now()}`,
+            name: productName,
+            price: price || 1000000,
+            qty: 1,
+            image: 'https://product.hstatic.net/200000722513/product/default_cart_image_grande.png',
+        });
+    }
+
+    updateCartBadge();
+    renderCart();
     showNotification(`${productName} đã được thêm vào giỏ hàng!`, 'success');
 }
 
@@ -198,7 +276,7 @@ function initApp() {
     const cartBtn = document.querySelector('.cart-btn');
     if (cartBtn) {
         cartBtn.addEventListener('click', () => {
-            showNotification('Giỏ hàng đang được phát triển', 'info');
+            openCart();
         });
     }
 
@@ -239,6 +317,210 @@ function initApp() {
     // Khởi tạo Slider Banner
     initBannerSlider();
 }
+
+// RENDER UI SECTIONS
+// ===========================
+function renderOrders() {
+    const list = document.getElementById('orders-list');
+    const empty = document.getElementById('orders-empty');
+    if (!list || !empty) return;
+
+    list.innerHTML = '';
+    if (!mockOrders.length) {
+        empty.style.display = 'block';
+        return;
+    }
+    empty.style.display = 'none';
+
+    const statusMap = {
+        'Hoàn thành': 'status-success',
+        'Đang giao': 'status-info',
+        'Chờ xử lý': 'status-warning',
+    };
+
+    mockOrders.forEach(order => {
+        const card = document.createElement('div');
+        card.className = 'order-card';
+        card.innerHTML = `
+            <div class="order-card__header">
+                <div class="order-meta">
+                    <strong>${order.id}</strong>
+                    <span>${order.date}</span>
+                </div>
+                <span class="status-badge ${statusMap[order.status] || 'status-muted'}">${order.status}</span>
+            </div>
+            <div class="order-items">${order.items.map(item => `<div>${item}</div>`).join('')}</div>
+            <div class="order-total">
+                <span>Tổng</span>
+                <span>${formatCurrency(order.total)}</span>
+            </div>
+            <div class="order-actions">
+                <button class="outline-button" onclick="openDeliveries()">Theo dõi</button>
+                <button class="primary-button" onclick="showNotification('Chi tiết đơn hàng demo', 'info')">Xem chi tiết</button>
+            </div>
+        `;
+        list.appendChild(card);
+    });
+}
+
+function renderDeliveries() {
+    const list = document.getElementById('deliveries-list');
+    const empty = document.getElementById('deliveries-empty');
+    if (!list || !empty) return;
+    list.innerHTML = '';
+    const delivering = mockOrders.filter(o => o.status === 'Đang giao');
+    if (!delivering.length) {
+        empty.style.display = 'block';
+        return;
+    }
+    empty.style.display = 'none';
+
+    delivering.forEach(order => {
+        const card = document.createElement('div');
+        card.className = 'delivery-card';
+        const steps = order.steps || [];
+        const activeIndex = steps.length - 1;
+        card.innerHTML = `
+            <div class="delivery-card__header">
+                <div class="delivery-meta">
+                    <strong>${order.id}</strong>
+                    <span>${order.date}</span>
+                </div>
+                <span class="status-badge status-info">Đang giao</span>
+            </div>
+            <div class="delivery-steps">
+                ${steps.map((step, idx) => `<div class="delivery-step ${idx === activeIndex ? 'active' : ''}">${step}</div>`).join('')}
+            </div>
+            <div class="order-total" style="margin-top:12px;">
+                <span>Tổng</span>
+                <span>${formatCurrency(order.total)}</span>
+            </div>
+        `;
+        list.appendChild(card);
+    });
+}
+
+function renderReviews() {
+    const list = document.getElementById('reviews-list');
+    const empty = document.getElementById('reviews-empty');
+    if (!list || !empty) return;
+    list.innerHTML = '';
+
+    if (!mockReviews.length) {
+        empty.style.display = 'block';
+        return;
+    }
+    empty.style.display = 'none';
+
+    mockReviews.forEach(review => {
+        const card = document.createElement('div');
+        card.className = 'review-card';
+        card.innerHTML = `
+            <div class="review-card__header">
+                <div class="delivery-meta">
+                    <strong>${review.product}</strong>
+                    <span>${review.hint}</span>
+                </div>
+                <span class="status-badge status-muted">Chờ đánh giá</span>
+            </div>
+            <div class="review-body">
+                <div class="star-row">
+                    <i class="icon ion-ios-star-outline"></i>
+                    <i class="icon ion-ios-star-outline"></i>
+                    <i class="icon ion-ios-star-outline"></i>
+                    <i class="icon ion-ios-star-outline"></i>
+                    <i class="icon ion-ios-star-outline"></i>
+                </div>
+                <textarea class="review-textarea" placeholder="Chia sẻ cảm nhận của bạn..."></textarea>
+                <div class="review-actions">
+                    <button class="outline-button" onclick="showNotification('Bỏ qua tạm thời', 'info')">Để sau</button>
+                    <button class="primary-button" onclick="showNotification('Gửi đánh giá demo', 'success')">Gửi đánh giá</button>
+                </div>
+            </div>
+        `;
+        list.appendChild(card);
+    });
+}
+
+function syncActionBadges() {
+    setBadgeValue('#ordersBadge', mockOrders.length);
+    const delivering = mockOrders.filter(o => o.status === 'Đang giao').length;
+    setBadgeValue('#deliveriesBadge', delivering);
+    setBadgeValue('#reviewsBadge', mockReviews.length);
+}
+
+// CART UI
+// ===========================
+function updateCartBadge() {
+    const badge = document.querySelector('.cart-badge');
+    if (!badge) return;
+    const totalQty = cartItems.reduce((sum, item) => sum + item.qty, 0);
+    badge.textContent = totalQty;
+}
+
+function renderCart() {
+    const list = document.getElementById('cart-items');
+    const empty = document.getElementById('cart-empty');
+    const subtotalEl = document.getElementById('cart-subtotal');
+    const shippingEl = document.getElementById('cart-shipping');
+    const totalEl = document.getElementById('cart-total');
+    if (!list || !empty || !subtotalEl || !shippingEl || !totalEl) return;
+
+    list.innerHTML = '';
+    if (!cartItems.length) {
+        empty.style.display = 'block';
+    } else {
+        empty.style.display = 'none';
+        cartItems.forEach(item => {
+            const row = document.createElement('div');
+            row.className = 'cart-item';
+            row.innerHTML = `
+                <img src="${item.image}" alt="${item.name}">
+                <div class="cart-item__info">
+                    <div class="cart-item__name">${item.name}</div>
+                    <div class="cart-item__price">${formatCurrency(item.price)}</div>
+                </div>
+                <div class="qty-controls">
+                    <button class="qty-button" onclick="changeCartQty('${item.id}', -1)">-</button>
+                    <span>${item.qty}</span>
+                    <button class="qty-button" onclick="changeCartQty('${item.id}', 1)">+</button>
+                </div>
+            `;
+            list.appendChild(row);
+        });
+    }
+
+    const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.qty, 0);
+    const shipping = cartItems.length ? 30000 : 0;
+    const total = subtotal + shipping;
+    subtotalEl.textContent = formatCurrency(subtotal);
+    shippingEl.textContent = formatCurrency(shipping);
+    totalEl.textContent = formatCurrency(total);
+}
+
+function changeCartQty(id, delta) {
+    cartItems = cartItems.map(item => item.id === id ? { ...item, qty: Math.max(0, item.qty + delta) } : item)
+        .filter(item => item.qty > 0);
+    updateCartBadge();
+    renderCart();
+}
+
+function openCart() {
+    renderCart();
+    updateCartBadge();
+    const overlay = document.getElementById('cart-overlay');
+    if (overlay) overlay.classList.add('active');
+}
+
+function closeCart() {
+    const overlay = document.getElementById('cart-overlay');
+    if (overlay) overlay.classList.remove('active');
+}
+
+// QUICK NAV HELPERS
+function openOrders() { switchNav('orders'); }
+function openDeliveries() { switchNav('deliveries'); }
+function openReviews() { switchNav('reviews'); }
 
 /**
  * Logic tự động chèn poster vào danh sách sản phẩm
@@ -730,6 +1012,16 @@ if (document.readyState === 'loading') {
 document.addEventListener('DOMContentLoaded', function () {
     loadSavedAvatar();
     loadSavedContactInfo();
+});
+
+// Khởi tạo UI mock cho Đơn hàng/Đang giao/Đánh giá và giỏ hàng
+document.addEventListener('DOMContentLoaded', function () {
+    renderOrders();
+    renderDeliveries();
+    renderReviews();
+    updateCartBadge();
+    renderCart();
+    syncActionBadges();
 });
 
 // Hiệu ứng động
@@ -1307,66 +1599,66 @@ const footerHTML = `
         <!-- Chi nhánh Đà Lạt -->
         <div class='footer-section'>
             <button class='footer-section-header' onclick='toggleFooterSection(this)'>
-                <span>SONG PHUONG - �� L?T</span>
+                <span>SONG PHUONG - ĐÀ LẠT</span>
                 <i class='icon ion-chevron-down'></i>
             </button>
             <div class='footer-section-content'>
-                <p><i class='icon ion-ios-location'></i> 472-473 Ph� �?ng Thi�n Vuong, P. L�m Vi�n, �� L?t, L�m �?ng</p>
+                <p><i class='icon ion-ios-location'></i> 472-473 Phù Đổng Thiên Vương, P. Lâm Viên, Đà Lạt, Lâm Đồng</p>
                 <p><i class='icon ion-ios-telephone'></i> Tel: 0263 999979 - 0849 585810</p>
                 <p><i class='icon ion-ios-email'></i> Email: kinhoanh@songphuong.vn</p>
-                <p><i class='icon ion-ios-clock'></i> 08h00 - 18h30 Th? 2 d?n CN</p>
+                <p><i class='icon ion-ios-clock'></i> 08h00 - 18h30 Thứ 2 đến CN</p>
             </div>
         </div>
-        <!-- Chi nh�nh HCM -->
+        <!-- Chi nhánh HCM -->
         <div class='footer-section'>
             <button class='footer-section-header' onclick='toggleFooterSection(this)'>
                 <span>SONG PHUONG - HCM</span>
                 <i class='icon ion-chevron-down'></i>
             </button>
             <div class='footer-section-content'>
-                <p><i class='icon ion-ios-location'></i> 694 �?ng B?c, Phu?ng Trung M? T�y, TP HCM</p>
+                <p><i class='icon ion-ios-location'></i> 694 Đặng Bệ, Phường Trung Mỹ Tây, TP HCM</p>
                 <p><i class='icon ion-ios-telephone'></i> Tel: 0934 111369 - 0849 585810</p>
                 <p><i class='icon ion-ios-email'></i> Email: kinhoanh@songphuong.vn</p>
-                <p><i class='icon ion-ios-clock'></i> 08h00 - 20h30 Th? 2 d?n CN</p>
+                <p><i class='icon ion-ios-clock'></i> 08h00 - 20h30 Thứ 2 đến CN</p>
             </div>
         </div>
-        <!-- Chi nh�nh Nha Trang -->
+        <!-- Chi nhánh Nha Trang -->
         <div class='footer-section'>
             <button class='footer-section-header' onclick='toggleFooterSection(this)'>
                 <span>SONG PHUONG - NHA TRANG</span>
                 <i class='icon ion-chevron-down'></i>
             </button>
             <div class='footer-section-content'>
-                <p><i class='icon ion-ios-location'></i> 01 Hoa Lu, Phu?ng Nha Trang, Kh�nh H�a</p>
+                <p><i class='icon ion-ios-location'></i> 01 Hòa Lư, Phường Nha Trang, Khánh Hòa</p>
                 <p><i class='icon ion-ios-telephone'></i> Tel: 0905 616999 - 0849 585810</p>
                 <p><i class='icon ion-ios-email'></i> Email: kinhoanh@songphuong.vn</p>
-                <p><i class='icon ion-ios-clock'></i> 08h00 - 18h30 Th? 2 d?n CN</p>
+                <p><i class='icon ion-ios-clock'></i> 08h00 - 18h30 Thứ 2 đến CN</p>
             </div>
         </div>
-        <!-- Chi nh�nh C?n Tho -->
+        <!-- Chi nhánh Cần Thơ -->
         <div class='footer-section'>
             <button class='footer-section-header' onclick='toggleFooterSection(this)'>
-                <span>TTBH SONG PHUONG - C?N THO</span>
+                <span>TTBH SONG PHUONG - CẦN THƠ</span>
                 <i class='icon ion-chevron-down'></i>
             </button>
             <div class='footer-section-content'>
-                <p><i class='icon ion-ios-location'></i> 30 Nguy?n Van Linh, P. Hung L?i, Ninh Ki?u, C?n Tho</p>
+                <p><i class='icon ion-ios-location'></i> 30 Nguyễn Văn Linh, P. Hưng Lợi, Ninh Kiều, Cần Thơ</p>
                 <p><i class='icon ion-ios-telephone'></i> Tel: 0799 919 911</p>
                 <p><i class='icon ion-ios-email'></i> Email: baohanhct@songphuong.vn</p>
-                <p><i class='icon ion-ios-clock'></i> 08h00 - 18h30 Th? 2 d?n CN</p>
+                <p><i class='icon ion-ios-clock'></i> 08h00 - 18h30 Thứ 2 đến CN</p>
             </div>
         </div>
-        <!-- Chi nh�nh �� N?ng -->
+        <!-- Chi nhánh Đà Nẵng -->
         <div class='footer-section'>
             <button class='footer-section-header' onclick='toggleFooterSection(this)'>
-                <span>TTBH SONG PHUONG - �� N?NG</span>
+                <span>TTBH SONG PHUONG - ĐÀ NẴNG</span>
                 <i class='icon ion-chevron-down'></i>
             </button>
             <div class='footer-section-content'>
-                <p><i class='icon ion-ios-location'></i> 40A H�m Nghi, Q. Thanh Kh�, TP �� N?ng</p>
+                <p><i class='icon ion-ios-location'></i> 40A Hàm Nghi, Q. Thanh Khê, TP Đà Nẵng</p>
                 <p><i class='icon ion-ios-telephone'></i> Tel: 0236 3835566</p>
                 <p><i class='icon ion-ios-email'></i> Email: baohanhdn@songphuong.vn</p>
-                <p><i class='icon ion-ios-clock'></i> 08h00 - 18h30 Th? 2 d?n CN</p>
+                <p><i class='icon ion-ios-clock'></i> 08h00 - 18h30 Thứ 2 đến CN</p>
             </div>
         </div>
     </div>
@@ -1375,63 +1667,63 @@ const footerHTML = `
     <div class='footer-policies'>
         <div class='policy-item'>
             <div class='policy-icon'><i class='icon ion-ios-box'></i></div>
-            <div class='policy-label'>CH�NH S�CH GIAO H�NG</div>
+            <div class='policy-label'>CHÍNH SÁCH GIAO HÀNG</div>
         </div>
         <div class='policy-item'>
             <div class='policy-icon'><i class='icon ion-loop'></i></div>
-            <div class='policy-label'>�?I TR? D? D�NG</div>
+            <div class='policy-label'>ĐỔI TRẢ DỄ DÀNG</div>
         </div>
         <div class='policy-item'>
             <div class='policy-icon'><i class='icon ion-card'></i></div>
-            <div class='policy-label'>THANH TO�N TI?N L?I</div>
+            <div class='policy-label'>THANH TOÁN TIỆN LỢI</div>
         </div>
         <div class='policy-item'>
             <div class='policy-icon'><i class='icon ion-chatbubbles'></i></div>
-            <div class='policy-label'>H? TR? NHI?T T�NH</div>
+            <div class='policy-label'>HỖ TRỢ NHIỆT TÌNH</div>
         </div>
     </div>
 
     <!-- Continue with Policy Sections -->
     <div class='footer-sections'>
-        <!-- Ch�nh s�ch chung -->
+        <!-- Chính sách chung -->
         <div class='footer-section'>
             <button class='footer-section-header' onclick='toggleFooterSection(this)'>
-                <span>CH�NH S�CH CHUNG</span>
+                <span>CHÍNH SÁCH CHUNG</span>
                 <i class='icon ion-chevron-down'></i>
             </button>
             <div class='footer-section-content'>
-                <p>Ch�nh s�ch Giao h�ng to�n qu?c</p>
-                <p>Ch�nh s�ch �?i tr? d? d�ng</p>
-                <p>Ch�nh s�ch Thanh to�n ti?n l?i</p>
-                <p>Ch�nh s�ch B?o h�nh</p>
-                <p>Ch�nh s�ch B?o m?t th�ng tin</p>
+                <p>Chính sách Giao hàng toàn quốc</p>
+                <p>Chính sách Đổi trả dễ dàng</p>
+                <p>Chính sách Thanh toán tiện lợi</p>
+                <p>Chính sách Bảo hành</p>
+                <p>Chính sách Bảo mật thông tin</p>
             </div>
         </div>
-        <!-- H? tr? kh�ch h�ng -->
+        <!-- Hỗ trợ khách hàng -->
         <div class='footer-section'>
             <button class='footer-section-header' onclick='toggleFooterSection(this)'>
-                <span>H? TR? KH�CH H�NG</span>
+                <span>HỖ TRỢ KHÁCH HÀNG</span>
                 <i class='icon ion-chevron-down'></i>
             </button>
             <div class='footer-section-content'>
-                <p>Hu?ng d?n mua h�ng</p>
-                <p>Hu?ng d?n Tr? g�p</p>
-                <p>Thanh to�n - Giao h�ng</p>
-                <p>Tra c?u B?o h�nh</p>
-                <p>In h�a don di?n t?</p>
-                <p>G�p �, Khi?u n?i</p>
+                <p>Hướng dẫn mua hàng</p>
+                <p>Hướng dẫn Trả góp</p>
+                <p>Thanh toán - Giao hàng</p>
+                <p>Tra cứu Bảo hành</p>
+                <p>In hóa đơn điện tử</p>
+                <p>Góp ý, Khiếu nại</p>
             </div>
         </div>
-        <!-- T?ng d�i h? tr? -->
+        <!-- Tổng đài hỗ trợ -->
         <div class='footer-section'>
             <button class='footer-section-header' onclick='toggleFooterSection(this)'>
-                <span>T?NG ��I H? TR?</span>
+                <span>TỔNG ĐÀI HỖ TRỢ</span>
                 <i class='icon ion-chevron-down'></i>
             </button>
             <div class='footer-section-content'>
-                <p><strong>Hotline:</strong> 0263999979</p>
+                <p><strong>Hotline:</strong> 0263 999979</p>
                 <p><strong>Kinh doanh:</strong> 0849 585810</p>
-                <p><strong>B?o h�nh:</strong> 02633 604444</p>
+                <p><strong>Bảo hành:</strong> 02633 604444</p>
             </div>
         </div>
     </div>
@@ -1439,7 +1731,7 @@ const footerHTML = `
     <!-- Credits -->
     <div class='footer-credits'>
         <div class='credit-left'>
-            � Song Phuong | M�y t�nh, Laptop, Linh ki?n Ch�nh h�ng
+            © Song Phuong | Máy tính, Laptop, Linh kiện Chính hãng
         </div>
         <div class='credit-right'>
             Cung cấp bởi: <strong>Hoàng Minh Duong</strong>
