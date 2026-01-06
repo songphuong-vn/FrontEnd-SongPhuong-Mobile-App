@@ -132,7 +132,7 @@ function switchNav(tab, evt) {
 
     const activeView = document.getElementById(`${tab}-view`);
     console.log('Looking for view:', `${tab}-view`, 'Found:', activeView);
-    
+
     if (activeView) {
         activeView.classList.add('active');
         // Cuộn lên đầu trang khi chuyển tab
@@ -1529,15 +1529,6 @@ function switchNav(viewName) {
     // Hide all views
     const views = document.querySelectorAll('.app-view');
     views.forEach(view => {
-
-// ===========================
-// NAVIGATION SYSTEM
-// ===========================
-
-function switchNav(viewName) {
-    // Hide all views
-    const views = document.querySelectorAll('.app-view');
-    views.forEach(view => {
         view.style.display = 'none';
         view.classList.remove('active');
     });
@@ -1556,7 +1547,7 @@ function switchNav(viewName) {
     }
 
     // Set active nav item
-    const activeNavLink = document.querySelector(.bottom-nav .nav-item[onclick*='']);
+    const activeNavLink = document.querySelector(`.bottom - nav.nav - item[onclick *= '${viewName}']`);
     if (activeNavLink) {
         activeNavLink.classList.add('active');
     }
