@@ -568,6 +568,13 @@
     margin-bottom: 3px;
 }
 
+.product-old-price {
+    color: #999;
+    font-size: 11px;
+    text-decoration: line-through;
+    margin-bottom: 4px;
+}
+
 .product-name {
     font-size: 13px;
     color: var(--text-dark);
@@ -888,6 +895,64 @@
 
 .sidebar-item .text-red {
     color: #ff4d4d !important;
+}
+
+.sidebar-item-arrow {
+    margin-left: auto;
+    font-size: 14px !important;
+    color: #ccc !important;
+}
+
+/* Sidebar Footer */
+.sidebar-footer {
+    background: linear-gradient(135deg, #2e308a 0%, #4a4cc9 100%);
+    padding: 12px 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    flex-shrink: 0;
+    margin-top: auto;
+}
+
+.sidebar-footer-item {
+    padding: 10px 5px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: white;
+    cursor: pointer;
+    transition: background 0.2s;
+    border-radius: 8px;
+}
+
+.sidebar-footer-item:active {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-footer-item i {
+    font-size: 18px;
+    color: white;
+    width: 22px;
+    text-align: center;
+}
+
+.sidebar-footer-item span {
+    font-size: 13px;
+    font-weight: 500;
+    color: white;
+}
+
+.sidebar-footer-item.hotline {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 5px;
+}
+
+.sidebar-footer-item.hotline i {
+    color: #4ade80;
+}
+
+.sidebar-footer-item.hotline span {
+    font-weight: 600;
 }
 
 /* ================================

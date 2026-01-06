@@ -6,7 +6,8 @@
   "scripts": {
     "start": "python -m http.server 8000 || php -S localhost:8000",
     "serve": "npx http-server -p 8000 -c-1",
-    "build": "echo 'Build complete'"
+    "build": "echo 'Build complete'",
+    "build:details": "node scripts/build-details.js"
   },
   "keywords": [
     "ionic",
@@ -17,6 +18,7 @@
   "author": "HMD",
   "license": "MIT",
   "devDependencies": {
-    "http-server": "^14.1.1"
+    "http-server": "^14.1.1",
+    "papaparse": "^5.4.1"
   }
 }

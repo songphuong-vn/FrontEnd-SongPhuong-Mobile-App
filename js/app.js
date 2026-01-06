@@ -1,5 +1,6 @@
 // ===========================
 // SONG PHUONG MOBILE APP - JAVASCRIPT
+// Tích hợp ProductManager với 9,926 sản phẩm từ database
 // ===========================
 
 /**
@@ -18,6 +19,133 @@ async function lockOrientation() {
 
 // Run orientation lock immediately on load
 lockOrientation();
+
+/**
+ * Khởi tạo tìm kiếm sản phẩm
+ */
+function initProductSearch() {
+    const searchInput = document.querySelector('.header-search-fixed .search-input');
+    if (!searchInput) return;
+    
+    let searchTimeout;
+    
+    searchInput.addEventListener('input', function(e) {
+        clearTimeout(searchTimeout);
+        const query = e.target.value.trim();
+        
+        searchTimeout = setTimeout(() => {
+            if (query.length >= 2 && window.ProductManager && ProductManager.isLoaded) {
+                showSearchResults(query);
+            } else {
+                hideSearchResults();
+            }
+        }, 300);
+    });
+    
+    searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            const query = e.target.value.trim();
+            if (query.length >= 2) {
+                showSearchResults(query);
+            }
+        }
+    });
+}
+
+/**
+ * Hiển thị kết quả tìm kiếm
+ */
+function showSearchResults(query) {
+    if (!window.ProductManager || !ProductManager.isLoaded) return;
+    
+    const results = ProductManager.searchProducts(query, { limit: 10 });
+    
+    // Tạo hoặc lấy container kết quả
+    let resultsContainer = document.getElementById('searchResultsDropdown');
+    if (!resultsContainer) {
+        resultsContainer = document.createElement('div');
+        resultsContainer.id = 'searchResultsDropdown';
+        resultsContainer.style.cssText = `
+            position: fixed;
+            top: 55px;
+            left: 10px;
+            right: 10px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 1100;
+        `;
+        document.body.appendChild(resultsContainer);
+    }
+    
+    if (results.length === 0) {
+        resultsContainer.innerHTML = `
+            <div style="padding: 20px; text-align: center; color: #666;">
+                <i class="fas fa-search" style="font-size: 24px; margin-bottom: 10px; display: block;"></i>
+                Không tìm thấy sản phẩm "${query}"
+            </div>
+        `;
+    } else {
+        resultsContainer.innerHTML = `
+            <div style="padding: 10px 15px; border-bottom: 1px solid #eee; font-size: 12px; color: #666;">
+                Tìm thấy ${results.length} sản phẩm
+            </div>
+            ${results.map(product => `
+                <div class="search-result-item" onclick="goToProduct('${product.sku}')" style="
+                    padding: 12px 15px;
+                    border-bottom: 1px solid #f0f0f0;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                " onmouseover="this.style.background='#f8f9fa'" onmouseout="this.style.background='white'">
+                    <div style="flex: 1; min-width: 0;">
+                        <div style="font-size: 13px; font-weight: 600; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            ${product.title}
+                        </div>
+                        <div style="font-size: 11px; color: #888; margin-top: 3px;">
+                            SKU: ${product.sku} | ${product.category}
+                        </div>
+                        <div style="font-size: 14px; font-weight: 700; color: #e60000; margin-top: 5px;">
+                            ${ProductManager.formatPrice(product.displayPrice)}
+                            ${product.onSale ? `<span style="font-size: 11px; color: #999; text-decoration: line-through; margin-left: 8px;">${ProductManager.formatPrice(product.originalPrice)}</span>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `).join('')}
+        `;
+    }
+    
+    resultsContainer.style.display = 'block';
+    
+    // Đóng khi click ra ngoài
+    document.addEventListener('click', function closeSearch(e) {
+        if (!e.target.closest('#searchResultsDropdown') && !e.target.closest('.header-search-fixed')) {
+            hideSearchResults();
+            document.removeEventListener('click', closeSearch);
+        }
+    });
+}
+
+/**
+ * Ẩn kết quả tìm kiếm
+ */
+function hideSearchResults() {
+    const resultsContainer = document.getElementById('searchResultsDropdown');
+    if (resultsContainer) {
+        resultsContainer.style.display = 'none';
+    }
+}
+
+/**
+ * Chuyển đến trang chi tiết sản phẩm
+ */
+function goToProduct(sku) {
+    hideSearchResults();
+    window.location.href = `pages/product-details.html?sku=${sku}`;
+}
 
 /**
  * Toggle Sidebar Menu
@@ -1056,6 +1184,22 @@ if (document.readyState === 'loading') {
     initApp();
 }
 
+// Khởi tạo ProductManager và tìm kiếm
+document.addEventListener('DOMContentLoaded', async function() {
+    // Đợi ProductManager load
+    if (window.ProductManager) {
+        await ProductManager.init();
+        console.log('✅ ProductManager đã sẵn sàng với', ProductManager.products.length, 'sản phẩm');
+        
+        // Hiện thống kê trong console
+        const stats = ProductManager.getStats();
+        console.log('📊 Thống kê:', stats);
+    }
+    
+    // Khởi tạo tìm kiếm
+    initProductSearch();
+});
+
 // Load user profile data
 document.addEventListener('DOMContentLoaded', function () {
     loadSavedAvatar();
@@ -1917,6 +2061,134 @@ function initProductClickEvents() {
         }
     });
 }
+
+/**
+ * Load và hiển thị sản phẩm từ ProductManager
+ */
+async function loadProductsToHome() {
+    const container = document.getElementById('productsContainer');
+    if (!container) return;
+    
+    // Đợi ProductManager sẵn sàng
+    if (!window.ProductManager || !ProductManager.isLoaded) {
+        await ProductManager.init();
+    }
+    
+    // Lấy mix sản phẩm: Khuyến mãi + Random
+    const saleProducts = ProductManager.getDiscountedProducts(15);
+    const randomProducts = ProductManager.getRandomProducts(35);
+    const allProducts = [...new Set([...saleProducts, ...randomProducts])].slice(0, 40);
+    
+    // Xóa nội dung cũ
+    container.innerHTML = '';
+    
+    // Poster positions
+    const posterUrls = [
+        'https://songphuong.vn/Content/uploads/2024/12/RTX-4070-Ti-SALE.jpg',
+        'https://songphuong.vn/Content/uploads/2024/11/Gaming-Week-Banner.jpg'
+    ];
+    let posterIndex = 0;
+    
+    // Render sản phẩm
+    allProducts.forEach((product, index) => {
+        // Thêm poster sau mỗi 6-7 sản phẩm
+        if (index === 6 || index === 14) {
+            const poster = createPosterElement(posterUrls[posterIndex]);
+            container.appendChild(poster);
+            posterIndex++;
+        }
+        
+        const productEl = createProductCard(product);
+        container.appendChild(productEl);
+    });
+    
+    console.log(`✅ Đã load ${allProducts.length} sản phẩm lên trang home`);
+}
+
+/**
+ * Tạo thẻ sản phẩm
+ */
+function createProductCard(product) {
+    const div = document.createElement('div');
+    div.className = 'product-item square';
+    div.setAttribute('data-category', getCategorySlug(product.category));
+    div.setAttribute('data-product-sku', product.sku);
+    div.onclick = () => openProductDetailBySku(product.sku);
+    
+    const hasDiscount = product.onSale && product.discountPercent > 0;
+    const priceDisplay = ProductManager.formatPrice(product.displayPrice);
+    
+    div.innerHTML = `
+        <div class="product-image">
+            ${hasDiscount ? `<span class="product-discount">-${product.discountPercent}%</span>` : ''}
+            ${hasDiscount ? '<span class="product-tag sale">Khuyến mãi</span>' : ''}
+            <img src="https://via.placeholder.com/300x300?text=${encodeURIComponent(product.category)}" 
+                 alt="${product.title}" 
+                 onerror="this.src='https://via.placeholder.com/300x300?text=Product'">
+        </div>
+        <div class="product-info">
+            <div class="product-price">${priceDisplay}</div>
+            ${hasDiscount ? `<div class="product-old-price">${ProductManager.formatPrice(product.originalPrice)}</div>` : ''}
+            <div class="product-name">${truncateText(product.title, 60)}</div>
+            <button class="btn-buy" onclick="event.stopPropagation(); addToCartQuick('${product.sku}')">Mua ngay</button>
+        </div>
+    `;
+    
+    return div;
+}
+
+/**
+ * Tạo poster
+ */
+function createPosterElement(imageUrl) {
+    const div = document.createElement('div');
+    div.className = 'product-item poster promo-banner';
+    div.setAttribute('data-category', 'promo');
+    
+    div.innerHTML = `
+        <div class="product-image">
+            <img src="${imageUrl}" alt="Khuyến mãi">
+        </div>
+    `;
+    
+    return div;
+}
+
+/**
+ * Chuyển category thành slug
+ */
+function getCategorySlug(category) {
+    const mapping = {
+        'VGA - Card Màn Hình': 'vga',
+        'CPU - Bộ vi xử lý': 'cpu',
+        'Ram - Bộ nhớ đệm': 'ram',
+        'SSD - HDD': 'ssd',
+        'Main - Bo Mạch Chủ': 'mainboard',
+        'Case - Vỏ máy tính': 'case',
+        'PSU - Nguồn máy tính': 'psu'
+    };
+    return mapping[category] || 'all';
+}
+
+/**
+ * Cắt ngắn text
+ */
+function truncateText(text, maxLength) {
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + '...';
+}
+
+/**
+ * Mở chi tiết sản phẩm theo SKU
+ */
+function openProductDetailBySku(sku) {
+    window.location.href = `pages/product-details.html?sku=${sku}`;
+}
+
+// Khởi tạo khi ProductManager ready
+window.addEventListener('productsLoaded', function() {
+    loadProductsToHome();
+});
 
 
 // ===========================
