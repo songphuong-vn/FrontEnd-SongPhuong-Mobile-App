@@ -165,9 +165,9 @@ function toggleSidebar() {
             body.style.position = 'fixed';
             body.style.width = '100%';
         } else {
-            body.style.overflow = '';
-            body.style.position = '';
-            body.style.width = '';
+            body.style.overflow = 'auto';
+            body.style.position = 'static';
+            body.style.width = 'auto';
         }
 
         // Logic hiển thị Search Bar: Chỉ hiện khi ở Home HOẶC đang mở sidebar
