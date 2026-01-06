@@ -600,10 +600,10 @@
 }
 
 .quick-menu-item:hover {
-    background: linear-gradient(135deg, var(--profile-primary) 0%, var(--profile-secondary) 100%);
-    transform: translateY(-6px);
-    box-shadow: 0 12px 25px rgba(46, 48, 138, 0.25);
-    border-color: var(--profile-primary);
+    background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);
+    transform: none;
+    box-shadow: none;
+    border-color: transparent;
 }
 
 .quick-menu-item .icon {
@@ -613,8 +613,8 @@
 }
 
 .quick-menu-item:hover .icon {
-    color: white;
-    transform: scale(1.15);
+    color: var(--profile-primary);
+    transform: none;
 }
 
 .quick-menu-item span {
@@ -626,7 +626,7 @@
 }
 
 .quick-menu-item:hover span {
-    color: white;
+    color: var(--profile-text-dark);
 }
 
 /* Quick Menu Icon Wrapper with Badge */
@@ -670,7 +670,7 @@
 }
 
 .quick-menu-item:hover .notification-badge {
-    border-color: var(--profile-primary);
+    border-color: white;
 }
 
 /* ================================
@@ -1081,7 +1081,7 @@
     box-shadow: 0 15px 45px rgba(0, 0, 0, 0.12);
 }
 
-/* Override default quick-menu-item styles for status grid - compact and no interactions */
+/* Override default quick-menu-item styles for status grid - compact, clickable but no hover effects */
 .order-status-grid .quick-menu-item {
     background: transparent;
     padding: 8px 5px;
@@ -1089,9 +1089,16 @@
     border: none;
     box-shadow: none;
     transition: none;
-    cursor: default;
-    pointer-events: none;
-    /* Disable all interactions */
+    cursor: pointer;
+}
+
+.order-status-grid .quick-menu-item:hover {
+    background: transparent;
+    transform: none;
+}
+
+.order-status-grid .quick-menu-item:active {
+    transform: none;
 }
 
 .order-status-grid .quick-menu-item span {

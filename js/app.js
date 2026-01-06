@@ -84,6 +84,8 @@ function toggleHeaderMenu() {
 
 /**
  * Switch Navigation Tabs
+ * @param {string} tab - The tab name to switch to (home, build-pc, warranty, profile, notifications)
+ * @param {Event} evt - Optional event object to prevent default behavior
  */
 function switchNav(tab, evt) {
     // Prevent default behavior
@@ -91,11 +93,10 @@ function switchNav(tab, evt) {
         evt.preventDefault();
     }
 
-    console.log('switchNav called with tab:', tab);
-
     // Đóng sidebar nếu đang mở
     const sidebar = document.getElementById('sidebarContainer');
     const overlay = document.getElementById('sidebarOverlay');
+    
     if (sidebar && sidebar.classList.contains('active')) {
         sidebar.classList.remove('active');
         overlay.classList.remove('active');
@@ -107,18 +108,15 @@ function switchNav(tab, evt) {
 
     // Xóa class active khỏi tất cả các mục điều hướng
     const navItems = document.querySelectorAll('.nav-item');
-    navItems.forEach(item => {
-        item.classList.remove('active');
-    });
+    navItems.forEach(item => item.classList.remove('active'));
 
     // Thêm class active vào mục tương ứng với tab
     navItems.forEach(item => {
         const onclickAttr = item.getAttribute('onclick');
-        // Kiểm tra xem onclick của item có chứa tên tab không
         if (onclickAttr && onclickAttr.includes(`'${tab}'`)) {
             item.classList.add('active');
         }
-        // Trường hợp đặc biệt: nếu mở danh mục, giữ trạng thái active cho nút danh mục
+        // Trường hợp đặc biệt cho danh mục
         if (tab === 'category' && onclickAttr && onclickAttr.includes('toggleSidebar')) {
             item.classList.add('active');
         }
@@ -126,33 +124,21 @@ function switchNav(tab, evt) {
 
     // Chuyển đổi hiển thị các View
     const views = document.querySelectorAll('.app-view');
-    views.forEach(view => {
-        view.classList.remove('active');
-    });
+    views.forEach(view => view.classList.remove('active'));
 
     const activeView = document.getElementById(`${tab}-view`);
-    console.log('Looking for view:', `${tab}-view`, 'Found:', activeView);
-
     if (activeView) {
         activeView.classList.add('active');
         // Cuộn lên đầu trang khi chuyển tab
         const scrollContent = document.querySelector('.scroll-content');
         if (scrollContent) scrollContent.scrollTop = 0;
-    } else {
-        console.warn('View not found:', `${tab}-view`);
     }
 
     // Xử lý hiển thị Search Bar
     const searchBar = document.querySelector('.header-search-fixed');
     if (searchBar) {
-        if (tab === 'home') {
-            searchBar.style.display = 'flex';
-        } else {
-            searchBar.style.display = 'none';
-        }
+        searchBar.style.display = (tab === 'home') ? 'flex' : 'none';
     }
-
-    console.log('Navigated to:', tab);
 }
 
 /**
@@ -966,46 +952,6 @@ document.head.appendChild(style);
 // ===========================
 
 /**
- * Toggle All Contact Info Visibility
- */
-let contactInfoVisible = false;
-
-function toggleAllContactInfo(btn) {
-    const phoneEl = document.getElementById('phoneValue');
-    const emailEl = document.getElementById('emailValue');
-    const icon = btn.querySelector('.icon');
-
-    contactInfoVisible = !contactInfoVisible;
-
-    if (contactInfoVisible) {
-        // Show Info
-        if (phoneEl) {
-            phoneEl.textContent = phoneEl.getAttribute('data-value');
-            phoneEl.classList.remove('masked');
-        }
-        if (emailEl) {
-            emailEl.textContent = emailEl.getAttribute('data-value');
-            emailEl.classList.remove('masked');
-        }
-        if (icon) icon.className = 'icon ion-eye';
-    } else {
-        // Hide Info (Mask)
-        if (phoneEl) {
-            const val = phoneEl.getAttribute('data-value');
-            phoneEl.textContent = val.substring(0, 3) + '****' + val.substring(val.length - 3);
-            phoneEl.classList.add('masked');
-        }
-        if (emailEl) {
-            const val = emailEl.getAttribute('data-value');
-            const atIndex = val.indexOf('@');
-            emailEl.textContent = val.substring(0, 3) + '*******' + val.substring(atIndex);
-            emailEl.classList.add('masked');
-        }
-        if (icon) icon.className = 'icon ion-eye-disabled';
-    }
-}
-
-/**
  * Toggle Spending Visibility
  */
 let spendingVisible = true;
@@ -1029,19 +975,11 @@ function toggleSpendingVisibility() {
 }
 
 /**
- * Open Favorites
+ * Open Favorites Page
  */
 function openFavorites() {
     showNotification('Tính năng Yêu thích đang được phát triển', 'info');
     // TODO: Navigate to favorites page
-}
-
-/**
- * Open Notifications
- */
-function openNotifications() {
-    showNotification('Tính năng Thông báo đang được phát triển', 'info');
-    // TODO: Navigate to notifications page or open notifications panel
 }
 
 /**
@@ -1362,11 +1300,11 @@ function closeProfileSettings() {
 // DYNAMIC FOOTER INJECTION
 // ===========================
 
-const footerHTML = `r
+const footerHTML = `
 <div class='profile-footer'>
     <!-- Collapsible Contact Sections -->
     <div class='footer-sections'>
-        <!-- Chi nh�nh �� L?t -->
+        <!-- Chi nhánh Đà Lạt -->
         <div class='footer-section'>
             <button class='footer-section-header' onclick='toggleFooterSection(this)'>
                 <span>SONG PHUONG - �� L?T</span>
@@ -1504,10 +1442,11 @@ const footerHTML = `r
             � Song Phuong | M�y t�nh, Laptop, Linh ki?n Ch�nh h�ng
         </div>
         <div class='credit-right'>
-            Cung c?p b?i: <strong>Ho�ng Minh Duong</strong>
+            Cung cấp bởi: <strong>Hoàng Minh Duong</strong>
         </div>
     </div>
-</div>\;
+</div>
+`;
 
 function initFooter() {
     const targets = ['build-pc-footer-placeholder', 'warranty-footer-placeholder'];
@@ -1522,42 +1461,13 @@ document.addEventListener('DOMContentLoaded', initFooter);
 
 
 // ===========================
-// NAVIGATION SYSTEM
-// ===========================
-
-function switchNav(viewName) {
-    // Hide all views
-    const views = document.querySelectorAll('.app-view');
-    views.forEach(view => {
-        view.style.display = 'none';
-        view.classList.remove('active');
-    });
-
-    // Hide all nav items active state
-    const navItems = document.querySelectorAll('.bottom-nav .nav-item');
-    navItems.forEach(item => {
-        item.classList.remove('active');
-    });
-
-    // Show selected view
-    const selectedView = document.getElementById(viewName + '-view');
-    if (selectedView) {
-        selectedView.style.display = 'block';
-        setTimeout(() => selectedView.classList.add('active'), 10);
-    }
-
-    // Set active nav item
-    const activeNavLink = document.querySelector(`.bottom - nav.nav - item[onclick *= '${viewName}']`);
-    if (activeNavLink) {
-        activeNavLink.classList.add('active');
-    }
-}
-
 // Initialize default view (Home)
 document.addEventListener('DOMContentLoaded', () => {
     if (typeof initFooter === 'function') {
         initFooter();
     }
-    switchNav('home');
+    // Switch to home view by default
+    if (typeof switchNav === 'function') {
+        switchNav('home');
+    }
 });
-

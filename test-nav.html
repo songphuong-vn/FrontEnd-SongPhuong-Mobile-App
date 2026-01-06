@@ -3,17 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test Navigation</title>
+    <title>Test Navigation - DEBUG MODE</title>
     <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        .debug-panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: #000;
+            color: #0f0;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 150px;
+            overflow-y: auto;
+            z-index: 10000;
+        }
+        .content-area {
+            margin-top: 160px;
+            margin-bottom: 70px;
+            padding: 20px;
+        }
         .app-view {
             display: none;
             padding: 20px;
-            border: 2px solid #ccc;
+            border: 3px solid #ccc;
             margin: 10px;
+            border-radius: 8px;
         }
         .app-view.active {
             display: block;
-            background-color: #f0f0f0;
+            background-color: #e8f5e9;
+            border-color: #4caf50;
+        }
+        .app-view h2 {
+            margin-top: 0;
+            color: #2e7d32;
         }
         .bottom-nav {
             position: fixed;
@@ -22,52 +52,129 @@
             right: 0;
             display: flex;
             background: white;
-            border-top: 1px solid #ccc;
+            border-top: 2px solid #2196f3;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            z-index: 100;
         }
         .nav-item {
             flex: 1;
-            padding: 15px;
+            padding: 15px 10px;
             text-align: center;
             cursor: pointer;
             text-decoration: none;
             color: #666;
+            background: white;
+            border: none;
+            transition: all 0.3s;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .nav-item:hover {
+            background-color: #e3f2fd;
         }
         .nav-item.active {
-            color: #007bff;
-            background-color: #f0f8ff;
+            color: #2196f3;
+            background-color: #e3f2fd;
+            border-top: 3px solid #2196f3;
+            font-weight: bold;
+        }
+        .test-info {
+            background: #fff3cd;
+            padding: 15px;
+            margin: 10px;
+            border-left: 4px solid #ffc107;
+            border-radius: 4px;
         }
     </style>
 </head>
 <body>
-    <h1>Test Navigation System</h1>
-    
-    <div id="home-view" class="app-view active">
-        <h2>Home View</h2>
-        <p>This is the home view content.</p>
+    <div class="debug-panel" id="debugPanel">
+        <strong>🔍 DEBUG CONSOLE:</strong> Mở Developer Tools (F12) để xem chi tiết logs...
     </div>
     
-    <div id="build-pc-view" class="app-view">
-        <h2>Build PC View</h2>
-        <p>This is the build PC view content.</p>
-    </div>
-    
-    <div id="warranty-view" class="app-view">
-        <h2>Warranty View</h2>
-        <p>This is the warranty view content.</p>
-    </div>
-    
-    <div id="profile-view" class="app-view">
-        <h2>Profile View</h2>
-        <p>This is the profile view content.</p>
+    <div class="content-area">
+        <div class="test-info">
+            <h3>📋 Test Instructions:</h3>
+            <ol>
+                <li>Mở Developer Console (nhấn F12)</li>
+                <li>Click vào các button navigation ở dưới</li>
+                <li>Xem console logs để debug</li>
+                <li>Views sẽ đổi màu xanh khi active</li>
+            </ol>
+        </div>
+        
+        <div id="home-view" class="app-view active">
+            <h2>🏠 HOME VIEW</h2>
+            <p>This is the home view content. It should be visible by default.</p>
+            <p>Background should be light green when active.</p>
+        </div>
+        
+        <div id="build-pc-view" class="app-view">
+            <h2>🖥️ BUILD PC VIEW</h2>
+            <p>This is the build PC view content.</p>
+            <p>Click "Build PC" button below to see this view.</p>
+        </div>
+        
+        <div id="warranty-view" class="app-view">
+            <h2>✅ WARRANTY VIEW</h2>
+            <p>This is the warranty view content.</p>
+            <p>Click "Warranty" button below to see this view.</p>
+        </div>
+        
+        <div id="profile-view" class="app-view">
+            <h2>👤 PROFILE VIEW</h2>
+            <p>This is the profile view content.</p>
+            <p>Click "Profile" button below to see this view.</p>
+        </div>
     </div>
     
     <div class="bottom-nav">
-        <a class="nav-item active" href="#" onclick="switchNav('home', event); return false;">Home</a>
-        <a class="nav-item" href="#" onclick="switchNav('build-pc', event); return false;">Build PC</a>
-        <a class="nav-item" href="#" onclick="switchNav('warranty', event); return false;">Warranty</a>
-        <a class="nav-item" href="#" onclick="switchNav('profile', event); return false;">Profile</a>
+        <button class="nav-item active" onclick="switchNav('home', event); return false;">
+            🏠 HOME
+        </button>
+        <button class="nav-item" onclick="switchNav('build-pc', event); return false;">
+            🖥️ BUILD PC
+        </button>
+        <button class="nav-item" onclick="switchNav('warranty', event); return false;">
+            ✅ WARRANTY
+        </button>
+        <button class="nav-item" onclick="switchNav('profile', event); return false;">
+            👤 PROFILE
+        </button>
     </div>
     
     <script src="js/app.js"></script>
+    <script>
+        // Capture console.log to debug panel
+        const debugPanel = document.getElementById('debugPanel');
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        
+        function addToPanel(msg, type = 'log') {
+            const color = type === 'error' ? '#f00' : type === 'warn' ? '#ff0' : '#0f0';
+            debugPanel.innerHTML += `<div style="color: ${color}">${msg}</div>`;
+            debugPanel.scrollTop = debugPanel.scrollHeight;
+        }
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addToPanel(args.join(' '), 'log');
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addToPanel('❌ ' + args.join(' '), 'error');
+        };
+        
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            addToPanel('⚠ ' + args.join(' '), 'warn');
+        };
+        
+        // Test on load
+        console.log('Test page loaded successfully');
+        console.log('switchNav function exists:', typeof switchNav === 'function');
+    </script>
 </body>
 </html>
