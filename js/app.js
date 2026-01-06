@@ -413,16 +413,6 @@ function initApp() {
         });
     }
 
-    // Thêm xử lý sự kiện click cho các nút mua
-    const buyButtons = document.querySelectorAll('.btn-buy');
-    buyButtons.forEach((btn, index) => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            const productName = btn.parentElement.querySelector('.product-name').textContent.trim();
-            addToCart(productName);
-        });
-    });
-
     // Thêm xử lý sự kiện click cho liên kết xem tất cả
     const viewAllLinks = document.querySelectorAll('.view-all');
     viewAllLinks.forEach(link => {
@@ -444,11 +434,214 @@ function initApp() {
     // Khởi tạo Sticky Product Category Navigation
     initProductCategoryNav();
 
-    // Khởi tạo Dynamic Posters - Tự động chèn poster
-    initDynamicPosters();
-
     // Khởi tạo Slider Banner
     initBannerSlider();
+
+    // Khởi tạo sản phẩm từ ProductManager khi load xong
+    if (window.ProductManager) {
+        window.addEventListener('productsLoaded', () => {
+            console.log('Products loaded - rendering to home page');
+            renderHomeProducts();
+        });
+    }
+}
+
+/**
+ * Render sản phẩm từ ProductManager vào trang home
+ */
+function renderHomeProducts() {
+    const container = document.getElementById('productsContainer');
+    if (!container || !window.ProductManager || !ProductManager.isLoaded) {
+        console.warn('Cannot render products: container or ProductManager not ready');
+        return;
+    }
+
+    // Lấy 30 sản phẩm đầu tiên từ database
+    const products = ProductManager.products.slice(0, 30);
+    
+    if (products.length === 0) {
+        console.warn('No products available to render');
+        container.innerHTML = `
+            <div style="text-align: center; padding: 60px 20px; width: 100%;">
+                <i class="icon ion-alert-circled" style="font-size: 48px; color: #999;"></i>
+                <p style="color: #999; margin-top: 15px; font-size: 14px;">Không có sản phẩm</p>
+            </div>
+        `;
+        return;
+    }
+
+    console.log(`Rendering ${products.length} products to home page...`);
+    console.log('First 3 products SKUs:', products.slice(0, 3).map(p => `${p.sku} - ${p.title}`));
+
+    // Xóa loading indicator và tất cả nội dung cũ
+    container.innerHTML = '';
+
+    // Render sản phẩm thực từ database
+    let productHTML = '';
+    products.forEach((product, index) => {
+        // Thêm poster sau mỗi 6 sản phẩm
+        if (index === 6) {
+            productHTML += `
+                <div class="product-item poster promo-banner" data-category="promo">
+                    <div class="product-image">
+                        <img src="https://songphuong.vn/Content/uploads/2024/12/RTX-4070-Ti-SALE.jpg" 
+                             alt="Khuyến mãi RTX 4070 Ti"
+                             onerror="this.src='https://via.placeholder.com/270x480/e63946/fff?text=SALE'">
+                    </div>
+                </div>
+            `;
+        } else if (index === 13) {
+            productHTML += `
+                <div class="product-item poster promo-banner" data-category="promo">
+                    <div class="product-image">
+                        <img src="https://songphuong.vn/Content/uploads/2024/11/Gaming-Week-Banner.jpg" 
+                             alt="Poster Gaming Week"
+                             onerror="this.src='https://via.placeholder.com/270x480/ff6b35/fff?text=GAMING+WEEK'">
+                    </div>
+                </div>
+            `;
+        }
+
+        const hasDiscount = product.onSale || product.displayPrice < product.originalPrice;
+        const discountPercent = product.discountPercent || 
+            (hasDiscount ? Math.round(((product.originalPrice - product.displayPrice) / product.originalPrice) * 100) : 0);
+        
+        // Lấy category từ mainCategory nếu có, không thì dùng category
+        const categorySlug = (product.mainCategory || product.category || 'other').toLowerCase().replace(/\s+/g, '-');
+        
+        // Escape SKU để tránh lỗi HTML attribute
+        const escapedSku = (product.sku || '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        const escapedTitle = (product.title || '').replace(/"/g, '&quot;');
+        
+        // Xử lý URL ảnh - nếu có image thì dùng, không thì dùng placeholder
+        let imageUrl = 'https://via.placeholder.com/200/f0f0f0/999?text=No+Image';
+        if (product.image) {
+            // Nếu đã là URL đầy đủ thì dùng luôn
+            if (product.image.startsWith('http://') || product.image.startsWith('https://')) {
+                imageUrl = product.image;
+            } else {
+                // Nếu là relative path, thêm base URL
+                imageUrl = `https://product.hstatic.net/200000722513/product/${product.image}`;
+            }
+        }
+        
+        productHTML += `
+            <div class="product-item square" 
+                 data-category="${categorySlug}" 
+                 data-sku="${escapedSku}" 
+                 data-product-title="${escapedTitle}"
+                 data-index="${index}">
+                <div class="product-image">
+                    ${hasDiscount && discountPercent > 0 ? `<span class="product-discount">-${discountPercent}%</span>` : ''}
+                    ${product.onSale ? `<span class="product-tag sale">Khuyến mãi</span>` : ''}
+                    <img src="${imageUrl}" 
+                         alt="${escapedTitle}"
+                         loading="lazy"
+                         onerror="this.src='https://via.placeholder.com/200/f0f0f0/999?text=No+Image'">
+                </div>
+                <div class="product-info">
+                    <div class="product-price">${ProductManager.formatPrice(product.displayPrice)}</div>
+                    <div class="product-name">${product.title}</div>
+                    <button class="btn-buy">Mua ngay</button>
+                </div>
+            </div>
+        `;
+    });
+
+    container.innerHTML = productHTML;
+
+    // Thêm event listeners cho sản phẩm sau khi render
+    setupProductClickHandlers();
+
+    // Chạy lại dynamic posters và category nav
+    initProductCategoryNav();
+
+    console.log(`✅ Successfully rendered ${products.length} products from database`);
+}
+
+/**
+ * Setup event handlers cho các sản phẩm sử dụng event delegation
+ * Chỉ setup 1 lần duy nhất để tránh duplicate listeners
+ */
+let productClickHandlerSetup = false;
+
+function setupProductClickHandlers() {
+    const container = document.getElementById('productsContainer');
+    if (!container) return;
+
+    // Nếu đã setup rồi thì không setup lại
+    if (productClickHandlerSetup) {
+        console.log('Product click handlers already setup, skipping...');
+        return;
+    }
+
+    // Event delegation cho click vào sản phẩm
+    container.addEventListener('click', function(e) {
+        const productItem = e.target.closest('.product-item.square');
+        
+        if (!productItem) return;
+
+        const clickedBuyButton = e.target.closest('.btn-buy');
+        
+        if (clickedBuyButton) {
+            // Click vào nút Mua ngay
+            e.preventDefault();
+            e.stopPropagation();
+            const productTitle = productItem.getAttribute('data-product-title');
+            if (productTitle) {
+                addToCart(productTitle);
+            }
+        } else {
+            // Click vào bất kỳ đâu khác trong product item -> mở chi tiết
+            const sku = productItem.getAttribute('data-sku');
+            const index = productItem.getAttribute('data-index');
+            const title = productItem.getAttribute('data-product-title');
+            
+            console.log('=== Product Click Debug ===');
+            console.log('Index:', index);
+            console.log('SKU from attribute:', sku);
+            console.log('Title from attribute:', title);
+            console.log('Product element:', productItem);
+            
+            if (sku) {
+                handleProductClick(sku);
+            } else {
+                console.error('No SKU found on product item!');
+            }
+        }
+    });
+
+    productClickHandlerSetup = true;
+    console.log('✅ Product click handlers setup complete');
+}
+
+/**
+ * Xử lý click vào sản phẩm - điều hướng tới trang chi tiết
+ */
+function handleProductClick(sku) {
+    console.log('=== handleProductClick called ===');
+    console.log('SKU parameter:', sku);
+    
+    if (!sku || sku === 'undefined' || sku === 'null') {
+        console.error('Invalid SKU:', sku);
+        showNotification('Lỗi: Không thể lấy thông tin sản phẩm', 'error');
+        return;
+    }
+    
+    // Kiểm tra sản phẩm có tồn tại trong database
+    if (window.ProductManager && ProductManager.isLoaded) {
+        const product = ProductManager.getProductBySku(sku);
+        console.log('Product found in database:', product ? `${product.sku} - ${product.title}` : 'NOT FOUND');
+        
+        if (!product) {
+            console.error('Product not found for SKU:', sku);
+            showNotification('Sản phẩm không tồn tại', 'error');
+            return;
+        }
+    }
+    
+    console.log('Navigating to product details page with SKU:', sku);
+    window.location.href = `pages/product-details.html?sku=${encodeURIComponent(sku)}`;
 }
 
 // RENDER UI SECTIONS
@@ -654,63 +847,6 @@ function closeCart() {
 function openOrders() { switchNav('orders'); }
 function openDeliveries() { switchNav('deliveries'); }
 function openReviews() { switchNav('reviews'); }
-
-/**
- * Logic tự động chèn poster vào danh sách sản phẩm
- */
-function initDynamicPosters() {
-    const container = document.getElementById('productsContainer');
-    if (!container) return;
-
-    // Danh sách poster để chèn
-    const posters = [
-        {
-            img: 'https://via.placeholder.com/270x480/e63946/fff?text=SALE+50%25%0ARTX+4070+Ti%0AHOT+DEAL',
-            alt: 'Khuyến mãi RTX 4070 Ti'
-        },
-        {
-            img: 'https://via.placeholder.com/270x480/ff6b35/fff?text=GAMING%0AWEEK%0ASALE+UP+TO%0A40%25+OFF',
-            alt: 'Poster Gaming Week'
-        },
-        {
-            img: 'https://via.placeholder.com/270x480/2e308a/fff?text=ASUS+ROG%0AMAINBOARD%0ANEW+ARRIVAL',
-            alt: 'Poster ASUS ROG'
-        }
-    ];
-
-    // Xóa tất cả poster hiện có
-    const existingPosters = container.querySelectorAll('.promo-banner');
-    existingPosters.forEach(poster => poster.remove());
-
-    // Lấy tất cả sản phẩm không phải poster
-    const products = Array.from(container.querySelectorAll('.product-item:not(.promo-banner)'));
-
-    // Chèn poster sau mỗi 6-8 sản phẩm (ngẫu nhiên)
-    let posterIndex = 0;
-    let nextPosterPosition = Math.floor(Math.random() * 3) + 6; // 6-8 sản phẩm
-
-    products.forEach((product, index) => {
-        if (index === nextPosterPosition && posterIndex < posters.length) {
-            // Tạo poster element
-            const posterData = posters[posterIndex];
-            const posterEl = document.createElement('div');
-            posterEl.className = 'product-item poster promo-banner';
-            posterEl.setAttribute('data-category', 'promo');
-            posterEl.innerHTML = `
-                <div class="product-image">
-                    <img src="${posterData.img}" alt="${posterData.alt}">
-                </div>
-            `;
-
-            // Chèn poster sau sản phẩm hiện tại
-            product.after(posterEl);
-
-            // Tính vị trí poster tiếp theo
-            posterIndex++;
-            nextPosterPosition = index + Math.floor(Math.random() * 3) + 6; // Thêm 6-8 sản phẩm nữa
-        }
-    });
-}
 
 /**
  * Logic Product Category Navigation (Sticky Nav)
@@ -2062,135 +2198,6 @@ function initProductClickEvents() {
     });
 }
 
-/**
- * Load và hiển thị sản phẩm từ ProductManager
- */
-async function loadProductsToHome() {
-    const container = document.getElementById('productsContainer');
-    if (!container) return;
-    
-    // Đợi ProductManager sẵn sàng
-    if (!window.ProductManager || !ProductManager.isLoaded) {
-        await ProductManager.init();
-    }
-    
-    // Lấy mix sản phẩm: Khuyến mãi + Random
-    const saleProducts = ProductManager.getDiscountedProducts(15);
-    const randomProducts = ProductManager.getRandomProducts(35);
-    const allProducts = [...new Set([...saleProducts, ...randomProducts])].slice(0, 40);
-    
-    // Xóa nội dung cũ
-    container.innerHTML = '';
-    
-    // Poster positions
-    const posterUrls = [
-        'https://songphuong.vn/Content/uploads/2024/12/RTX-4070-Ti-SALE.jpg',
-        'https://songphuong.vn/Content/uploads/2024/11/Gaming-Week-Banner.jpg'
-    ];
-    let posterIndex = 0;
-    
-    // Render sản phẩm
-    allProducts.forEach((product, index) => {
-        // Thêm poster sau mỗi 6-7 sản phẩm
-        if (index === 6 || index === 14) {
-            const poster = createPosterElement(posterUrls[posterIndex]);
-            container.appendChild(poster);
-            posterIndex++;
-        }
-        
-        const productEl = createProductCard(product);
-        container.appendChild(productEl);
-    });
-    
-    console.log(`✅ Đã load ${allProducts.length} sản phẩm lên trang home`);
-}
-
-/**
- * Tạo thẻ sản phẩm
- */
-function createProductCard(product) {
-    const div = document.createElement('div');
-    div.className = 'product-item square';
-    div.setAttribute('data-category', getCategorySlug(product.category));
-    div.setAttribute('data-product-sku', product.sku);
-    div.onclick = () => openProductDetailBySku(product.sku);
-    
-    const hasDiscount = product.onSale && product.discountPercent > 0;
-    const priceDisplay = ProductManager.formatPrice(product.displayPrice);
-    
-    div.innerHTML = `
-        <div class="product-image">
-            ${hasDiscount ? `<span class="product-discount">-${product.discountPercent}%</span>` : ''}
-            ${hasDiscount ? '<span class="product-tag sale">Khuyến mãi</span>' : ''}
-            <img src="https://via.placeholder.com/300x300?text=${encodeURIComponent(product.category)}" 
-                 alt="${product.title}" 
-                 onerror="this.src='https://via.placeholder.com/300x300?text=Product'">
-        </div>
-        <div class="product-info">
-            <div class="product-price">${priceDisplay}</div>
-            ${hasDiscount ? `<div class="product-old-price">${ProductManager.formatPrice(product.originalPrice)}</div>` : ''}
-            <div class="product-name">${truncateText(product.title, 60)}</div>
-            <button class="btn-buy" onclick="event.stopPropagation(); addToCartQuick('${product.sku}')">Mua ngay</button>
-        </div>
-    `;
-    
-    return div;
-}
-
-/**
- * Tạo poster
- */
-function createPosterElement(imageUrl) {
-    const div = document.createElement('div');
-    div.className = 'product-item poster promo-banner';
-    div.setAttribute('data-category', 'promo');
-    
-    div.innerHTML = `
-        <div class="product-image">
-            <img src="${imageUrl}" alt="Khuyến mãi">
-        </div>
-    `;
-    
-    return div;
-}
-
-/**
- * Chuyển category thành slug
- */
-function getCategorySlug(category) {
-    const mapping = {
-        'VGA - Card Màn Hình': 'vga',
-        'CPU - Bộ vi xử lý': 'cpu',
-        'Ram - Bộ nhớ đệm': 'ram',
-        'SSD - HDD': 'ssd',
-        'Main - Bo Mạch Chủ': 'mainboard',
-        'Case - Vỏ máy tính': 'case',
-        'PSU - Nguồn máy tính': 'psu'
-    };
-    return mapping[category] || 'all';
-}
-
-/**
- * Cắt ngắn text
- */
-function truncateText(text, maxLength) {
-    if (text.length <= maxLength) return text;
-    return text.substring(0, maxLength) + '...';
-}
-
-/**
- * Mở chi tiết sản phẩm theo SKU
- */
-function openProductDetailBySku(sku) {
-    window.location.href = `pages/product-details.html?sku=${sku}`;
-}
-
-// Khởi tạo khi ProductManager ready
-window.addEventListener('productsLoaded', function() {
-    loadProductsToHome();
-});
-
-
 // ===========================
 // Initialize default view (Home)
 document.addEventListener('DOMContentLoaded', () => {
@@ -2200,9 +2207,5 @@ document.addEventListener('DOMContentLoaded', () => {
     // Switch to home view by default
     if (typeof switchNav === 'function') {
         switchNav('home');
-    }
-    // Initialize product click events
-    if (typeof initProductClickEvents === 'function') {
-        initProductClickEvents();
     }
 });

@@ -402,7 +402,21 @@ function showErrorPage(message) {
 // Get product ID or SKU from URL
 function getProductId() {
     const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get('productId') || urlParams.get('sku') || urlParams.get('id') || '1';
+    const sku = urlParams.get('sku');
+    const productId = urlParams.get('productId');
+    const id = urlParams.get('id');
+    
+    const result = sku || productId || id || '1';
+    
+    console.log('=== getProductId Debug ===');
+    console.log('Full URL:', window.location.href);
+    console.log('Search params:', window.location.search);
+    console.log('sku param:', sku);
+    console.log('productId param:', productId);
+    console.log('id param:', id);
+    console.log('Final result:', result);
+    
+    return result;
 }
 
 // Hiển thị loading
@@ -453,21 +467,29 @@ function hideLoading() {
 // Load product details - tích hợp ProductManager
 async function loadProductDetails() {
     const productId = getProductId();
-    console.log('🔍 Đang tìm sản phẩm:', productId);
+    console.log('=== loadProductDetails ===');
+    console.log('🔍 Đang tìm sản phẩm với ID/SKU:', productId);
     
     // Ưu tiên tìm từ ProductManager (database 9,926 sản phẩm)
     if (window.ProductManager && ProductManager.isLoaded) {
+        console.log('ProductManager available with', ProductManager.products.length, 'products');
+        
         // Thử tìm theo SKU trước
         let productBase = ProductManager.getProductBySku(productId);
+        console.log('Search by SKU result:', productBase ? `Found: ${productBase.title}` : 'Not found');
         
         // Nếu không tìm thấy theo SKU, thử tìm theo ID
         if (!productBase) {
             productBase = ProductManager.getProductById(productId);
+            console.log('Search by ID result:', productBase ? `Found: ${productBase.title}` : 'Not found');
         }
         
         // Nếu tìm thấy, chuyển đổi và hiển thị ngay
         if (productBase) {
-            console.log('✅ Tìm thấy sản phẩm:', productBase.title);
+            console.log('✅ Tìm thấy sản phẩm trong database:');
+            console.log('  - SKU:', productBase.sku);
+            console.log('  - Title:', productBase.title);
+            console.log('  - Price:', productBase.displayPrice);
             
             // Hiển thị ngay với thông tin cơ bản
             currentProduct = convertToDisplayFormat(productBase);
@@ -476,24 +498,31 @@ async function loadProductDetails() {
             // Lazy load mô tả chi tiết (background, không block UI)
             loadDetailedDescription(productBase.sku);
             return;
+        } else {
+            console.warn('⚠️ Không tìm thấy sản phẩm trong ProductManager');
         }
+    } else {
+        console.warn('⚠️ ProductManager not available or not loaded');
     }
     
     // Fallback: tìm trong sampleProducts nếu không có trong database
     if (!currentProduct) {
+        console.log('Trying fallback to sampleProducts...');
         currentProduct = sampleProducts[productId];
         if (currentProduct) {
+            console.log('✅ Found in sampleProducts:', currentProduct.title);
             renderProductPage();
             return;
         }
     }
     
     // Không tìm thấy sản phẩm
+    console.error('❌ Product not found anywhere!');
     document.querySelector('.product-details-container').innerHTML = `
         <div style="text-align: center; padding: 50px 20px;">
             <i class="fas fa-exclamation-circle" style="font-size: 50px; color: #ccc; margin-bottom: 15px;"></i>
             <h2 style="color: #666;">Không tìm thấy sản phẩm</h2>
-            <p style="color: #888;">Sản phẩm "${productId}" không tồn tại trong hệ thống.</p>
+            <p style="color: #888;">Sản phẩm với ID/SKU "${productId}" không tồn tại trong hệ thống.</p>
             <p style="color: #888; font-size: 13px; margin-top: 10px;">Tổng sản phẩm trong database: ${ProductManager?.products?.length || 0}</p>
             <button onclick="goBack()" style="margin-top: 15px; padding: 10px 20px; background: #2e308a; color: white; border: none; border-radius: 5px; cursor: pointer;">
                 Quay lại trang chủ
