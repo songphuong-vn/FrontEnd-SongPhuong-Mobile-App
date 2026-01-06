@@ -446,6 +446,49 @@ function setupHomeInfiniteScroll() {
 }
 
 /**
+ * Toggle Sidebar Menu (Danh mục)
+ */
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebarContainer');
+    const overlay = document.getElementById('sidebarOverlay');
+
+    if (!sidebar || !overlay) {
+        console.error('Sidebar elements not found');
+        return;
+    }
+
+    const isOpen = sidebar.classList.contains('active');
+
+    if (isOpen) {
+        // Đóng sidebar
+        sidebar.classList.remove('active');
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+        document.body.style.position = '';
+        document.body.style.width = '';
+    } else {
+        // Mở sidebar
+        sidebar.classList.add('active');
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+/**
+ * Close Sidebar (gọi từ overlay hoặc nút đóng)
+ */
+function closeSidebar() {
+    const sidebar = document.getElementById('sidebarContainer');
+    const overlay = document.getElementById('sidebarOverlay');
+
+    if (sidebar) sidebar.classList.remove('active');
+    if (overlay) overlay.classList.remove('active');
+    document.body.style.overflow = '';
+    document.body.style.position = '';
+    document.body.style.width = '';
+}
+
+/**
  * Switch Navigation Tabs
  * @param {string} tab - The tab name to switch to (home, build-pc, warranty, profile, notifications)
  * @param {Event} evt - Optional event object to prevent default behavior
@@ -2162,6 +2205,73 @@ function initProductClickEvents() {
 }
 
 // ===========================
+/* ===========================
+   BANNER SLIDER
+   =========================== */
+function initBannerSlider() {
+    const slider = document.querySelector('.banner-slider');
+    const slides = document.querySelectorAll('.banner-link');
+    const dots = document.querySelectorAll('.banner-dots .dot');
+
+    if (!slider || slides.length === 0) return;
+
+    let currentIndex = 0;
+    let slideInterval;
+    const intervalTime = 4000;
+
+    function showSlide(index) {
+        if (index >= slides.length) currentIndex = 0;
+        else if (index < 0) currentIndex = slides.length - 1;
+        else currentIndex = index;
+
+        slider.style.transform = `translateX(-${currentIndex * 100}%)`;
+
+        dots.forEach((dot, idx) => {
+            if (idx === currentIndex) dot.classList.add('active');
+            else dot.classList.remove('active');
+        });
+    }
+
+    function nextSlide() {
+        showSlide(currentIndex + 1);
+    }
+
+    function startAutoSlide() {
+        clearInterval(slideInterval);
+        slideInterval = setInterval(nextSlide, intervalTime);
+    }
+
+    function stopAutoSlide() {
+        clearInterval(slideInterval);
+    }
+
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    slider.addEventListener('touchstart', (e) => {
+        stopAutoSlide();
+        touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+
+    slider.addEventListener('touchend', (e) => {
+        touchEndX = e.changedTouches[0].screenX;
+        if (touchEndX < touchStartX - 50) nextSlide();
+        if (touchEndX > touchStartX + 50) showSlide(currentIndex - 1);
+        startAutoSlide();
+    }, { passive: true });
+
+    dots.forEach(dot => {
+        dot.addEventListener('click', (e) => {
+            stopAutoSlide();
+            const index = parseInt(e.target.getAttribute('data-index'));
+            if (!isNaN(index)) showSlide(index);
+            startAutoSlide();
+        });
+    });
+
+    startAutoSlide();
+}
+
 // Initialize default view (Home)
 document.addEventListener('DOMContentLoaded', () => {
     if (typeof initFooter === 'function') {
@@ -2171,4 +2281,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof switchNav === 'function') {
         switchNav('home');
     }
+    // Init Banner Slider
+    initBannerSlider();
 });
