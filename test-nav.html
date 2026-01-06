@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Navigation</title>
+    <style>
+        .app-view {
+            display: none;
+            padding: 20px;
+            border: 2px solid #ccc;
+            margin: 10px;
+        }
+        .app-view.active {
+            display: block;
+            background-color: #f0f0f0;
+        }
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            background: white;
+            border-top: 1px solid #ccc;
+        }
+        .nav-item {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            text-decoration: none;
+            color: #666;
+        }
+        .nav-item.active {
+            color: #007bff;
+            background-color: #f0f8ff;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Navigation System</h1>
+    
+    <div id="home-view" class="app-view active">
+        <h2>Home View</h2>
+        <p>This is the home view content.</p>
+    </div>
+    
+    <div id="build-pc-view" class="app-view">
+        <h2>Build PC View</h2>
+        <p>This is the build PC view content.</p>
+    </div>
+    
+    <div id="warranty-view" class="app-view">
+        <h2>Warranty View</h2>
+        <p>This is the warranty view content.</p>
+    </div>
+    
+    <div id="profile-view" class="app-view">
+        <h2>Profile View</h2>
+        <p>This is the profile view content.</p>
+    </div>
+    
+    <div class="bottom-nav">
+        <a class="nav-item active" href="#" onclick="switchNav('home', event); return false;">Home</a>
+        <a class="nav-item" href="#" onclick="switchNav('build-pc', event); return false;">Build PC</a>
+        <a class="nav-item" href="#" onclick="switchNav('warranty', event); return false;">Warranty</a>
+        <a class="nav-item" href="#" onclick="switchNav('profile', event); return false;">Profile</a>
+    </div>
+    
+    <script src="js/app.js"></script>
+</body>
+</html>

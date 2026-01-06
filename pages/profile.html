@@ -57,28 +57,28 @@
     <!-- Dashboard Cards - Compact Grid -->
     <div class="profile-dashboard">
         <div class="order-status-grid">
-            <button class="quick-menu-item" onclick="switchNav('notifications'); filterNotifications('order')">
+            <button class="quick-menu-item" onclick="switchNav('notifications', event); filterNotifications('order')">
                 <div class="icon-badge-container">
                     <i class="icon ion-ios-box"></i>
                     <span class="notification-badge">12</span>
                 </div>
                 <span>Đơn hàng</span>
             </button>
-            <button class="quick-menu-item" onclick="switchNav('notifications'); filterNotifications('delivery')">
+            <button class="quick-menu-item" onclick="switchNav('notifications', event); filterNotifications('delivery')">
                 <div class="icon-badge-container">
                     <i class="icon ion-android-car"></i>
                     <span class="notification-badge">2</span>
                 </div>
                 <span>Đang giao</span>
             </button>
-            <button class="quick-menu-item" onclick="switchNav('notifications'); filterNotifications('review')">
+            <button class="quick-menu-item" onclick="switchNav('notifications', event); filterNotifications('review')">
                 <div class="icon-badge-container">
                     <i class="icon ion-ios-star"></i>
                     <span class="notification-badge">5</span>
                 </div>
                 <span>Đánh giá</span>
             </button>
-            <button class="quick-menu-item" onclick="switchNav('notifications'); filterNotifications('all')">
+            <button class="quick-menu-item" onclick="switchNav('notifications', event); filterNotifications('all')">
                 <div class="icon-badge-container">
                     <i class="icon ion-ios-bell"></i>
                     <span class="notification-badge">2</span>
@@ -121,7 +121,7 @@
             <div class="section-header">
                 <i class="icon ion-ios-list"></i>
                 <span>Đơn hàng gần đây</span>
-                <a href="#" class="view-all-link" onclick="switchNav('warranty')">Xem tất cả</a>
+                <a href="#" class="view-all-link" onclick="switchNav('warranty', event)">Xem tất cả</a>
             </div>
             <div class="orders-preview">
                 <div class="order-preview-item">

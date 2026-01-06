@@ -85,8 +85,13 @@ function toggleHeaderMenu() {
 /**
  * Switch Navigation Tabs
  */
-function switchNav(tab) {
-    if (event) event.preventDefault();
+function switchNav(tab, evt) {
+    // Prevent default behavior
+    if (evt && evt.preventDefault) {
+        evt.preventDefault();
+    }
+
+    console.log('switchNav called with tab:', tab);
 
     // ƒê√≥ng sidebar n·∫øu ƒëang m·ªü
     const sidebar = document.getElementById('sidebarContainer');
@@ -94,6 +99,10 @@ function switchNav(tab) {
     if (sidebar && sidebar.classList.contains('active')) {
         sidebar.classList.remove('active');
         overlay.classList.remove('active');
+        // Unlock body scroll
+        document.body.style.overflow = '';
+        document.body.style.position = '';
+        document.body.style.width = '';
     }
 
     // X√≥a class active kh·ªèi t·∫•t c·∫£ c√°c m·ª•c ƒëi·ªÅu h∆∞·ªõng
@@ -122,11 +131,15 @@ function switchNav(tab) {
     });
 
     const activeView = document.getElementById(`${tab}-view`);
+    console.log('Looking for view:', `${tab}-view`, 'Found:', activeView);
+    
     if (activeView) {
         activeView.classList.add('active');
         // Cu·ªôn l√™n ƒë·∫ßu trang khi chuy·ªÉn tab
         const scrollContent = document.querySelector('.scroll-content');
         if (scrollContent) scrollContent.scrollTop = 0;
+    } else {
+        console.warn('View not found:', `${tab}-view`);
     }
 
     // X·ª≠ l√Ω hi·ªÉn th·ªã Search Bar
@@ -1353,46 +1366,46 @@ const footerHTML = `r
 <div class='profile-footer'>
     <!-- Collapsible Contact Sections -->
     <div class='footer-sections'>
-        <!-- Chi nh·nh –‡ L?t -->
+        <!-- Chi nhÔøΩnh ÔøΩÔøΩ L?t -->
         <div class='footer-section'>
             <button class='footer-section-header' onclick='toggleFooterSection(this)'>
-                <span>SONG PHUONG - –¿ L?T</span>
+                <span>SONG PHUONG - ÔøΩÔøΩ L?T</span>
                 <i class='icon ion-chevron-down'></i>
             </button>
             <div class='footer-section-content'>
-                <p><i class='icon ion-ios-location'></i> 472-473 Ph˘ –?ng ThiÍn Vuong, P. L‚m ViÍn, –‡ L?t, L‚m –?ng</p>
+                <p><i class='icon ion-ios-location'></i> 472-473 PhÔøΩ ÔøΩ?ng ThiÔøΩn Vuong, P. LÔøΩm ViÔøΩn, ÔøΩÔøΩ L?t, LÔøΩm ÔøΩ?ng</p>
                 <p><i class='icon ion-ios-telephone'></i> Tel: 0263 999979 - 0849 585810</p>
                 <p><i class='icon ion-ios-email'></i> Email: kinhoanh@songphuong.vn</p>
                 <p><i class='icon ion-ios-clock'></i> 08h00 - 18h30 Th? 2 d?n CN</p>
             </div>
         </div>
-        <!-- Chi nh·nh HCM -->
+        <!-- Chi nhÔøΩnh HCM -->
         <div class='footer-section'>
             <button class='footer-section-header' onclick='toggleFooterSection(this)'>
                 <span>SONG PHUONG - HCM</span>
                 <i class='icon ion-chevron-down'></i>
             </button>
             <div class='footer-section-content'>
-                <p><i class='icon ion-ios-location'></i> 694 –?ng B?c, Phu?ng Trung M? T‚y, TP HCM</p>
+                <p><i class='icon ion-ios-location'></i> 694 ÔøΩ?ng B?c, Phu?ng Trung M? TÔøΩy, TP HCM</p>
                 <p><i class='icon ion-ios-telephone'></i> Tel: 0934 111369 - 0849 585810</p>
                 <p><i class='icon ion-ios-email'></i> Email: kinhoanh@songphuong.vn</p>
                 <p><i class='icon ion-ios-clock'></i> 08h00 - 20h30 Th? 2 d?n CN</p>
             </div>
         </div>
-        <!-- Chi nh·nh Nha Trang -->
+        <!-- Chi nhÔøΩnh Nha Trang -->
         <div class='footer-section'>
             <button class='footer-section-header' onclick='toggleFooterSection(this)'>
                 <span>SONG PHUONG - NHA TRANG</span>
                 <i class='icon ion-chevron-down'></i>
             </button>
             <div class='footer-section-content'>
-                <p><i class='icon ion-ios-location'></i> 01 Hoa Lu, Phu?ng Nha Trang, Kh·nh HÚa</p>
+                <p><i class='icon ion-ios-location'></i> 01 Hoa Lu, Phu?ng Nha Trang, KhÔøΩnh HÔøΩa</p>
                 <p><i class='icon ion-ios-telephone'></i> Tel: 0905 616999 - 0849 585810</p>
                 <p><i class='icon ion-ios-email'></i> Email: kinhoanh@songphuong.vn</p>
                 <p><i class='icon ion-ios-clock'></i> 08h00 - 18h30 Th? 2 d?n CN</p>
             </div>
         </div>
-        <!-- Chi nh·nh C?n Tho -->
+        <!-- Chi nhÔøΩnh C?n Tho -->
         <div class='footer-section'>
             <button class='footer-section-header' onclick='toggleFooterSection(this)'>
                 <span>TTBH SONG PHUONG - C?N THO</span>
@@ -1405,14 +1418,14 @@ const footerHTML = `r
                 <p><i class='icon ion-ios-clock'></i> 08h00 - 18h30 Th? 2 d?n CN</p>
             </div>
         </div>
-        <!-- Chi nh·nh –‡ N?ng -->
+        <!-- Chi nhÔøΩnh ÔøΩÔøΩ N?ng -->
         <div class='footer-section'>
             <button class='footer-section-header' onclick='toggleFooterSection(this)'>
-                <span>TTBH SONG PHUONG - –¿ N?NG</span>
+                <span>TTBH SONG PHUONG - ÔøΩÔøΩ N?NG</span>
                 <i class='icon ion-chevron-down'></i>
             </button>
             <div class='footer-section-content'>
-                <p><i class='icon ion-ios-location'></i> 40A H‡m Nghi, Q. Thanh KhÍ, TP –‡ N?ng</p>
+                <p><i class='icon ion-ios-location'></i> 40A HÔøΩm Nghi, Q. Thanh KhÔøΩ, TP ÔøΩÔøΩ N?ng</p>
                 <p><i class='icon ion-ios-telephone'></i> Tel: 0236 3835566</p>
                 <p><i class='icon ion-ios-email'></i> Email: baohanhdn@songphuong.vn</p>
                 <p><i class='icon ion-ios-clock'></i> 08h00 - 18h30 Th? 2 d?n CN</p>
@@ -1424,63 +1437,63 @@ const footerHTML = `r
     <div class='footer-policies'>
         <div class='policy-item'>
             <div class='policy-icon'><i class='icon ion-ios-box'></i></div>
-            <div class='policy-label'>CHÕNH S¡CH GIAO H¿NG</div>
+            <div class='policy-label'>CHÔøΩNH SÔøΩCH GIAO HÔøΩNG</div>
         </div>
         <div class='policy-item'>
             <div class='policy-icon'><i class='icon ion-loop'></i></div>
-            <div class='policy-label'>–?I TR? D? D¿NG</div>
+            <div class='policy-label'>ÔøΩ?I TR? D? DÔøΩNG</div>
         </div>
         <div class='policy-item'>
             <div class='policy-icon'><i class='icon ion-card'></i></div>
-            <div class='policy-label'>THANH TO¡N TI?N L?I</div>
+            <div class='policy-label'>THANH TOÔøΩN TI?N L?I</div>
         </div>
         <div class='policy-item'>
             <div class='policy-icon'><i class='icon ion-chatbubbles'></i></div>
-            <div class='policy-label'>H? TR? NHI?T TÃNH</div>
+            <div class='policy-label'>H? TR? NHI?T TÔøΩNH</div>
         </div>
     </div>
 
     <!-- Continue with Policy Sections -->
     <div class='footer-sections'>
-        <!-- ChÌnh s·ch chung -->
+        <!-- ChÔøΩnh sÔøΩch chung -->
         <div class='footer-section'>
             <button class='footer-section-header' onclick='toggleFooterSection(this)'>
-                <span>CHÕNH S¡CH CHUNG</span>
+                <span>CHÔøΩNH SÔøΩCH CHUNG</span>
                 <i class='icon ion-chevron-down'></i>
             </button>
             <div class='footer-section-content'>
-                <p>ChÌnh s·ch Giao h‡ng to‡n qu?c</p>
-                <p>ChÌnh s·ch –?i tr? d? d‡ng</p>
-                <p>ChÌnh s·ch Thanh to·n ti?n l?i</p>
-                <p>ChÌnh s·ch B?o h‡nh</p>
-                <p>ChÌnh s·ch B?o m?t thÙng tin</p>
+                <p>ChÔøΩnh sÔøΩch Giao hÔøΩng toÔøΩn qu?c</p>
+                <p>ChÔøΩnh sÔøΩch ÔøΩ?i tr? d? dÔøΩng</p>
+                <p>ChÔøΩnh sÔøΩch Thanh toÔøΩn ti?n l?i</p>
+                <p>ChÔøΩnh sÔøΩch B?o hÔøΩnh</p>
+                <p>ChÔøΩnh sÔøΩch B?o m?t thÔøΩng tin</p>
             </div>
         </div>
-        <!-- H? tr? kh·ch h‡ng -->
+        <!-- H? tr? khÔøΩch hÔøΩng -->
         <div class='footer-section'>
             <button class='footer-section-header' onclick='toggleFooterSection(this)'>
-                <span>H? TR? KH¡CH H¿NG</span>
+                <span>H? TR? KHÔøΩCH HÔøΩNG</span>
                 <i class='icon ion-chevron-down'></i>
             </button>
             <div class='footer-section-content'>
-                <p>Hu?ng d?n mua h‡ng</p>
-                <p>Hu?ng d?n Tr? gÛp</p>
-                <p>Thanh to·n - Giao h‡ng</p>
-                <p>Tra c?u B?o h‡nh</p>
-                <p>In hÛa don di?n t?</p>
-                <p>GÛp ˝, Khi?u n?i</p>
+                <p>Hu?ng d?n mua hÔøΩng</p>
+                <p>Hu?ng d?n Tr? gÔøΩp</p>
+                <p>Thanh toÔøΩn - Giao hÔøΩng</p>
+                <p>Tra c?u B?o hÔøΩnh</p>
+                <p>In hÔøΩa don di?n t?</p>
+                <p>GÔøΩp ÔøΩ, Khi?u n?i</p>
             </div>
         </div>
-        <!-- T?ng d‡i h? tr? -->
+        <!-- T?ng dÔøΩi h? tr? -->
         <div class='footer-section'>
             <button class='footer-section-header' onclick='toggleFooterSection(this)'>
-                <span>T?NG –¿I H? TR?</span>
+                <span>T?NG ÔøΩÔøΩI H? TR?</span>
                 <i class='icon ion-chevron-down'></i>
             </button>
             <div class='footer-section-content'>
                 <p><strong>Hotline:</strong> 0263999979</p>
                 <p><strong>Kinh doanh:</strong> 0849 585810</p>
-                <p><strong>B?o h‡nh:</strong> 02633 604444</p>
+                <p><strong>B?o hÔøΩnh:</strong> 02633 604444</p>
             </div>
         </div>
     </div>
@@ -1488,10 +1501,10 @@ const footerHTML = `r
     <!-- Credits -->
     <div class='footer-credits'>
         <div class='credit-left'>
-            © Song Phuong | M·y tÌnh, Laptop, Linh ki?n ChÌnh h„ng
+            ÔøΩ Song Phuong | MÔøΩy tÔøΩnh, Laptop, Linh ki?n ChÔøΩnh hÔøΩng
         </div>
         <div class='credit-right'>
-            Cung c?p b?i: <strong>Ho‡ng Minh Duong</strong>
+            Cung c?p b?i: <strong>HoÔøΩng Minh Duong</strong>
         </div>
     </div>
 </div>\;
@@ -1516,6 +1529,15 @@ function switchNav(viewName) {
     // Hide all views
     const views = document.querySelectorAll('.app-view');
     views.forEach(view => {
+
+// ===========================
+// NAVIGATION SYSTEM
+// ===========================
+
+function switchNav(viewName) {
+    // Hide all views
+    const views = document.querySelectorAll('.app-view');
+    views.forEach(view => {
         view.style.display = 'none';
         view.classList.remove('active');
     });
@@ -1530,25 +1552,21 @@ function switchNav(viewName) {
     const selectedView = document.getElementById(viewName + '-view');
     if (selectedView) {
         selectedView.style.display = 'block';
-        // Small delay to allow display:block to apply before adding opacity animation class if needed
         setTimeout(() => selectedView.classList.add('active'), 10);
     }
 
     // Set active nav item
-    // Note: onclick handlers are set inline in HTML
     const activeNavLink = document.querySelector(.bottom-nav .nav-item[onclick*='']);
     if (activeNavLink) {
         activeNavLink.classList.add('active');
-    }
-
-    // Special handling for specific views
-    if (viewName === 'home') {
-        // Ensure home view components are reset if needed
     }
 }
 
 // Initialize default view (Home)
 document.addEventListener('DOMContentLoaded', () => {
+    if (typeof initFooter === 'function') {
+        initFooter();
+    }
     switchNav('home');
 });
 

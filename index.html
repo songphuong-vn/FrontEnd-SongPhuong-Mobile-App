@@ -35,7 +35,7 @@
         <!-- Header -->
         <header class="song-phuong-header">
             <div class="header-container">
-                <div class="logo" onclick="switchNav('home')" style="cursor: pointer;">
+                <div class="logo" onclick="switchNav('home', event); return false;" style="cursor: pointer;">
                     <img src="icons/songphuong-logo.png" alt="Song Phương Logo" class="logo-img">
                 </div>
 
@@ -802,7 +802,7 @@
                             <div class="section-header">
                                 <i class="icon ion-ios-list"></i>
                                 <span>Đơn hàng gần đây</span>
-                                <a href="#" class="view-all-link" onclick="switchNav('warranty')">Xem tất cả</a>
+                                <a href="#" class="view-all-link" onclick="switchNav('warranty', event)">Xem tất cả</a>
                             </div>
                             <div class="orders-preview">
                                 <div class="order-preview-item">
@@ -1044,19 +1044,19 @@
                 <i class="icon ion-navicon-round"></i>
                 <span>Danh Mục</span>
             </a>
-            <a class="nav-item" href="#" onclick="switchNav('build-pc')">
+            <a class="nav-item" href="#" onclick="switchNav('build-pc', event); return false;">
                 <i class="icon ion-settings"></i>
                 <span>Build PC</span>
             </a>
-            <a class="nav-item active" href="#" onclick="switchNav('home')">
+            <a class="nav-item active" href="#" onclick="switchNav('home', event); return false;">
                 <i class="icon ion-home"></i>
                 <span>Trang Chủ</span>
             </a>
-            <a class="nav-item" href="#" onclick="switchNav('warranty')">
+            <a class="nav-item" href="#" onclick="switchNav('warranty', event); return false;">
                 <i class="icon ion-checkmark-circled"></i>
                 <span>Bảo Hành</span>
             </a>
-            <a class="nav-item" href="#" onclick="switchNav('profile')">
+            <a class="nav-item" href="#" onclick="switchNav('profile', event); return false;">
                 <i class="icon ion-person"></i>
                 <span>Người Dùng</span>
             </a>
