@@ -1822,6 +1822,102 @@ async function loadWarrantyContent() {
 // Call initFooter when DOM loads
 document.addEventListener('DOMContentLoaded', initFooter);
 
+/**
+ * Open Product Detail Page
+ * @param {number|string} productId - The product ID to view
+ */
+function openProductDetail(productId) {
+    window.location.href = 'pages/product-details.html?productId=' + productId;
+}
+
+/**
+ * Quick Add to Cart from Product List
+ * @param {number|string} productId - The product ID to add
+ */
+function addToCartQuick(productId) {
+    addToCartId(productId, 1);
+    // quick feedback
+    const btn = document.querySelector('.cart-btn');
+    if (btn) {
+        // small visual feedback could be added here
+    }
+}
+
+// --- Cart helpers (localStorage) ---
+function getCart() {
+    try {
+        const raw = localStorage.getItem('sp_cart');
+        return raw ? JSON.parse(raw) : [];
+    } catch (e) {
+        return [];
+    }
+}
+
+function saveCart(cart) {
+    localStorage.setItem('sp_cart', JSON.stringify(cart));
+}
+
+function addToCartId(productId, qty = 1) {
+    // In this file we don't have full product metadata; store id and qty.
+    const cart = getCart();
+    const idNum = Number(productId);
+    let existing = cart.find(i => i.id === idNum);
+    if (existing) {
+        existing.qty = (existing.qty || 0) + qty;
+    } else {
+        cart.push({ id: idNum, qty: qty });
+    }
+    saveCart(cart);
+    updateCartBadge();
+}
+
+function updateCartBadge() {
+    const badge = document.querySelector('.cart-badge');
+    if (!badge) return;
+    const cart = getCart();
+    const total = cart.reduce((s, item) => s + (item.qty || 0), 0);
+    badge.textContent = total;
+}
+
+// Ensure badge shows current cart count on load
+document.addEventListener('DOMContentLoaded', function() {
+    updateCartBadge();
+});
+
+/**
+ * Initialize product click events
+ * Automatically add click handlers to all product items
+ */
+function initProductClickEvents() {
+    const productItems = document.querySelectorAll('.product-item:not(.poster):not(.promo-banner)');
+    
+    productItems.forEach((item, index) => {
+        // Generate a product ID based on index (in real app, this would come from data)
+        const productId = item.getAttribute('data-product-id') || (index + 1);
+        
+        // Make the product item clickable
+        item.style.cursor = 'pointer';
+        
+        // Add click event to the product item (excluding button clicks)
+        item.addEventListener('click', function(e) {
+            // Don't navigate if clicking the buy button
+            if (e.target.classList.contains('btn-buy')) {
+                return;
+            }
+            openProductDetail(productId);
+        });
+        
+        // Handle buy button click separately
+        const buyBtn = item.querySelector('.btn-buy');
+        if (buyBtn) {
+            buyBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                addToCartQuick(productId);
+            });
+        }
+    });
+}
+
 
 // ===========================
 // Initialize default view (Home)
@@ -1832,5 +1928,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Switch to home view by default
     if (typeof switchNav === 'function') {
         switchNav('home');
+    }
+    // Initialize product click events
+    if (typeof initProductClickEvents === 'function') {
+        initProductClickEvents();
     }
 });

@@ -101,7 +101,7 @@
                             <span class="dot" data-index="3"></span>
                             <span class="dot" data-index="4"></span>
                             <span class="dot" data-index="5"></span>
-                            <span class="dot" data-index="6"></span>
+                            <span class="dot" data-index="6"></span>Tư vấn - Mua hàng xin vui lòng gọi 02633 999979
                         </div>
                     </div>
 
@@ -149,7 +149,7 @@
                     <!-- Infinite Scroll Product Showcase - Masonry Waterfall Layout -->
                     <div class="products-container masonry" id="productsContainer">
                         <!-- Sản phẩm vuông với tag Khuyến mãi -->
-                        <div class="product-item square" data-category="ram">
+                        <div class="product-item square" data-category="ram" data-product-id="2" onclick="openProductDetail(2)">
                             <div class="product-image">
                                 <span class="product-tag sale">Khuyến mãi</span>
                                 <img src="https://product.hstatic.net/200000722513/product/ram-adata-xpg-d35g-16gb-ddr5-5600mhz-rgb_1_e81a2113b38e4ef99e13c84a0c95ed72_grande.png"
@@ -158,7 +158,7 @@
                             <div class="product-info">
                                 <div class="product-price">1.250.000đ</div>
                                 <div class="product-name">RAM Adata XPG D35G 16GB DDR5 5600MHz RGB</div>
-                                <button class="btn-buy">Mua ngay</button>
+                                <button class="btn-buy" onclick="event.stopPropagation(); addToCartQuick(2)">Mua ngay</button>
                             </div>
                         </div>
 
