@@ -67,159 +67,285 @@ function showSearchResults(query) {
         resultsContainer.id = 'searchResultsDropdown';
         resultsContainer.style.cssText = `
             position: fixed;
-            /**
-             * Lấy batch sản phẩm (2 SKU lớn : 1 SKU nhỏ), mỗi SKU tối đa 2 lần
-             */
-            function getNextProductsBatch(batchSize = 15) {
-                const result = [];
-                let safety = 0;
-
-                while (result.length < batchSize && safety < batchSize * 6) {
-                    const slot = homeFeedState.patternCursor % 3; // 0,1 => big ; 2 => small
-                    let candidate = null;
-
-                    if (slot < 2) {
-                        candidate = pickNextProduct('big');
-                    } else {
-                        candidate = pickNextProduct('small');
-                    }
-
-                    if (!candidate) {
-                        candidate = pickNextProduct('big') || pickNextProduct('small');
-                    }
-
-                    homeFeedState.patternCursor += 1;
-
-                    if (candidate) {
-                        result.push(candidate);
-                    }
-
-                    safety += 1;
-                }
-
-                return result;
-            }
-
-            function pickNextProduct(type) {
-                const list = type === 'big' ? homeFeedState.sortedBigToSmall : homeFeedState.sortedSmallToBig;
-                if (!list.length) return null;
-
-                const indexKey = type === 'big' ? 'bigIndex' : 'smallIndex';
-                let attempts = 0;
-
-                while (attempts < list.length) {
-                    const candidate = list[homeFeedState[indexKey] % list.length];
-                    homeFeedState[indexKey] += 1;
-
-                    const sku = candidate?.sku;
-                    if (!sku) {
-                        attempts += 1;
-                        continue;
-                    }
-
-                    const count = homeFeedState.seenCounts.get(sku) || 0;
-                    if (count < 2) {
-                        homeFeedState.seenCounts.set(sku, count + 1);
-                        return candidate;
-                    }
-
-                    attempts += 1;
-                }
-
-                return null;
-            }
-
-            function renderPosterCard() {
-                const posterUrl = HOME_POSTER_IMAGES[homeFeedState.posterIndex % HOME_POSTER_IMAGES.length];
-                homeFeedState.posterIndex += 1;
-
-                return `
-                    <div class="product-item poster promo-banner" data-category="promo">
-                        <div class="product-image">
-                            <img src="${posterUrl}" 
-                                 alt="Poster"
-                                 loading="lazy"
-                                 onerror="this.src='${HOME_POSTER_FALLBACK}'">
-                        </div>
-                    </div>
-                `;
-            }
-
-            function buildProductCard(product, index) {
-                const hasDiscount = product.onSale || product.displayPrice < product.originalPrice;
-                const discountPercent = product.discountPercent || 
-                    (hasDiscount ? Math.round(((product.originalPrice - product.displayPrice) / product.originalPrice) * 100) : 0);
-    
-                const categorySlug = (product.mainCategory || product.category || 'other').toLowerCase().replace(/\s+/g, '-');
-                const escapedSku = (product.sku || '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-                const escapedTitle = (product.title || '').replace(/"/g, '&quot;');
-    
-                let imageUrl = 'https://via.placeholder.com/200/f0f0f0/999?text=No+Image';
-                if (product.image) {
-                    if (product.image.startsWith('http://') || product.image.startsWith('https://')) {
-                        imageUrl = product.image;
-                    if (!resultsContainer) {
-                        resultsContainer = document.createElement('div');
-                        resultsContainer.id = 'searchResultsDropdown';
-                        resultsContainer.style.cssText = `
-                            position: fixed;
-                            top: 60px;
-                            left: 8px;
-                            right: 8px;
-                            background: white;
-                            border: 1px solid #eee;
-                            border-radius: 8px;
-                            box-shadow: 0 6px 24px rgba(0,0,0,0.12);
-                            z-index: 999;
-                            max-height: 320px;
-                            overflow-y: auto;
-                            padding: 8px 0;
-                        `;
-                    }
-        itemsSincePoster: 0,
-        posterIndex: 0,
-        posterInterval: 6,
-        renderedCount: 0,
-    };
-
-    let homeInfiniteScrollSetup = false;
-    let currentTab = null;
-
-    // Chuyển SKU sang số để ưu tiên sản phẩm mới (SKU lớn hơn)
-    const parseSkuNumber = (sku) => {
-        const num = parseInt(String(sku || '').replace(/\D/g, ''), 10);
-        return Number.isFinite(num) ? num : 0;
-    };
-
-    const sortedBigToSmall = [...allProducts].sort((a, b) => parseSkuNumber(b.sku) - parseSkuNumber(a.sku));
-    const sortedSmallToBig = [...allProducts].sort((a, b) => parseSkuNumber(a.sku) - parseSkuNumber(b.sku));
-
-    const products = [];
-    const seenSku = new Set();
-    let iBig = 0;
-    let iSmall = 0;
-    while (products.length < 30 && (iBig < sortedBigToSmall.length || iSmall < sortedSmallToBig.length)) {
-        // Thêm 2 sản phẩm SKU lớn
-        for (let k = 0; k < 2 && products.length < 30 && iBig < sortedBigToSmall.length; k++) {
-            const candidate = sortedBigToSmall[iBig++];
-            if (candidate && !seenSku.has(candidate.sku)) {
-                products.push(candidate);
-                seenSku.add(candidate.sku);
-            }
-        }
-
-        // Thêm 1 sản phẩm SKU nhỏ
-        if (products.length < 30 && iSmall < sortedSmallToBig.length) {
-            const candidate = sortedSmallToBig[iSmall++];
-            if (candidate && !seenSku.has(candidate.sku)) {
-                products.push(candidate);
-                seenSku.add(candidate.sku);
-            }
-        }
+            top: 60px;
+            left: 8px;
+            right: 8px;
+            background: white;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            box-shadow: 0 6px 24px rgba(0,0,0,0.12);
+            z-index: 999;
+            max-height: 320px;
+            overflow-y: auto;
+            padding: 8px 0;
+        `;
+        document.body.appendChild(resultsContainer);
     }
     
-    if (products.length === 0) {
-        console.warn('⚠️ No products available to render');
+    if (results.length === 0) {
+        resultsContainer.innerHTML = '<div style="padding: 16px; text-align: center; color: #999;">Không tìm thấy sản phẩm</div>';
+        return;
+    }
+    
+    resultsContainer.innerHTML = results.map(p => `
+        <div class="search-result-item" onclick="window.location.href='pages/product-details.html?sku=${encodeURIComponent(p.sku)}'" style="display: flex; align-items: center; padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #f0f0f0;">
+            <img src="${p.image && (p.image.startsWith('http') ? p.image : 'https://product.hstatic.net/200000722513/product/' + p.image)}" 
+                 alt="${p.title}" 
+                 style="width: 48px; height: 48px; object-fit: cover; border-radius: 6px; margin-right: 12px;"
+                 onerror="this.src='https://placehold.co/48x48/f0f0f0/999?text=No'">
+            <div style="flex: 1; min-width: 0;">
+                <div style="font-size: 13px; font-weight: 500; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.title}</div>
+                <div style="font-size: 12px; color: #e60000; font-weight: 600;">${ProductManager.formatPrice(p.displayPrice)}</div>
+            </div>
+        </div>
+    `).join('');
+}
+
+/**
+ * Ẩn kết quả tìm kiếm
+ */
+function hideSearchResults() {
+    const resultsContainer = document.getElementById('searchResultsDropdown');
+    if (resultsContainer) {
+        resultsContainer.remove();
+    }
+}
+
+// ===========================
+// MOCK DATA FOR ORDERS/DELIVERIES/REVIEWS
+// ===========================
+const mockOrders = [];
+const mockReviews = [];
+
+// ===========================
+// INFINITE SCROLL HOME FEED
+// ===========================
+
+// Poster images để xen kẽ trong feed
+const HOME_POSTER_IMAGES = [
+    'https://i.pinimg.com/736x/b3/2a/39/b32a392528f8447b5d6fce33728739f2.jpg',
+    'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=400&h=600&fit=crop',
+    'https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=400&h=600&fit=crop',
+    'https://images.unsplash.com/photo-1591488320449-011701bb6704?w=400&h=600&fit=crop',
+    'https://images.unsplash.com/photo-1625842268584-8f3296236761?w=400&h=600&fit=crop',
+];
+
+const HOME_POSTER_FALLBACK = 'https://placehold.co/270x480/222/fff?text=POSTER';
+
+// Trạng thái feed để hỗ trợ infinite scroll
+const homeFeedState = {
+    initialized: false,
+    container: null,
+    sortedBigToSmall: [],
+    sortedSmallToBig: [],
+    bigIndex: 0,
+    smallIndex: 0,
+    seenCounts: new Map(), // SKU -> số lần xuất hiện (max 2)
+    patternCursor: 0, // Duy trì nhịp 2 lớn : 1 nhỏ
+    itemsSincePoster: 0,
+    posterIndex: 0,
+    posterInterval: 6,
+    renderedCount: 0,
+};
+
+let homeInfiniteScrollSetup = false;
+let currentTab = 'home'; // Mặc định là home vì trang chủ hiển thị đầu tiên
+
+// Chuyển SKU sang số để ưu tiên sản phẩm mới (SKU lớn hơn)
+function parseSkuNumber(sku) {
+    const num = parseInt(String(sku || '').replace(/\D/g, ''), 10);
+    return Number.isFinite(num) ? num : 0;
+}
+
+/**
+ * Lấy batch sản phẩm (2 SKU lớn : 1 SKU nhỏ), mỗi SKU tối đa 2 lần
+ */
+function getNextProductsBatch(batchSize = 15) {
+    const result = [];
+    let safety = 0;
+
+    while (result.length < batchSize && safety < batchSize * 6) {
+        const slot = homeFeedState.patternCursor % 3; // 0,1 => big ; 2 => small
+        let candidate = null;
+
+        if (slot < 2) {
+            candidate = pickNextProduct('big');
+        } else {
+            candidate = pickNextProduct('small');
+        }
+
+        if (!candidate) {
+            candidate = pickNextProduct('big') || pickNextProduct('small');
+        }
+
+        homeFeedState.patternCursor += 1;
+
+        if (candidate) {
+            result.push(candidate);
+        }
+
+        safety += 1;
+    }
+
+    return result;
+}
+
+function pickNextProduct(type) {
+    const list = type === 'big' ? homeFeedState.sortedBigToSmall : homeFeedState.sortedSmallToBig;
+    if (!list.length) return null;
+
+    const indexKey = type === 'big' ? 'bigIndex' : 'smallIndex';
+    let attempts = 0;
+
+    while (attempts < list.length) {
+        const candidate = list[homeFeedState[indexKey] % list.length];
+        homeFeedState[indexKey] += 1;
+
+        const sku = candidate?.sku;
+        if (!sku) {
+            attempts += 1;
+            continue;
+        }
+
+        const count = homeFeedState.seenCounts.get(sku) || 0;
+        if (count < 2) {
+            homeFeedState.seenCounts.set(sku, count + 1);
+            return candidate;
+        }
+
+        attempts += 1;
+    }
+
+    return null;
+}
+
+function renderPosterCard() {
+    const posterUrl = HOME_POSTER_IMAGES[homeFeedState.posterIndex % HOME_POSTER_IMAGES.length];
+    homeFeedState.posterIndex += 1;
+
+    return `
+        <div class="product-item poster promo-banner" data-category="promo">
+            <div class="product-image">
+                <img src="${posterUrl}" 
+                     alt="Poster"
+                     loading="lazy"
+                     onerror="this.src='${HOME_POSTER_FALLBACK}'">
+            </div>
+        </div>
+    `;
+}
+
+function buildProductCard(product, index) {
+    const hasDiscount = product.onSale || product.displayPrice < product.originalPrice;
+    const discountPercent = product.discountPercent || 
+        (hasDiscount ? Math.round(((product.originalPrice - product.displayPrice) / product.originalPrice) * 100) : 0);
+
+    const categorySlug = (product.mainCategory || product.category || 'other').toLowerCase().replace(/\s+/g, '-');
+    const escapedSku = (product.sku || '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    const escapedTitle = (product.title || '').replace(/"/g, '&quot;');
+
+    let imageUrl = 'https://placehold.co/200x200/f0f0f0/999?text=No+Image';
+    if (product.image) {
+        if (product.image.startsWith('http://') || product.image.startsWith('https://')) {
+            imageUrl = product.image;
+        } else {
+            imageUrl = `https://product.hstatic.net/200000722513/product/${product.image}`;
+        }
+    }
+
+    const rating = product.rating || 5;
+    const starsHTML = Array.from({length: 5}, (_, i) => 
+        i < rating ? '<i class="icon ion-android-star" style="color: #ffc107;"></i>' : '<i class="icon ion-android-star-outline" style="color: #ddd;"></i>'
+    ).join('');
+
+    return `
+        <div class="product-item square" 
+             data-category="${categorySlug}" 
+             data-sku="${escapedSku}" 
+             data-product-title="${escapedTitle}"
+             data-index="${index}">
+            <div class="product-image">
+                ${hasDiscount && discountPercent > 0 ? `<span class="product-discount">-${discountPercent}%</span>` : ''}
+                ${product.onSale ? `<span class="product-tag sale">Khuyến mãi</span>` : ''}
+                <img src="${imageUrl}" 
+                     alt="${escapedTitle}"
+                     loading="lazy"
+                     onerror="this.src='https://placehold.co/200x200/f0f0f0/999?text=No+Image'">
+            </div>
+            <div class="product-info">
+                <div class="product-sku" style="font-size: 11px; color: #999; margin: 0;">SKU: ${product.sku}</div>
+                <div class="product-name"><strong>${product.title}</strong></div>
+                <div class="product-rating" style="margin: 0; font-size: 14px;">
+                    ${starsHTML}
+                </div>
+                <div class="product-price-wrapper">
+                    ${hasDiscount && product.originalPrice ? `<div class="product-old-price" style="font-size: 13px; color: #999; text-decoration: line-through; margin-bottom: 0;">${ProductManager.formatPrice(product.originalPrice)}</div>` : ''}
+                    <div class="product-price" style="font-size: 16px; font-weight: 700; color: #e60000;">${ProductManager.formatPrice(product.displayPrice)}</div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function appendHomeProductsBatch(batchSize = 15) {
+    if (!homeFeedState.initialized || !homeFeedState.container) return 0;
+
+    const products = getNextProductsBatch(batchSize);
+    if (!products.length) return 0;
+
+    let html = '';
+    products.forEach((product) => {
+        if (homeFeedState.itemsSincePoster >= homeFeedState.posterInterval) {
+            html += renderPosterCard();
+            homeFeedState.itemsSincePoster = 0;
+        }
+
+        html += buildProductCard(product, homeFeedState.renderedCount);
+        homeFeedState.itemsSincePoster += 1;
+        homeFeedState.renderedCount += 1;
+    });
+
+    homeFeedState.container.insertAdjacentHTML('beforeend', html);
+    return products.length;
+}
+
+function resetHomeFeed(allProducts, container) {
+    homeFeedState.container = container;
+    homeFeedState.sortedBigToSmall = [...allProducts].sort((a, b) => parseSkuNumber(b.sku) - parseSkuNumber(a.sku));
+    homeFeedState.sortedSmallToBig = [...allProducts].sort((a, b) => parseSkuNumber(a.sku) - parseSkuNumber(b.sku));
+    homeFeedState.bigIndex = 0;
+    homeFeedState.smallIndex = 0;
+    homeFeedState.seenCounts = new Map();
+    homeFeedState.patternCursor = 0;
+    homeFeedState.itemsSincePoster = 0;
+    homeFeedState.posterIndex = 0;
+    homeFeedState.renderedCount = 0;
+    homeFeedState.initialized = true;
+    container.innerHTML = '';
+}
+
+/**
+ * Render sản phẩm từ ProductManager vào trang home (hỗ trợ infinite scroll)
+ */
+function renderHomeProducts(options = {}) {
+    const { reset = true, reason = 'default' } = options;
+    console.log('=== renderHomeProducts called ===', { reset, reason });
+    
+    const container = document.getElementById('productsContainer');
+    
+    if (!container) {
+        console.error('❌ productsContainer not found!');
+        return;
+    }
+    
+    if (!window.ProductManager || !ProductManager.isLoaded) {
+        console.warn('⚠️ ProductManager not ready');
+        return;
+    }
+
+    const allProducts = ProductManager.products.filter(p => p.displayPrice > 0 && p.originalPrice > 0);
+    
+    if (!allProducts.length) {
         container.innerHTML = `
             <div style="text-align: center; padding: 60px 20px; width: 100%;">
                 <i class="icon ion-alert-circled" style="font-size: 48px; color: #999;"></i>
@@ -229,106 +355,115 @@ function showSearchResults(query) {
         return;
     }
 
-    console.log(`✅ Rendering ${products.length} products to home page...`);
-    console.log(`Filtered out ${ProductManager.products.length - allProducts.length} products with price = 0`);
-    console.log('First 3 products (SKU desc priority, 2:1 mix):', products.slice(0, 3).map(p => `${p.sku} - ${p.title} - ${ProductManager.formatPrice(p.displayPrice)}`));
+    if (reset || !homeFeedState.initialized) {
+        resetHomeFeed(allProducts, container);
+    }
 
-    // Xóa loading indicator và tất cả nội dung cũ
-    container.innerHTML = '';
-
-    // Render sản phẩm thực từ database
-    let productHTML = '';
-    products.forEach((product, index) => {
-        // Thêm poster sau mỗi 6 sản phẩm
-        if (index === 6) {
-            productHTML += `
-                <div class="product-item poster promo-banner" data-category="promo">
-                    <div class="product-image">
-                        <img src="https://songphuong.vn/Content/uploads/2024/12/RTX-4070-Ti-SALE.jpg" 
-                             alt="Khuyến mãi RTX 4070 Ti"
-                             onerror="this.src='https://via.placeholder.com/270x480/e63946/fff?text=SALE'">
-                    </div>
-                </div>
-            `;
-        } else if (index === 13) {
-            productHTML += `
-                <div class="product-item poster promo-banner" data-category="promo">
-                    <div class="product-image">
-                        <img src="https://songphuong.vn/Content/uploads/2024/11/Gaming-Week-Banner.jpg" 
-                             alt="Poster Gaming Week"
-                             onerror="this.src='https://via.placeholder.com/270x480/ff6b35/fff?text=GAMING+WEEK'">
-                    </div>
-                </div>
-            `;
-        }
-
-        const hasDiscount = product.onSale || product.displayPrice < product.originalPrice;
-        const discountPercent = product.discountPercent || 
-            (hasDiscount ? Math.round(((product.originalPrice - product.displayPrice) / product.originalPrice) * 100) : 0);
-        
-        // Lấy category từ mainCategory nếu có, không thì dùng category
-        const categorySlug = (product.mainCategory || product.category || 'other').toLowerCase().replace(/\s+/g, '-');
-        
-        // Escape SKU để tránh lỗi HTML attribute
-        const escapedSku = (product.sku || '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-        const escapedTitle = (product.title || '').replace(/"/g, '&quot;');
-        
-        // Xử lý URL ảnh - nếu có image thì dùng, không thì dùng placeholder
-        let imageUrl = 'https://via.placeholder.com/200/f0f0f0/999?text=No+Image';
-        if (product.image) {
-            // Nếu đã là URL đầy đủ thì dùng luôn
-            if (product.image.startsWith('http://') || product.image.startsWith('https://')) {
-                imageUrl = product.image;
-            } else {
-                // Nếu là relative path, thêm base URL
-                imageUrl = `https://product.hstatic.net/200000722513/product/${product.image}`;
-            }
-        }
-        
-        // Tạo rating stars (mặc định 5 sao nếu không có)
-        const rating = product.rating || 5;
-        const starsHTML = Array.from({length: 5}, (_, i) => 
-            i < rating ? '<i class="icon ion-android-star" style="color: #ffc107;"></i>' : '<i class="icon ion-android-star-outline" style="color: #ddd;"></i>'
-        ).join('');
-        
-        productHTML += `
-            <div class="product-item square" 
-                 data-category="${categorySlug}" 
-                 data-sku="${escapedSku}" 
-                 data-product-title="${escapedTitle}"
-                 data-index="${index}">
-                <div class="product-image">
-                    ${hasDiscount && discountPercent > 0 ? `<span class="product-discount">-${discountPercent}%</span>` : ''}
-                    ${product.onSale ? `<span class="product-tag sale">Khuyến mãi</span>` : ''}
-                    <img src="${imageUrl}" 
-                         alt="${escapedTitle}"
-                         loading="lazy"
-                         onerror="this.src='https://via.placeholder.com/200/f0f0f0/999?text=No+Image'">
-                </div>
-                <div class="product-info">
-                    <div class="product-sku" style="font-size: 11px; color: #999; margin: 0;">SKU: ${product.sku}</div>
-                    <div class="product-name"><strong>${product.title}</strong></div>
-                    <div class="product-rating" style="margin: 0; font-size: 14px;">
-                        ${starsHTML}
-                    </div>
-                    <div class="product-price-wrapper">
-                        ${hasDiscount && product.originalPrice ? `<div class="product-old-price" style="font-size: 13px; color: #999; text-decoration: line-through; margin-bottom: 3px;">${ProductManager.formatPrice(product.originalPrice)}</div>` : ''}
-                        <div class="product-price" style="font-size: 16px; font-weight: 700; color: #e60000;">${ProductManager.formatPrice(product.displayPrice)}</div>
-                    </div>
-                </div>
-            </div>
-        `;
-    });
-
-    container.innerHTML = productHTML;
-
-    // Thêm event listeners cho sản phẩm sau khi render
+    const appended = appendHomeProductsBatch(18);
     setupProductClickHandlers();
-
-    // Chạy lại dynamic posters và category nav
+    setupHomeInfiniteScroll();
     initProductCategoryNav();
 
-    console.log(`✅ Successfully rendered ${products.length} products from database`);
+    console.log(`✅ Appended ${appended} products (total rendered: ${homeFeedState.renderedCount})`);
+}
+
+function setupHomeInfiniteScroll() {
+    if (homeInfiniteScrollSetup) return;
+
+    const scrollContent = document.querySelector('.scroll-content');
+    if (!scrollContent) return;
+
+    scrollContent.addEventListener('scroll', () => {
+        if (!homeFeedState.initialized) return;
+        const homeViewActive = document.getElementById('home-view')?.classList.contains('active');
+        if (!homeViewActive) return;
+
+        const nearBottom = scrollContent.scrollTop + scrollContent.clientHeight >= scrollContent.scrollHeight - 300;
+        if (nearBottom) {
+            const appended = appendHomeProductsBatch(12);
+            if (appended > 0) {
+                console.log(`📥 Infinite scroll appended ${appended} products (total ${homeFeedState.renderedCount})`);
+            }
+        }
+    });
+
+    homeInfiniteScrollSetup = true;
+}
+
+/**
+ * Switch Navigation Tabs
+ * @param {string} tab - The tab name to switch to (home, build-pc, warranty, profile, notifications)
+ * @param {Event} evt - Optional event object to prevent default behavior
+ */
+function switchNav(tab, evt) {
+    // Prevent default behavior
+    if (evt && evt.preventDefault) {
+        evt.preventDefault();
+    }
+
+    // Nếu đang ở Home và nhấn Home lần nữa -> làm mới gợi ý sản phẩm
+    const isHomeReclick = tab === 'home' && currentTab === 'home' && document.getElementById('home-view')?.classList.contains('active');
+    if (isHomeReclick) {
+        showNotification('Đang làm mới gợi ý sản phẩm...', 'info');
+        renderHomeProducts({ reset: true, reason: 'home-tab-refresh' });
+        const scrollContent = document.querySelector('.scroll-content');
+        if (scrollContent) scrollContent.scrollTop = 0;
+        return;
+    }
+
+    // Đóng sidebar nếu đang mở
+    const sidebar = document.getElementById('sidebarContainer');
+    const overlay = document.getElementById('sidebarOverlay');
+    
+    if (sidebar && sidebar.classList.contains('active')) {
+        sidebar.classList.remove('active');
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+        document.body.style.position = '';
+        document.body.style.width = '';
+    }
+
+    // Load warranty content if needed
+    if (tab === 'warranty') {
+        loadWarrantyContent();
+    }
+
+    // Xóa class active khỏi tất cả các mục điều hướng
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => item.classList.remove('active'));
+
+    // Thêm class active vào mục tương ứng với tab
+    navItems.forEach(item => {
+        const onclickAttr = item.getAttribute('onclick');
+        if (onclickAttr && onclickAttr.includes(`'${tab}'`)) {
+            item.classList.add('active');
+        }
+        // Trường hợp đặc biệt cho danh mục
+        if (tab === 'category' && onclickAttr && onclickAttr.includes('toggleSidebar')) {
+            item.classList.add('active');
+        }
+    });
+
+    // Chuyển đổi hiển thị các View
+    const views = document.querySelectorAll('.app-view');
+    views.forEach(view => view.classList.remove('active'));
+
+    const activeView = document.getElementById(`${tab}-view`);
+    if (activeView) {
+        activeView.classList.add('active');
+        // Cuộn lên đầu trang khi chuyển tab
+        const scrollContent = document.querySelector('.scroll-content');
+        if (scrollContent) scrollContent.scrollTop = 0;
+    }
+
+    // Xử lý hiển thị Search Bar
+    const searchBar = document.querySelector('.header-search-fixed');
+    if (searchBar) {
+        searchBar.style.display = (tab === 'home') ? 'flex' : 'none';
+    }
+
+    // Cập nhật tab hiện tại
+    currentTab = tab;
 }
 
 /**
@@ -1085,13 +1220,6 @@ function confirmLogout() {
     }, 500);
 }
 
-// Khởi tạo ứng dụng khi DOM đã tải xong
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initApp);
-} else {
-    initApp();
-}
-
 // Khởi tạo ProductManager và tìm kiếm
 document.addEventListener('DOMContentLoaded', async function() {
     // Đợi ProductManager load
@@ -1102,6 +1230,14 @@ document.addEventListener('DOMContentLoaded', async function() {
         // Hiện thống kê trong console
         const stats = ProductManager.getStats();
         console.log('📊 Thống kê:', stats);
+        
+        // Render sản phẩm lên trang chủ
+        if (ProductManager.isLoaded && ProductManager.products.length > 0) {
+            console.log('🏠 Đang render sản phẩm lên trang chủ...');
+            renderHomeProducts({ reset: true, reason: 'initial-load' });
+            setupProductClickHandlers();
+            setupHomeInfiniteScroll();
+        }
     }
     
     // Khởi tạo tìm kiếm
