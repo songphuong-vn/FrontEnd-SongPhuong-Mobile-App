@@ -56,78 +56,77 @@
                 </div>
             </section>
 
-            <!-- Product Info Section -->
+            <!-- Product Info Section (two-column: main + aside) -->
             <section class="product-info-section">
-                <!-- Product Title -->
-                <h1 class="product-title" id="productTitle">Tên sản phẩm</h1>
+                <div class="product-info-grid">
+                    <div class="product-info-main">
+                        <!-- Product Title -->
+                        <h1 class="product-title" id="productTitle">Tên sản phẩm</h1>
 
-                <!-- SKU, Warranty, Rating Row -->
-                <div class="product-meta-row">
-                    <div class="product-sku">
-                        <span class="meta-label">SKU:</span>
-                        <span class="meta-value" id="productSku">000000</span>
+                        <!-- SKU, Warranty, Rating Row -->
+                        <div class="product-meta-row">
+                            <div class="product-sku">
+                                <span class="meta-label">SKU:</span>
+                                <span class="meta-value" id="productSku">000000</span>
+                            </div>
+                            <div class="product-warranty">
+                                <span class="meta-label">Bảo hành:</span>
+                                <span class="meta-value" id="productWarranty">12 tháng</span>
+                            </div>
+                            <div class="product-rating" id="productRating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+
+                        <!-- Short Description with Bullet Points -->
+                        <div class="product-short-description">
+                            <ul class="description-bullets" id="descriptionBullets">
+                                <!-- Bullets will be loaded dynamically -->
+                            </ul>
+                            <button class="expand-btn" id="expandDescBtn" onclick="toggleDescription()">
+                                <span id="expandBtnText">XEM THÊM</span>
+                                <i class="fas fa-chevron-down" id="expandBtnIcon"></i>
+                            </button>
+                        </div>
                     </div>
-                    <div class="product-warranty">
-                        <span class="meta-label">Bảo hành:</span>
-                        <span class="meta-value" id="productWarranty">12 tháng</span>
-                    </div>
-                    <div class="product-rating" id="productRating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                    </div>
+
+                    <aside class="product-info-aside">
+                        <!-- Price Section (styled box) -->
+                        <div class="product-price-box">
+                            <div class="price-row-line">
+                                <span class="price-label">Giá niêm yết:</span>
+                                <span class="original-price" id="originalPrice">0đ</span>
+                            </div>
+                            <div class="price-row-line sale" id="salePriceRow">
+                                <span class="price-label">Giá khuyến mãi:</span>
+                                <span class="sale-price" id="salePrice">0đ</span>
+                            </div>
+                            <div class="vat-note">(Đã bao gồm VAT)</div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="action-buttons aside-actions">
+                            <button class="btn-add-cart" onclick="addToCart()">
+                                <i class="fas fa-shopping-cart"></i>
+                                MUA NGAY
+                            </button>
+                            <button class="btn-consult" onclick="callConsult()">
+                                <i class="fas fa-phone-alt"></i>
+                                TƯ VẤN MUA HÀNG
+                            </button>
+                            <button class="btn-zalo" onclick="openZalo()">
+                                <i class="fas fa-comment-dots"></i>
+                                NHẮN TIN
+                            </button>
+                        </div>
+                        <p class="consult-note">Tư vấn - Mua hàng xin vui lòng gọi <strong>02633 999979</strong></p>
+                    </aside>
                 </div>
-
-                <!-- Short Description with Bullet Points -->
-                <div class="product-short-description">
-                    <ul class="description-bullets" id="descriptionBullets">
-                        <!-- Bullets will be loaded dynamically -->
-                    </ul>
-                    <button class="expand-btn" id="expandDescBtn" onclick="toggleDescription()">
-                        <span id="expandBtnText">XEM THÊM</span>
-                        <i class="fas fa-chevron-down" id="expandBtnIcon"></i>
-                    </button>
-                </div>
-
-                <!-- Price Section -->
-                <div class="product-price-section">
-                    <div class="price-row">
-                        <span class="price-label">Giá niêm yết:</span>
-                        <span class="original-price" id="originalPrice">0đ</span>
-                    </div>
-                    <div class="price-row sale-price-row" id="salePriceRow">
-                        <span class="price-label">Giá khuyến mãi:</span>
-                        <span class="sale-price" id="salePrice">0đ</span>
-                    </div>
-                    <span class="vat-note">( Đã bao gồm VAT )</span>
-                </div>
-
-                <!-- Quantity removed as requested -->
-
-                <!-- Action Buttons -->
-                <div class="action-buttons">
-                    <button class="btn-add-cart" onclick="addToCart()">
-                        <i class="fas fa-shopping-cart"></i>
-                        MUA NGAY
-                    </button>
-                    <button class="btn-consult" onclick="callConsult()">
-                        <i class="fas fa-phone-alt"></i>
-                        TƯ VẤN MUA HÀNG
-                    </button>
-                    <button class="btn-zalo" onclick="openZalo()">
-                        <i class="fas fa-comment-dots"></i>
-                        NHẮN TIN
-                    </button>
-                </div>
-                <p class="consult-note">Tư vấn - Mua hàng xin vui lòng gọi <strong>02633 999979</strong></p>
-
-                <!-- Specs Button (opens modal) -->
-                <button class="btn-view-specs" onclick="openSpecsModal()">
-                    <i class="fas fa-list-ul"></i>
-                    XEM THÔNG SỐ KỸ THUẬT CHI TIẾT
-                </button>
+                <!-- Specs Button removed from here and moved under product description -->
             </section>
 
             <!-- Specs Modal (hidden by default, shown when clicking button) -->
@@ -150,6 +149,12 @@
                 </div>
                 <div class="product-full-description" id="productFullDescription">
                     <!-- Full description will be loaded dynamically -->
+                </div>
+                <div style="margin-top:12px; text-align:center;">
+                    <button class="btn-view-specs" onclick="openSpecsModal()">
+                        <i class="fas fa-list-ul"></i>
+                        XEM THÔNG SỐ KỸ THUẬT CHI TIẾT
+                    </button>
                 </div>
             </section>
 

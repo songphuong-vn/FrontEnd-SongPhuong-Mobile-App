@@ -91,6 +91,21 @@
     margin-bottom: 8px;
 }
 
+.product-info-grid {
+    display: flex;
+    gap: 18px;
+    align-items: flex-start;
+}
+
+.product-info-main {
+    flex: 1;
+}
+
+.product-info-aside {
+    width: 320px;
+    flex-shrink: 0;
+}
+
 .product-title {
     font-size: 18px;
     font-weight: 700;
@@ -222,6 +237,75 @@
     margin-bottom: 15px;
 }
 
+/* New price box style to match reference */
+
+.product-price-box {
+    background: #f3f3f4;
+    padding: 12px;
+    border-radius: 6px;
+    text-align: left;
+    border: 1px solid #ededed;
+    display: block;
+}
+
+.product-price-box .price-row-line {
+    display: flex;
+    align-items: center;
+    padding: 2px 0;
+    gap: 10px;
+}
+
+.product-price-box .price-label {
+    color: #666;
+    font-size: 13px;
+    font-weight: 600;
+    min-width: 130px;
+    flex-shrink: 0;
+}
+
+.product-price-box .original-price {
+    color: #999;
+    text-decoration: line-through;
+    font-size: 16px;
+    font-weight: 700;
+    margin-left: 0;
+}
+
+.product-price-box .sale-price {
+    font-size: 26px;
+    font-weight: 800;
+    color: #e60000;
+    margin-left: 0;
+}
+
+.product-price-box .vat-note {
+    margin-left: 140px; /* căn trái với đơn giá */
+    color: #e60000;
+    font-style: italic;
+    font-weight: 700;
+    text-align: left;
+    padding-top: 0px;
+    margin-top: -2px;
+    font-size: 13px;
+}
+
+@media (max-width: 480px) {
+    .product-price-box .price-row-line {
+        grid-template-columns: 1fr;
+        row-gap: 6px;
+    }
+    .product-price-box .price-label {
+        font-size: 13px;
+    }
+}
+
+.product-price-box .original-price.no-sale {
+    color: #e60000;
+    text-decoration: none;
+    font-size: 24px;
+    font-weight: 800;
+}
+
 .price-row {
     display: flex;
     align-items: center;
@@ -259,13 +343,15 @@
 }
 
 .vat-note {
-    display: inline-block;
-    background: #fff3cd;
+    display: block;
+    background: transparent;
     color: #e60000;
-    padding: 4px 10px;
-    border-radius: 4px;
-    font-size: 12px;
-    font-weight: 600;
+    padding: 0;
+    border-radius: 0;
+    font-size: 13px;
+    font-weight: 700;
+    margin-top: 6px;
+    text-align: left;
 }
 
 /* ================================
@@ -281,6 +367,21 @@
     gap: 8px;
     margin-bottom: 10px;
     flex-wrap: wrap;
+}
+
+.aside-actions .btn-add-cart {
+    min-width: 100%;
+}
+
+/* Responsive: stack grid */
+@media (max-width: 900px) {
+    .product-info-grid {
+        display: block;
+    }
+    .product-info-aside {
+        width: 100%;
+        margin-top: 12px;
+    }
 }
 
 .btn-add-cart {
