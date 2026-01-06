@@ -594,6 +594,49 @@ function initProductCategoryNav() {
 
     if (!categoryNav || catItems.length === 0) return;
 
+    // ===== Swipe/Touch Handling =====
+    let touchStartX = 0;
+    let touchEndX = 0;
+    let isScrolling = false;
+
+    categoryNav.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].screenX;
+        isScrolling = false;
+    }, { passive: true });
+
+    categoryNav.addEventListener('touchmove', (e) => {
+        // Nếu đã cuộn, không xử lý swipe
+        if (Math.abs(e.changedTouches[0].screenX - touchStartX) > 5) {
+            isScrolling = true;
+        }
+    }, { passive: true });
+
+    categoryNav.addEventListener('touchend', (e) => {
+        touchEndX = e.changedTouches[0].screenX;
+        const swipeThreshold = 50; // Minimum distance to be considered a swipe
+        const difference = touchStartX - touchEndX;
+
+        // Chỉ xử lý swipe nếu không phải là cuộn thông thường
+        if (!isScrolling) {
+            return;
+        }
+
+        // Swipe trái (kéo sang trái) - Scroll phải
+        if (difference > swipeThreshold) {
+            categoryNav.scrollBy({
+                left: 100,
+                behavior: 'smooth'
+            });
+        }
+        // Swipe phải (kéo sang phải) - Scroll trái
+        else if (difference < -swipeThreshold) {
+            categoryNav.scrollBy({
+                left: -100,
+                behavior: 'smooth'
+            });
+        }
+    }, { passive: true });
+
     // Xử lý click vào các mục danh mục
     catItems.forEach(item => {
         item.addEventListener('click', () => {
