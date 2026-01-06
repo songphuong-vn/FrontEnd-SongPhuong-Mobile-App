@@ -106,6 +106,11 @@ function switchNav(tab, evt) {
         document.body.style.width = '';
     }
 
+    // Load warranty content if needed
+    if (tab === 'warranty') {
+        loadWarrantyContent();
+    }
+
     // Xóa class active khỏi tất cả các mục điều hướng
     const navItems = document.querySelectorAll('.nav-item');
     navItems.forEach(item => item.classList.remove('active'));
@@ -1741,11 +1746,34 @@ const footerHTML = `
 `;
 
 function initFooter() {
-    const targets = ['build-pc-footer-placeholder', 'warranty-footer-placeholder'];
+    const targets = ['build-pc-footer-placeholder'];
     targets.forEach(id => {
         const el = document.getElementById(id);
         if (el) el.innerHTML = footerHTML;
     });
+}
+
+/**
+ * Load warranty content from external file
+ */
+async function loadWarrantyContent() {
+    const warrantyPlaceholder = document.getElementById('warranty-content-placeholder');
+    
+    // Only load if not already loaded
+    if (warrantyPlaceholder && warrantyPlaceholder.innerHTML.trim() === '') {
+        try {
+            const response = await fetch('pages/warranty.html');
+            if (response.ok) {
+                const content = await response.text();
+                warrantyPlaceholder.innerHTML = content;
+            } else {
+                warrantyPlaceholder.innerHTML = '<div class="error-message">Không thể tải nội dung bảo hành.</div>';
+            }
+        } catch (error) {
+            console.error('Error loading warranty content:', error);
+            warrantyPlaceholder.innerHTML = '<div class="error-message">Lỗi khi tải nội dung bảo hành.</div>';
+        }
+    }
 }
 
 // Call initFooter when DOM loads

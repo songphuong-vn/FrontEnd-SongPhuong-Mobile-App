@@ -1,23 +1,15 @@
-<div class="warranty-page">
+<div class="warranty-page" alt = "Trang Bảo Hành">
     <!-- Header Section -->
     <div class="warranty-header">
         <h2>Trang Bảo Hành</h2>
        </div>
-    <!-- Products Purchased Header -->
-    <div class="products-purchased-section">
-        <h3>Các sản phẩm đã mua</h3>
-        <p class="section-desc">Bao gồm các linh kiện lẻ trong bộ PC</p>
-
         <!-- Warranty Table -->
         <div class="warranty-table-container">
             <table class="warranty-table">
                 <thead>
                     <tr>
-                        <th class="selection-col">
-                            <input type="checkbox" class="select-all" id="selectAllWarranty">
-                        </th>
-                        <th>Tên sản phẩm</th>
-                        <th>Serial</th>
+                        <th class="stt-col">STT</th>
+                        <th class="product-col">Tên sản phẩm</th>
                         <th>Ngày mua</th>
                         <th>Hạn bảo hành (Status)</th>
                     </tr>
@@ -25,146 +17,32 @@
                 <tbody>
                     <!-- Sample warranty items -->
                     <tr>
-                        <td class="selection-col"><input type="checkbox" class="item-checkbox"></td>
+                        <td class="stt-cell">1</td>
                         <td>RTX 4060 Ti</td>
-                        <td>SN-GPU-001</td>
                         <td>15/11/2023</td>
-                        <td><span class="status-active">Còn 18 tháng</span></td>
+                        <td class="status-cell"><span class="status-active">18 tháng</span></td>
                     </tr>
                     <tr>
-                        <td class="selection-col"><input type="checkbox" class="item-checkbox"></td>
+                        <td class="stt-cell">2</td>
                         <td>Intel Core i7-13700K</td>
-                        <td>SN-CPU-002</td>
                         <td>15/11/2023</td>
-                        <td><span class="status-active">Còn 18 tháng</span></td>
+                        <td class="status-cell"><span class="status-active">18 tháng</span></td>
                     </tr>
                     <tr>
-                        <td class="selection-col"><input type="checkbox" class="item-checkbox"></td>
+                        <td class="stt-cell">3</td>
                         <td>RAM Kingston 32GB DDR5</td>
-                        <td>SN-RAM-003</td>
                         <td>20/12/2023</td>
-                        <td><span class="status-warning">Còn 6 tháng</span></td>
+                        <td class="status-cell"><span class="status-warning">6 tháng</span></td>
                     </tr>
                     <tr>
-                        <td class="selection-col"><input type="checkbox" class="item-checkbox"></td>
+                        <td class="stt-cell">4</td>
                         <td>Samsung 980 Pro 1TB NVMe</td>
-                        <td>SN-SSD-004</td>
                         <td>10/06/2024</td>
-                        <td><span class="status-expired">Hết hạn</span></td>
+                        <td class="status-cell"><span class="status-expired">Hết hạn</span></td>
                     </tr>
                 </tbody>
             </table>
         </div>
     </div>
 
-    <!-- Product Grid Section -->
-    <div class="warranty-products-grid">
-        <h3>Chi tiết sản phẩm</h3>
-        <div class="products-grid">
-            <!-- Product Card 1 -->
-            <div class="product-warranty-card">
-                <div class="product-image">
-                    <img src="https://via.placeholder.com/150" alt="RTX 4060">
-                </div>
-                <div class="product-info">
-                    <h4>RTX 4060 Ti</h4>
-                    
-                    <!-- Health Bar (Warranty Duration) -->
-                    <div class="warranty-health">
-                        <span class="health-label">Tình trạng bảo hành</span>
-                        <div class="health-bar">
-                            <div class="health-progress active" style="width: 100%;">
-                                <span class="health-text">18/24 tháng</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="product-price">
-                        <span class="price-label">Giá mua:</span>
-                        <span class="price-value">12,500,000₫</span>
-                    </div>
-                    
-                    <button class="btn-detail-warranty">Xem chi tiết</button>
-                </div>
-            </div>
-
-            <!-- Product Card 2 -->
-            <div class="product-warranty-card">
-                <div class="product-image">
-                    <img src="https://via.placeholder.com/150" alt="Intel i7">
-                </div>
-                <div class="product-info">
-                    <h4>Intel Core i7-13700K</h4>
-                    
-                    <div class="warranty-health">
-                        <span class="health-label">Tình trạng bảo hành</span>
-                        <div class="health-bar">
-                            <div class="health-progress active" style="width: 100%;">
-                                <span class="health-text">18/24 tháng</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="product-price">
-                        <span class="price-label">Giá mua:</span>
-                        <span class="price-value">9,800,000₫</span>
-                    </div>
-                    
-                    <button class="btn-detail-warranty">Xem chi tiết</button>
-                </div>
-            </div>
-
-            <!-- Product Card 3 -->
-            <div class="product-warranty-card">
-                <div class="product-image">
-                    <img src="https://via.placeholder.com/150" alt="RAM 32GB">
-                </div>
-                <div class="product-info">
-                    <h4>RAM Kingston 32GB DDR5</h4>
-                    
-                    <div class="warranty-health">
-                        <span class="health-label">Tình trạng bảo hành</span>
-                        <div class="health-bar">
-                            <div class="health-progress warning" style="width: 25%;">
-                                <span class="health-text">6/24 tháng</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="product-price">
-                        <span class="price-label">Giá mua:</span>
-                        <span class="price-value">3,200,000₫</span>
-                    </div>
-                    
-                    <button class="btn-detail-warranty">Xem chi tiết</button>
-                </div>
-            </div>
-
-            <!-- Product Card 4 -->
-            <div class="product-warranty-card">
-                <div class="product-image">
-                    <img src="https://via.placeholder.com/150" alt="SSD 1TB">
-                </div>
-                <div class="product-info">
-                    <h4>Samsung 980 Pro 1TB NVMe</h4>
-                    
-                    <div class="warranty-health">
-                        <span class="health-label">Tình trạng bảo hành</span>
-                        <div class="health-bar">
-                            <div class="health-progress expired" style="width: 0%;">
-                                <span class="health-text">0/12 tháng</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="product-price">
-                        <span class="price-label">Giá mua:</span>
-                        <span class="price-value">2,500,000₫</span>
-                    </div>
-                    
-                    <button class="btn-detail-warranty">Xem chi tiết</button>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
