@@ -489,6 +489,268 @@ function closeSidebar() {
 }
 
 /**
+ * Khởi tạo sidebar với danh mục từ categories-data.js
+ */
+function initSidebarCategories() {
+    const sidebarContent = document.getElementById('sidebarContent');
+    if (!sidebarContent || !window.CATEGORIES) {
+        console.error('Sidebar content or CATEGORIES not found');
+        return;
+    }
+
+    let html = '';
+
+    // Sản phẩm khuyến mãi (special item)
+    html += `
+        <div class="sidebar-item" onclick="filterProductsByCategory('Sản Phẩm Khuyến Mãi')">
+            <i class="icon ion-pricetag text-red"></i>
+            <span>Sản Phẩm Khuyến Mãi</span>
+        </div>
+    `;
+
+    // Các danh mục chính với danh mục con
+    CATEGORIES.forEach((category, catIndex) => {
+        const hasChildren = category.children && category.children.length > 0;
+        const categoryId = `cat-${catIndex}`;
+
+        // Danh mục cha
+        html += `
+            <div class="sidebar-item ${hasChildren ? 'has-children' : ''}" 
+                 onclick="${hasChildren ? `toggleSubmenu('${categoryId}')` : `filterProductsByCategory('${category.name}')`}">
+                <i class="${category.icon || 'icon ion-grid'}"></i>
+                <span>${category.name}</span>
+                ${hasChildren ? '<i class="icon ion-ios-arrow-forward sidebar-item-arrow"></i>' : ''}
+            </div>
+        `;
+
+        // Danh mục con (nếu có)
+        if (hasChildren) {
+            html += `<div class="sidebar-submenu" id="${categoryId}">`;
+            
+            category.children.forEach((child, childIndex) => {
+                if (typeof child === 'string') {
+                    // Danh mục con đơn giản
+                    html += `
+                        <div class="sidebar-submenu-item" onclick="filterProductsByCategory('${category.name} > ${child}')">
+                            <span>${child}</span>
+                        </div>
+                    `;
+                } else {
+                    // Danh mục con có danh mục con cấp 2
+                    const hasSubChildren = child.children && child.children.length > 0;
+                    const subCategoryId = `${categoryId}-${childIndex}`;
+
+                    html += `
+                        <div class="sidebar-submenu-item ${hasSubChildren ? 'has-children' : ''}" 
+                             onclick="${hasSubChildren ? `toggleSubSubmenu('${subCategoryId}')` : `filterProductsByCategory('${category.name} > ${child.name}')`}">
+                            <span>${child.name}</span>
+                            ${hasSubChildren ? '<i class="icon ion-ios-arrow-forward submenu-arrow"></i>' : ''}
+                        </div>
+                    `;
+
+                    // Danh mục con cấp 2 (nếu có)
+                    if (hasSubChildren) {
+                        html += `<div class="sidebar-subsubmenu" id="${subCategoryId}">`;
+                        child.children.forEach(subChild => {
+                            html += `
+                                <div class="sidebar-subsubmenu-item" 
+                                     onclick="filterProductsByCategory('${category.name} > ${child.name} > ${subChild}')">
+                                    ${subChild}
+                                </div>
+                            `;
+                        });
+                        html += `</div>`;
+                    }
+                }
+            });
+            
+            html += `</div>`;
+        }
+    });
+
+    sidebarContent.innerHTML = html;
+}
+
+/**
+ * Toggle submenu (danh mục con cấp 1)
+ */
+function toggleSubmenu(submenuId) {
+    event.stopPropagation();
+    const submenu = document.getElementById(submenuId);
+    const parentItem = submenu.previousElementSibling;
+    
+    if (!submenu) return;
+
+    // Toggle active class
+    const isActive = submenu.classList.contains('active');
+    
+    if (isActive) {
+        submenu.classList.remove('active');
+        parentItem.classList.remove('active');
+    } else {
+        // Đóng tất cả submenu khác
+        document.querySelectorAll('.sidebar-submenu.active').forEach(item => {
+            item.classList.remove('active');
+            item.previousElementSibling.classList.remove('active');
+        });
+        
+        submenu.classList.add('active');
+        parentItem.classList.add('active');
+    }
+}
+
+/**
+ * Toggle sub-submenu (danh mục con cấp 2)
+ */
+function toggleSubSubmenu(subSubmenuId) {
+    event.stopPropagation();
+    const subSubmenu = document.getElementById(subSubmenuId);
+    const parentItem = subSubmenu.previousElementSibling;
+    
+    if (!subSubmenu) return;
+
+    // Toggle active class
+    const isActive = subSubmenu.classList.contains('active');
+    
+    if (isActive) {
+        subSubmenu.classList.remove('active');
+        parentItem.classList.remove('active');
+    } else {
+        // Đóng tất cả sub-submenu khác trong cùng submenu
+        const parentSubmenu = subSubmenu.closest('.sidebar-submenu');
+        if (parentSubmenu) {
+            parentSubmenu.querySelectorAll('.sidebar-subsubmenu.active').forEach(item => {
+                item.classList.remove('active');
+                item.previousElementSibling.classList.remove('active');
+            });
+        }
+        
+        subSubmenu.classList.add('active');
+        parentItem.classList.add('active');
+    }
+}
+
+/**
+ * Lọc sản phẩm theo danh mục
+ */
+function filterProductsByCategory(categoryPath) {
+    console.log('Filtering products by category:', categoryPath);
+    
+    // Đóng sidebar
+    closeSidebar();
+
+    // Có thể tích hợp với ProductManager để lọc sản phẩm
+    showNotification(`Đang lọc sản phẩm: ${categoryPath}`, 'info');
+    
+    // Chuyển về home view nếu đang ở view khác
+    switchNav('home');
+}
+
+/**
+ * Khởi tạo navigation danh mục dưới banner
+ */
+function initCategoryNavigation() {
+    const navElement = document.getElementById('productCategoryNav');
+    if (!navElement || !window.CATEGORIES) {
+        console.error('Category navigation or CATEGORIES not found');
+        return;
+    }
+
+    // Tạo HTML mới chỉ với "Tất cả" và "SALE", loại bỏ các item cũ
+    let html = `
+        <div class="product-cat-item active" data-category="all">
+            <i class="icon ion-grid cat-icon"></i>
+            <span class="cat-label">Tất cả</span>
+        </div>
+        <div class="product-cat-item category-sale" data-category="sale">
+            <i class="icon ion-pricetag cat-icon"></i>
+            <span class="cat-label">SALE</span>
+        </div>
+    `;
+    
+    // Chọn 6-8 danh mục phổ biến nhất để hiển thị
+    const popularCategories = [
+        'Laptop - Máy Tính Xách Tay',
+        'Linh Kiện Máy Tính',
+        'Màn Hình Máy Tính',
+        'PC Song Phương',
+        'Gaming Gear-Phím-Chuột',
+        'Camera An Ninh'
+    ];
+
+    popularCategories.forEach(catName => {
+        const category = CATEGORIES.find(c => c.name === catName);
+        if (category) {
+            html += `
+                <div class="product-cat-item" data-category="${catName}">
+                    <i class="${category.icon || 'icon ion-grid'} cat-icon"></i>
+                    <span class="cat-label">${getShortCategoryName(catName)}</span>
+                </div>
+            `;
+        }
+    });
+
+    navElement.innerHTML = html;
+    
+    // Thiết lập sự kiện click cho navigation items
+    setupCategoryNavClickHandlers();
+}
+
+/**
+ * Rút gọn tên danh mục cho navigation
+ */
+function getShortCategoryName(fullName) {
+    const shortNames = {
+        'Laptop - Máy Tính Xách Tay': 'Laptop',
+        'Linh Kiện Máy Tính': 'Linh Kiện',
+        'Màn Hình Máy Tính': 'Màn Hình',
+        'PC Song Phương': 'PC',
+        'Gaming Gear-Phím-Chuột': 'Gaming',
+        'Camera An Ninh': 'Camera',
+        'Máy Tính Trọn Bộ': 'Máy Bộ',
+        'Dịch Vụ PC-Laptop': 'Dịch Vụ'
+    };
+    
+    return shortNames[fullName] || fullName;
+}
+
+/**
+ * Thiết lập sự kiện click cho category navigation
+ */
+function setupCategoryNavClickHandlers() {
+    const navItems = document.querySelectorAll('.product-cat-item');
+    
+    navItems.forEach(item => {
+        // Bỏ qua item đã có onclick inline
+        if (item.getAttribute('onclick')) return;
+        
+        item.addEventListener('click', function() {
+            // Remove active từ tất cả items
+            navItems.forEach(i => i.classList.remove('active'));
+            
+            // Thêm active vào item được click
+            this.classList.add('active');
+            
+            // Lấy category và filter
+            const category = this.getAttribute('data-category');
+            
+            if (category === 'all') {
+                // Hiển thị tất cả sản phẩm
+                console.log('Showing all products');
+                renderHomeProducts({ reset: true, reason: 'category-all' });
+            } else if (category === 'sale') {
+                // Lọc sản phẩm khuyến mãi
+                console.log('Filtering sale products');
+                filterProductsByCategory('Sản Phẩm Khuyến Mãi');
+            } else {
+                // Lọc theo danh mục
+                filterProductsByCategory(category);
+            }
+        });
+    });
+}
+
+/**
  * Switch Navigation Tabs
  * @param {string} tab - The tab name to switch to (home, build-pc, warranty, profile, notifications)
  * @param {Event} evt - Optional event object to prevent default behavior
@@ -1255,6 +1517,12 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     // Khởi tạo tìm kiếm
     initProductSearch();
+    
+    // Khởi tạo sidebar với danh mục
+    initSidebarCategories();
+    
+    // Khởi tạo navigation danh mục
+    initCategoryNavigation();
 });
 
 // Load user profile data

@@ -130,34 +130,7 @@
                             <i class="icon ion-pricetag cat-icon"></i>
                             <span class="cat-label">SALE</span>
                         </div>
-                        <div class="product-cat-item" data-category="vga">
-                            <i class="icon ion-monitor cat-icon"></i>
-                            <span class="cat-label">VGA</span>
-                        </div>
-                        <div class="product-cat-item" data-category="cpu">
-                            <i class="icon ion-flash cat-icon"></i>
-                            <span class="cat-label">CPU</span>
-                        </div>
-                        <div class="product-cat-item" data-category="ram">
-                            <i class="icon ion-card cat-icon"></i>
-                            <span class="cat-label">RAM</span>
-                        </div>
-                        <div class="product-cat-item" data-category="ssd">
-                            <i class="icon ion-disc cat-icon"></i>
-                            <span class="cat-label">SSD</span>
-                        </div>
-                        <div class="product-cat-item" data-category="mainboard">
-                            <i class="icon ion-ios-keypad cat-icon"></i>
-                            <span class="cat-label">Mainboard</span>
-                        </div>
-                        <div class="product-cat-item" data-category="case">
-                            <i class="icon ion-cube cat-icon"></i>
-                            <span class="cat-label">Case</span>
-                        </div>
-                        <div class="product-cat-item" data-category="psu">
-                            <i class="icon ion-battery-full cat-icon"></i>
-                            <span class="cat-label">PSU</span>
-                        </div>
+                        <!-- Các danh mục sẽ được tạo động từ categories-data.js -->
                     </nav>
 
                     <!-- Infinite Scroll Product Showcase - Masonry Waterfall Layout -->
@@ -895,86 +868,8 @@
         <div class="sidebar-header">
             <h3>Danh mục sản phẩm</h3>
         </div>
-        <div class="sidebar-content">
-            <div class="sidebar-item">
-                <i class="icon ion-pricetag text-red"></i>
-                <span>Sản Phẩm Khuyến Mãi</span>
-            </div>
-            <div class="sidebar-item">
-                <i class="icon ion-monitor"></i>
-                <span>PC Song Phương</span>
-                <i class="icon ion-ios-arrow-forward sidebar-item-arrow"></i>
-            </div>
-            <div class="sidebar-item">
-                <i class="icon ion-ios-box"></i>
-                <span>Máy Tính Trọn Bộ</span>
-                <i class="icon ion-ios-arrow-forward sidebar-item-arrow"></i>
-            </div>
-            <div class="sidebar-item">
-                <i class="icon ion-laptop"></i>
-                <span>Máy Tính Xách Tay</span>
-                <i class="icon ion-ios-arrow-forward sidebar-item-arrow"></i>
-            </div>
-            <div class="sidebar-item">
-                <i class="icon ion-settings"></i>
-                <span>Linh Kiện Máy Tính</span>
-                <i class="icon ion-ios-arrow-forward sidebar-item-arrow"></i>
-            </div>
-            <div class="sidebar-item">
-                <i class="icon ion-ios-snowy"></i>
-                <span>Tản Nhiệt - Cooling</span>
-                <i class="icon ion-ios-arrow-forward sidebar-item-arrow"></i>
-            </div>
-            <div class="sidebar-item">
-                <i class="icon ion-android-desktop"></i>
-                <span>Màn Hình Máy Tính</span>
-                <i class="icon ion-ios-arrow-forward sidebar-item-arrow"></i>
-            </div>
-            <div class="sidebar-item">
-                <i class="icon ion-usb"></i>
-                <span>Phụ Kiện PC-Laptop-Mobile</span>
-                <i class="icon ion-ios-arrow-forward sidebar-item-arrow"></i>
-            </div>
-            <div class="sidebar-item">
-                <i class="icon ion-mouse"></i>
-                <span>Gaming Gear-Phím-Chuột</span>
-                <i class="icon ion-ios-arrow-forward sidebar-item-arrow"></i>
-            </div>
-            <div class="sidebar-item">
-                <i class="icon ion-printer"></i>
-                <span>Thiết Bị Văn Phòng</span>
-                <i class="icon ion-ios-arrow-forward sidebar-item-arrow"></i>
-            </div>
-            <div class="sidebar-item">
-                <i class="icon ion-videocamera"></i>
-                <span>Camera An Ninh</span>
-                <i class="icon ion-ios-arrow-forward sidebar-item-arrow"></i>
-            </div>
-            <div class="sidebar-item">
-                <i class="icon ion-speakerphone"></i>
-                <span>Thiết Bị Âm Thanh</span>
-                <i class="icon ion-ios-arrow-forward sidebar-item-arrow"></i>
-            </div>
-            <div class="sidebar-item">
-                <i class="icon ion-wifi"></i>
-                <span>Thiết Bị Mạng Lan-Wifi</span>
-                <i class="icon ion-ios-arrow-forward sidebar-item-arrow"></i>
-            </div>
-            <div class="sidebar-item">
-                <i class="icon ion-wrench"></i>
-                <span>Dịch Vụ PC-Laptop</span>
-                <i class="icon ion-ios-arrow-forward sidebar-item-arrow"></i>
-            </div>
-            <div class="sidebar-item">
-                <i class="icon ion-game-controller-b"></i>
-                <span>Thiết Bị Phòng Game</span>
-                <i class="icon ion-ios-arrow-forward sidebar-item-arrow"></i>
-            </div>
-            <div class="sidebar-item">
-                <i class="icon ion-social-windows"></i>
-                <span>Phần Mềm Bản Quyền</span>
-                <i class="icon ion-ios-arrow-forward sidebar-item-arrow"></i>
-            </div>
+        <div class="sidebar-content" id="sidebarContent">
+
         </div>
     </div>
 
@@ -7872,6 +7767,9 @@
     <script src="js/products-data.js"></script>
     <script src="js/product-manager.js"></script>
 
+    <!-- Categories Data -->
+    <script src="js/categories-data.js"></script>
+
     <!-- Custom JS -->
     <script src="js/app.js"></script>
 
@@ -7986,6 +7884,81 @@
             font-size: 14px;
             color: #ccc;
             flex-shrink: 0;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-item.has-children.active .sidebar-item-arrow {
+            transform: rotate(90deg);
+        }
+
+        /* Submenu Styles */
+        .sidebar-submenu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            background: #f8f8f8;
+        }
+
+        .sidebar-submenu.active {
+            max-height: 1000px;
+        }
+
+        .sidebar-submenu-item {
+            padding: 8px 20px 8px 59px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            color: #555;
+            background: #f8f8f8;
+            transition: background 0.2s;
+            font-size: 13px;
+        }
+
+        .sidebar-submenu-item:active {
+            background: #e8e8f0;
+        }
+
+        .sidebar-submenu-item.has-children {
+            padding-right: 35px;
+            position: relative;
+        }
+
+        .sidebar-submenu-item .submenu-arrow {
+            position: absolute;
+            right: 15px;
+            font-size: 12px;
+            color: #ccc;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-submenu-item.active .submenu-arrow {
+            transform: rotate(90deg);
+        }
+
+        /* Sub-submenu (level 3) */
+        .sidebar-subsubmenu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            background: #f0f0f0;
+        }
+
+        .sidebar-subsubmenu.active {
+            max-height: 500px;
+        }
+
+        .sidebar-subsubmenu-item {
+            padding: 7px 20px 7px 79px;
+            cursor: pointer;
+            color: #666;
+            background: #f0f0f0;
+            transition: background 0.2s;
+            font-size: 12px;
+        }
+
+        .sidebar-subsubmenu-item:active {
+            background: #e0e0e8;
         }
 
         /* Mobile Responsive */
