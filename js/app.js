@@ -948,7 +948,7 @@ function initProductCategoryNav() {
 }
 
 /**
- * Logic slider banner
+ * Logic slider banner - Auto slide only
  */
 function initBannerSlider() {
     const slider = document.querySelector('.banner-slider');
@@ -958,102 +958,17 @@ function initBannerSlider() {
     if (!slider || slides.length === 0) return;
 
     let currentIndex = 0;
-    let isDragging = false;
-    let startPos = 0;
     let currentTranslate = 0;
-    let prevTranslate = 0;
-    let animationID;
     let autoSlideInterval;
-
-    // Ngăn chặn menu chuột phải mặc định
-    window.oncontextmenu = function (event) {
-        event.preventDefault();
-        event.stopPropagation();
-        return false;
-    };
-
-    // SỰ KIỆN TOUCH VÀ MOUSE
-    slides.forEach((slide, index) => {
-        const slideImage = slide.querySelector('img');
-        if (slideImage) slideImage.addEventListener('dragstart', (e) => e.preventDefault());
-
-        // Touch events
-        slide.addEventListener('touchstart', touchStart(index), { passive: true });
-        slide.addEventListener('touchend', touchEnd);
-        slide.addEventListener('touchmove', touchMove, { passive: false });
-
-        // Mouse events (để test trên PC dễ hơn)
-        slide.addEventListener('mousedown', touchStart(index));
-        slide.addEventListener('mouseup', touchEnd);
-        slide.addEventListener('mouseleave', () => {
-            if (isDragging) touchEnd();
-        });
-        slide.addEventListener('mousemove', touchMove);
-    });
-
-    function touchStart(index) {
-        return function (event) {
-            isDragging = true;
-            currentIndex = index;
-            startPos = getPositionX(event);
-            animationID = requestAnimationFrame(animation);
-            slider.style.transition = 'none'; // Tắt transition khi bắt đầu kéo để mượt
-            clearInterval(autoSlideInterval);
-        }
-    }
-
-    function touchMove(event) {
-        if (isDragging) {
-            const currentPosition = getPositionX(event);
-            // Ngăn cuộn trang nếu đang kéo ngang rõ rệt
-            if (Math.abs(currentPosition - startPos) > 10) {
-                if (event.cancelable) event.preventDefault();
-            }
-            currentTranslate = prevTranslate + currentPosition - startPos;
-        }
-    }
-
-    function touchEnd() {
-        isDragging = false;
-        cancelAnimationFrame(animationID);
-
-        const movedBy = currentTranslate - prevTranslate;
-
-        // Nếu kéo đủ xa (> 70px) thì chuyển slide
-        if (movedBy < -70 && currentIndex < slides.length - 1) {
-            currentIndex += 1;
-        }
-        else if (movedBy > 70 && currentIndex > 0) {
-            currentIndex -= 1;
-        }
-
-        setPositionByIndex();
-        startAutoSlide(); // Khởi động lại auto slide
-    }
-
-    function getPositionX(event) {
-        return event.type.includes('mouse') ? event.pageX : event.touches[0].clientX;
-    }
-
-    function animation() {
-        if (isDragging) {
-            setSliderPosition();
-            requestAnimationFrame(animation);
-        }
-    }
 
     function setSliderPosition() {
         slider.style.transform = `translateX(${currentTranslate}px)`;
     }
 
     function setPositionByIndex() {
-        slider.style.transition = 'transform 0.3s ease-out'; // Bật lại transition
-        currentTranslate = currentIndex * -window.innerWidth; // Giả sử width slider là 100vw hoặc lấy offsetWidth
-        // Lấy chiều rộng chính xác của slider container thay vì window
+        slider.style.transition = 'transform 0.3s ease-out';
         const sliderWidth = slider.parentElement.offsetWidth;
         currentTranslate = currentIndex * -sliderWidth;
-
-        prevTranslate = currentTranslate;
         setSliderPosition();
         updateDots();
     }
