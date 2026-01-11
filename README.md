@@ -223,13 +223,6 @@ icon: 'fas fa-laptop'
 icon: 'fas fa-keyboard'
 ```
 
-## 📊 Dữ Liệu & Database
-
-- **Database:** 9,926 sản phẩm từ CSV gốc
-- **Danh mục:** 15+ danh mục chính, 47+ danh mục con cấp 1, 200+ danh mục con cấp 2
-- **Tối ưu hóa:** Chunk files cho chi tiết sản phẩm (lazy load)
-- **Format:** JSON + CSV + Chunk JS
-
 ## 🎯 Tính năng Sắp Tới
 
 - [ ] Tích hợp API backend thực
@@ -270,15 +263,7 @@ Copyright © 2026 Song Phương. All rights reserved.
 
 ## 👥 Team
 
-- **Development:** GitHub Copilot
-- **Product Management:** Nhóm 11
-- **University:** UNG (University of New Generation)
-
-## 📞 Liên Hệ & Support
-
-- **Website:** https://songphuong.vn
-- **Email:** support@songphuong.vn
-- **Phone:** [Liên hệ qua website]
+- **University:** DLU - Dalat University
 
 ---
 
