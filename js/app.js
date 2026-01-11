@@ -756,6 +756,8 @@ function setupCategoryNavClickHandlers() {
             const category = this.getAttribute('data-category');
 
             if (category === 'all') {
+                // Reset bộ lọc toàn cục khi quay về "Tất cả"
+                currentCategoryFilter = null;
                 // Hiển thị tất cả sản phẩm
                 console.log('Showing all products');
                 renderHomeProducts({ reset: true, reason: 'category-all' });
