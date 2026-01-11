@@ -24,6 +24,7 @@ lockOrientation();
 // GLOBAL STATE & HELPERS
 // ===========================
 let cartItems = []; // Global cart items
+let currentCategoryFilter = null; // Global category filter for home rendering
 
 // Helper: Format Currency
 function formatCurrency(amount) {
@@ -398,7 +399,26 @@ function renderHomeProducts(options = {}) {
         return;
     }
 
-    const allProducts = ProductManager.products.filter(p => p.displayPrice > 0 && p.originalPrice > 0);
+    let allProducts = ProductManager.products.filter(p => p.displayPrice > 0 && p.originalPrice > 0);
+
+    // Áp dụng bộ lọc danh mục nếu có
+    if (currentCategoryFilter && currentCategoryFilter !== 'all') {
+        const filter = currentCategoryFilter;
+        if (filter === 'Sản Phẩm Khuyến Mãi' || filter === 'sale') {
+            allProducts = allProducts.filter(p => p.onSale || (p.discountPercent && p.discountPercent > 0));
+        } else {
+            allProducts = allProducts.filter(p => {
+                const cat = (p.category || '').trim();
+                const sub = (p.subCategory || '').trim();
+                return (
+                    cat === filter ||
+                    sub === filter ||
+                    cat.includes(filter) ||
+                    sub.includes(filter)
+                );
+            });
+        }
+    }
 
     if (!allProducts.length) {
         container.innerHTML = `
@@ -526,7 +546,7 @@ function initSidebarCategories() {
         // Danh mục con (nếu có)
         if (hasChildren) {
             html += `<div class="sidebar-submenu" id="${categoryId}">`;
-            
+
             category.children.forEach((child, childIndex) => {
                 if (typeof child === 'string') {
                     // Danh mục con đơn giản
@@ -563,7 +583,7 @@ function initSidebarCategories() {
                     }
                 }
             });
-            
+
             html += `</div>`;
         }
     });
@@ -578,12 +598,12 @@ function toggleSubmenu(submenuId) {
     event.stopPropagation();
     const submenu = document.getElementById(submenuId);
     const parentItem = submenu.previousElementSibling;
-    
+
     if (!submenu) return;
 
     // Toggle active class
     const isActive = submenu.classList.contains('active');
-    
+
     if (isActive) {
         submenu.classList.remove('active');
         parentItem.classList.remove('active');
@@ -593,7 +613,7 @@ function toggleSubmenu(submenuId) {
             item.classList.remove('active');
             item.previousElementSibling.classList.remove('active');
         });
-        
+
         submenu.classList.add('active');
         parentItem.classList.add('active');
     }
@@ -606,12 +626,12 @@ function toggleSubSubmenu(subSubmenuId) {
     event.stopPropagation();
     const subSubmenu = document.getElementById(subSubmenuId);
     const parentItem = subSubmenu.previousElementSibling;
-    
+
     if (!subSubmenu) return;
 
     // Toggle active class
     const isActive = subSubmenu.classList.contains('active');
-    
+
     if (isActive) {
         subSubmenu.classList.remove('active');
         parentItem.classList.remove('active');
@@ -624,7 +644,7 @@ function toggleSubSubmenu(subSubmenuId) {
                 item.previousElementSibling.classList.remove('active');
             });
         }
-        
+
         subSubmenu.classList.add('active');
         parentItem.classList.add('active');
     }
@@ -635,16 +655,18 @@ function toggleSubSubmenu(subSubmenuId) {
  */
 function filterProductsByCategory(categoryPath) {
     console.log('Filtering products by category:', categoryPath);
-    
-    // Đóng sidebar
-    closeSidebar();
+    // Đóng sidebar nếu có
+    if (typeof closeSidebar === 'function') closeSidebar();
 
-    // Có thể tích hợp với ProductManager để lọc sản phẩm
+    // Cập nhật filter toàn cục
+    currentCategoryFilter = categoryPath;
     showNotification(`Đang lọc sản phẩm: ${categoryPath}`, 'info');
-    
-    // Chuyển về home view nếu đang ở view khác
-    switchNav('home');
+
+    // Chuyển về home và render lại bằng pipeline chuẩn
+    if (typeof switchNav === 'function') switchNav('home');
+    renderHomeProducts({ reset: true, reason: 'category-filter' });
 }
+
 
 /**
  * Khởi tạo navigation danh mục dưới banner
@@ -666,7 +688,7 @@ function initCategoryNavigation() {
             <span class="cat-label">SALE</span>
         </div>
     `;
-    
+
     // Chọn 6-8 danh mục phổ biến nhất để hiển thị
     const popularCategories = [
         'Laptop - Máy Tính Xách Tay',
@@ -690,7 +712,7 @@ function initCategoryNavigation() {
     });
 
     navElement.innerHTML = html;
-    
+
     // Thiết lập sự kiện click cho navigation items
     setupCategoryNavClickHandlers();
 }
@@ -709,7 +731,7 @@ function getShortCategoryName(fullName) {
         'Camera An Ninh': 'Camera',
         'Dịch Vụ PC-Laptop': 'Dịch Vụ'
     };
-    
+
     return shortNames[fullName] || fullName;
 }
 
@@ -718,21 +740,21 @@ function getShortCategoryName(fullName) {
  */
 function setupCategoryNavClickHandlers() {
     const navItems = document.querySelectorAll('.product-cat-item');
-    
+
     navItems.forEach(item => {
         // Bỏ qua item đã có onclick inline
         if (item.getAttribute('onclick')) return;
-        
-        item.addEventListener('click', function() {
+
+        item.addEventListener('click', function () {
             // Remove active từ tất cả items
             navItems.forEach(i => i.classList.remove('active'));
-            
+
             // Thêm active vào item được click
             this.classList.add('active');
-            
+
             // Lấy category và filter
             const category = this.getAttribute('data-category');
-            
+
             if (category === 'all') {
                 // Hiển thị tất cả sản phẩm
                 console.log('Showing all products');
@@ -1516,10 +1538,10 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     // Khởi tạo tìm kiếm
     initProductSearch();
-    
+
     // Khởi tạo sidebar với danh mục
     initSidebarCategories();
-    
+
     // Khởi tạo navigation danh mục
     initCategoryNavigation();
 });
@@ -2465,4 +2487,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     // Init Banner Slider
     initBannerSlider();
+
+    // ⭐ FIX: Initialize Products Rendering
+    // Wait for ProductManager to be ready before rendering
+    const initProducts = () => {
+        if (window.ProductManager && ProductManager.isLoaded) {
+            console.log('✅ ProductManager ready, rendering products...');
+            renderHomeProducts({ reset: true, reason: 'initial_load' });
+        } else {
+            console.log('⏳ Waiting for ProductManager...');
+            setTimeout(initProducts, 100);
+        }
+    };
+    initProducts();
 });
