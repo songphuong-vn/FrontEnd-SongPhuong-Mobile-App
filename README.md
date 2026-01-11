@@ -67,11 +67,4 @@ Sau quá trình nghiên cứu và phát triển, nhóm đã đạt được các
 - ✅ **Về Khả năng mở rộng:** Cấu trúc mã nguồn được module hóa rõ ràng (tách biệt logic và view), sẵn sàng cho việc tích hợp API Backend thực tế.
 
 ---
-
-## 👥 THÔNG TIN NHÓM THỰC HIỆN
-
-- **Trường:** Đại học Đà Lạt (Dalat University)
-- **Môn học:** Lập trình thiết bị di động
-- **Nhóm:** 11
-
 **© 2026 Song Phương - Project Mobile App**
