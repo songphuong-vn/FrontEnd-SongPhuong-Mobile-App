@@ -1,4 +1,4 @@
-# � ĐỒ ÁN MÔN HỌC: ỨNG DỤNG QUẢN LÝ & KINH DOANH THIẾT BỊ CÔNG NGHỆ (SONG PHƯƠNG MOBILE)
+# ỨNG DỤNG QUẢN LÝ & KINH DOANH THIẾT BỊ CÔNG NGHỆ - SONG PHƯƠNG MOBILE
 
 ## 1. TỔNG QUAN & TÍNH CẤP THIẾT
 Trong kỷ nguyên số, việc mua sắm thiết bị công nghệ qua nền tảng di động đã trở thành nhu cầu thiết yếu. Đặc biệt đối với lĩnh vực phần cứng máy tính (PC), khách hàng không chỉ cần xem giá mà còn cần hỗ trợ kỹ thuật về tính tương thích khi xây dựng cấu hình (Build PC).
