@@ -656,7 +656,6 @@ function initCategoryNavigation() {
         return;
     }
 
-    // Tạo HTML mới chỉ với "Tất cả" và "SALE", loại bỏ các item cũ
     let html = `
         <div class="product-cat-item active" data-category="all">
             <i class="icon ion-grid cat-icon"></i>
@@ -701,13 +700,13 @@ function initCategoryNavigation() {
  */
 function getShortCategoryName(fullName) {
     const shortNames = {
+        'Máy Tính Trọn Bộ': 'Máy Bộ',
+        'PC Song Phương': 'SP PC',
         'Laptop - Máy Tính Xách Tay': 'Laptop',
         'Linh Kiện Máy Tính': 'Linh Kiện',
         'Màn Hình Máy Tính': 'Màn Hình',
-        'PC Song Phương': 'PC',
-        'Gaming Gear-Phím-Chuột': 'Gaming',
+        'Gaming Gear-Phím-Chuột': 'Gaming Gears',
         'Camera An Ninh': 'Camera',
-        'Máy Tính Trọn Bộ': 'Máy Bộ',
         'Dịch Vụ PC-Laptop': 'Dịch Vụ'
     };
     
