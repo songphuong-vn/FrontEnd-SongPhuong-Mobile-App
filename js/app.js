@@ -1058,6 +1058,14 @@ function renderReviews() {
     });
 }
 
+function setBadgeValue(selector, value) {
+    const badge = document.querySelector(selector);
+    if (badge) {
+        badge.textContent = value;
+        badge.style.display = value > 0 ? 'flex' : 'none';
+    }
+}
+
 function syncActionBadges() {
     setBadgeValue('#ordersBadge', mockOrders.length);
     const delivering = mockOrders.filter(o => o.status === 'Đang giao').length;
@@ -1922,39 +1930,62 @@ function initMembershipData() {
 }
 
 // Toggle Visibility for Contact Info
-function toggleAllContactInfo(btn) {
-    const icon = btn.querySelector('.icon');
+function toggleAllContactInfo() {
+    const icon = document.getElementById('globalVisibilityIcon');
+    const maskedElements = document.querySelectorAll('.info-value.masked-content');
+
+    if (!icon) return;
+
     const isHidden = icon.classList.contains('ion-eye-disabled');
-    const values = document.querySelectorAll('.info-value.masked');
 
     if (isHidden) {
         // Show actual values
         icon.classList.remove('ion-eye-disabled');
         icon.classList.add('ion-eye');
-        values.forEach(el => {
-            el.textContent = el.getAttribute('data-value');
+        maskedElements.forEach(el => {
+            const original = el.getAttribute('data-original');
+            if (original) {
+                el.textContent = original;
+            }
         });
     } else {
         // Mask values
         icon.classList.remove('ion-eye');
         icon.classList.add('ion-eye-disabled');
-        values.forEach(el => {
-            // Re-generate mask based on type (phone or email)
-            const val = el.getAttribute('data-value');
-            if (val.includes('@')) {
-                // Email mask: keep 3 chars start, 4 chars end? or just simplify
-                // Original: ngu*******@email.com
-                // Simple logic: first 3 chars + *** + @ + domain
-                const [user, domain] = val.split('@');
-                const maskedUser = user.substring(0, 3) + '*******';
-                el.textContent = maskedUser + '@' + domain;
-            } else {
-                // Phone mask: 091****678
-                el.textContent = val.substring(0, 3) + '****' + val.substring(val.length - 3);
+        maskedElements.forEach(el => {
+            const original = el.getAttribute('data-original');
+            if (original) {
+                // Create masked text with asterisks
+                el.textContent = '*'.repeat(original.length);
             }
         });
     }
 }
+
+/**
+ * Toggle Header Menu in Profile
+ */
+function toggleHeaderMenu() {
+    const menuItems = document.getElementById('headerMenuItems');
+    const toggleBtn = document.getElementById('headerToggleBtn');
+
+    if (!menuItems || !toggleBtn) return;
+
+    const isOpen = menuItems.classList.contains('active');
+
+    if (isOpen) {
+        // Close menu
+        menuItems.classList.remove('active');
+        toggleBtn.classList.remove('active');
+        toggleBtn.querySelector('.icon').className = 'icon ion-plus-round';
+    } else {
+        // Open menu
+        menuItems.classList.add('active');
+        toggleBtn.classList.add('active');
+        toggleBtn.querySelector('.icon').className = 'icon ion-close-round';
+    }
+}
+
 
 // Call init on load
 document.addEventListener('DOMContentLoaded', initMembershipData);
@@ -2108,12 +2139,51 @@ function toggleFooterSection(button) {
  * Open Profile Settings Modal
  */
 function openProfileSettings() {
-    const modal = document.getElementById('settingsModal');
-    if (modal) {
-        modal.classList.add('active');
-        // Lock body scroll
-        document.body.style.overflow = 'hidden';
-    }
+    // Tạo modal động
+    const modal = document.createElement('div');
+    modal.className = 'settings-modal';
+    modal.id = 'settingsModal';
+    modal.innerHTML = `
+        <div class="settings-overlay" onclick="closeProfileSettings()"></div>
+        <div class="settings-content">
+            <div class="settings-header">
+                <h3>Cài đặt</h3>
+            </div>
+            <div class="settings-body">
+                <button class="settings-item" onclick="showNotification('Tính năng sẽ sớm ra mắt', 'info')">
+                    <i class="icon ion-ios-world"></i>
+                    <span>Ngôn ngữ</span>
+                </button>
+                <button class="settings-item" onclick="showNotification('Tính năng sẽ sớm ra mắt', 'info')">
+                    <i class="icon ion-ios-moon"></i>
+                    <span>Chế độ tối</span>
+                </button>
+                <button class="settings-item" onclick="showNotification('Tính năng sẽ sớm ra mắt', 'info')">
+                    <i class="icon ion-ios-bell"></i>
+                    <span>Thông báo</span>
+                </button>
+                <div class="settings-divider"></div>
+                <button class="settings-item" onclick="showNotification('Tính năng sẽ sớm ra mắt', 'info')">
+                    <i class="icon ion-help-circled"></i>
+                    <span>Trợ giúp</span>
+                </button>
+                <button class="settings-item" onclick="showNotification('Tính năng sẽ sớm ra mắt', 'info')">
+                    <i class="icon ion-information-circled"></i>
+                    <span>Về chúng tôi</span>
+                </button>
+                <div class="settings-divider"></div>
+                <button class="settings-item logout-btn" onclick="showNotification('Đăng xuất thành công', 'success'); closeProfileSettings();">
+                    <i class="icon ion-log-out"></i>
+                    <span>Đăng xuất</span>
+                </button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    // Animation
+    setTimeout(() => modal.classList.add('active'), 10);
+    document.body.style.overflow = 'hidden';
 }
 
 /**
@@ -2123,8 +2193,10 @@ function closeProfileSettings() {
     const modal = document.getElementById('settingsModal');
     if (modal) {
         modal.classList.remove('active');
-        // Unlock body scroll
-        document.body.style.overflow = '';
+        setTimeout(() => {
+            modal.remove();
+            document.body.style.overflow = '';
+        }, 300);
     }
 }
 
@@ -2289,27 +2361,166 @@ function initFooter() {
 }
 
 /**
- * Load warranty content from external file
+ * Load warranty content (hardcoded to avoid CORS issues with file://)
  */
-async function loadWarrantyContent() {
+function loadWarrantyContent() {
     const warrantyPlaceholder = document.getElementById('warranty-content-placeholder');
 
     // Only load if not already loaded
     if (warrantyPlaceholder && warrantyPlaceholder.innerHTML.trim() === '') {
-        try {
-            const response = await fetch('pages/warranty.html');
-            if (response.ok) {
-                const content = await response.text();
-                warrantyPlaceholder.innerHTML = content;
-            } else {
-                warrantyPlaceholder.innerHTML = '<div class="error-message">Không thể tải nội dung bảo hành.</div>';
-            }
-        } catch (error) {
-            console.error('Error loading warranty content:', error);
-            warrantyPlaceholder.innerHTML = '<div class="error-message">Lỗi khi tải nội dung bảo hành.</div>';
-        }
+        const warrantyHTML = `
+            <div class="warranty-page">
+                <div class="warranty-header">
+                    <h2>Trang Bảo Hành</h2>
+                </div>
+                <div class="warranty-table-container">
+                    <table class="warranty-table">
+                        <thead>
+                            <tr>
+                                <th class="stt-col">STT</th>
+                                <th class="product-col">Tên sản phẩm</th>
+                                <th>Ngày mua</th>
+                                <th>Hạn bảo hành</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="stt-cell">1</td>
+                                <td>RTX 4060 Ti</td>
+                                <td>15/11/2023</td>
+                                <td class="status-cell"><span class="status-active">18 tháng</span></td>
+                            </tr>
+                            <tr>
+                                <td class="stt-cell">2</td>
+                                <td>Intel Core i7-13700K</td>
+                                <td>15/11/2023</td>
+                                <td class="status-cell"><span class="status-active">18 tháng</span></td>
+                            </tr>
+                            <tr>
+                                <td class="stt-cell">3</td>
+                                <td>RAM Kingston 32GB DDR5</td>
+                                <td>20/12/2023</td>
+                                <td class="status-cell"><span class="status-warning">6 tháng</span></td>
+                            </tr>
+                            <tr>
+                                <td class="stt-cell">4</td>
+                                <td>Samsung 980 Pro 1TB NVMe</td>
+                                <td>10/06/2024</td>
+                                <td class="status-cell"><span class="status-expired">Hết hạn</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+        warrantyPlaceholder.innerHTML = warrantyHTML;
     }
 }
+
+/**
+ * Edit Contact Information
+ */
+function editContactInfo() {
+    // Tạo modal chỉnh sửa thông tin
+    const modal = document.createElement('div');
+    modal.className = 'edit-contact-modal';
+    modal.innerHTML = `
+        <div class="modal-overlay" onclick="closeEditModal()"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Chỉnh sửa thông tin</h3>
+                <button class="modal-close" onclick="closeEditModal()">
+                    <i class="icon ion-close"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Họ và tên</label>
+                    <input type="text" id="editName" value="Nguyễn Văn A" placeholder="Nhập họ và tên">
+                </div>
+                <div class="form-group">
+                    <label>Số điện thoại</label>
+                    <input type="tel" id="editPhone" value="0912 345 678" placeholder="Nhập số điện thoại">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="editEmail" value="nguyenvana@email.com" placeholder="Nhập email">
+                </div>
+                <div class="form-group">
+                    <label>Địa chỉ</label>
+                    <textarea id="editAddress" rows="2" placeholder="Nhập địa chỉ">123 Nguyễn Văn Linh, Quận 7, TP.HCM</textarea>
+                </div>
+                <div class="form-group">
+                    <label>Ngày sinh</label>
+                    <input type="date" id="editBirthday" value="1990-03-15">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeEditModal()">Hủy</button>
+                <button class="btn-save" onclick="saveContactInfo()">Lưu thay đổi</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    // Animation
+    setTimeout(() => modal.classList.add('active'), 10);
+}
+
+/**
+ * Close Edit Modal
+ */
+function closeEditModal() {
+    const modal = document.querySelector('.edit-contact-modal');
+    if (modal) {
+        modal.classList.remove('active');
+        setTimeout(() => modal.remove(), 300);
+    }
+}
+
+/**
+ * Save Contact Information
+ */
+function saveContactInfo() {
+    const name = document.getElementById('editName').value;
+    const phone = document.getElementById('editPhone').value;
+    const email = document.getElementById('editEmail').value;
+    const address = document.getElementById('editAddress').value;
+    const birthday = document.getElementById('editBirthday').value;
+
+    // Cập nhật hiển thị trên trang
+    const contactItems = document.querySelectorAll('.contact-item .contact-value');
+    if (contactItems.length >= 4) {
+        contactItems[0].textContent = phone;
+        contactItems[1].textContent = email;
+        contactItems[2].textContent = address;
+
+        // Format ngày sinh
+        const dateObj = new Date(birthday);
+        const formattedDate = `${String(dateObj.getDate()).padStart(2, '0')}/${String(dateObj.getMonth() + 1).padStart(2, '0')}/${dateObj.getFullYear()}`;
+        contactItems[3].textContent = formattedDate;
+    }
+
+    // Cập nhật tên người dùng
+    const userName = document.querySelector('.user-name');
+    if (userName) userName.textContent = name;
+
+    // Lưu vào localStorage
+    const userInfo = { name, phone, email, address, birthday };
+    localStorage.setItem('userContactInfo', JSON.stringify(userInfo));
+
+    closeEditModal();
+    showNotification('Đã lưu thông tin thành công!', 'success');
+}
+
+/**
+ * Customer Support Action
+ */
+function openCustomerSupport() {
+    showNotification('Liên hệ Hotline: 0263999979', 'info');
+    // window.location.href = 'tel:0263999979'; // Uncomment to auto-dial
+}
+
 
 // Call initFooter when DOM loads
 document.addEventListener('DOMContentLoaded', initFooter);
@@ -2487,11 +2698,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof switchNav === 'function') {
         switchNav('home');
     }
-    // Init Banner Slider
     initBannerSlider();
 
-    // ⭐ FIX: Initialize Products Rendering
-    // Wait for ProductManager to be ready before rendering
     const initProducts = () => {
         if (window.ProductManager && ProductManager.isLoaded) {
             console.log('✅ ProductManager ready, rendering products...');

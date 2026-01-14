@@ -8,7 +8,7 @@
                 <button class="menu-item-btn" onclick="editContactInfo()" title="Chỉnh sửa thông tin">
                     <i class="icon ion-edit"></i>
                 </button>
-                <button class="menu-item-btn" title="Chăm sóc khách hàng">
+                <button class="menu-item-btn" onclick="openCustomerSupport()" title="Chăm sóc khách hàng">
                     <i class="icon ion-headphone"></i>
                 </button>
                 <button class="menu-item-btn" onclick="openProfileSettings()" title="Cài đặt">
@@ -63,7 +63,8 @@
                 </div>
                 <span>Đơn hàng</span>
             </button>
-            <button class="quick-menu-item" onclick="switchNav('notifications', event); filterNotifications('delivery')">
+            <button class="quick-menu-item"
+                onclick="switchNav('notifications', event); filterNotifications('delivery')">
                 <div class="icon-badge-container">
                     <i class="icon ion-android-car"></i>
                     <span class="notification-badge">2</span>
