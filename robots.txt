@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /icons/
+Disallow: /css/
+Disallow: /js/
+Disallow: /node_modules/
+
+Sitemap: https://khach-hang-mobile-app.vercel.app/sitemap.xml
