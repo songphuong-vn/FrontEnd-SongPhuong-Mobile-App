@@ -20,7 +20,10 @@ Dự án này đã được tối ưu hóa để triển khai trên Vercel.
     vercel
     ```
     - Làm theo hướng dẫn trên màn hình.
-    - Chọn cài đặt mặc định (Vercel sẽ tự động phát hiện đây là dự án tĩnh).
+    - Vercel sẽ tự động phát hiện đây là dự án tĩnh (static site).
+    - **Lưu ý**: Nếu Vercel hỏi về Framework, chọn "Other" hoặc để trống.
+    - Nếu hỏi về Build Command, nhập: `exit 0`
+    - Nếu hỏi về Output Directory, nhập: `.` (dấu chấm)
 
 4.  **Deploy Production**:
     Khi đã sẵn sàng deploy bản chính thức:
