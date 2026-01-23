@@ -4,3 +4,4 @@ node_modules
 *.md
 !README.md
 scripts/fix_https.js
+public/

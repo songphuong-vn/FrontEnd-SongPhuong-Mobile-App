@@ -6,7 +6,7 @@
   "scripts": {
     "start": "python -m http.server 8000 || php -S localhost:8000",
     "serve": "npx http-server -p 8000 -c-1",
-    "build": "exit 0",
+    "build": "node scripts/build-for-vercel.js",
     "build:details": "node scripts/build-details.js"
   },
   "keywords": [
