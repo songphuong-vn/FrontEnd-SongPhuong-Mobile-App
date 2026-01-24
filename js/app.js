@@ -808,6 +808,13 @@ function switchNav(tab, evt) {
 
     // Load warranty content if needed
     if (tab === 'warranty') {
+        // Check if user is authenticated
+        if (!api || !api.isAuthenticated()) {
+            // Not logged in - redirect to profile to login
+            showNotification('Vui lòng đăng nhập để xem', 'info');
+            switchNav('profile', evt);
+            return;
+        }
         loadWarrantyContent();
     }
 
@@ -841,8 +848,21 @@ function switchNav(tab, evt) {
 
     // Xử lý hiển thị Search Bar
     const searchBar = document.querySelector('.header-search-fixed');
-    if (searchBar) {
-        searchBar.style.display = (tab === 'home') ? 'flex' : 'none';
+    if (tab === 'home' || tab === 'category') {
+        if (searchBar) searchBar.style.display = 'flex';
+    } else {
+        if (searchBar) searchBar.style.display = 'none';
+    }
+
+    // Nếu chuyển sang tab profile, kiểm tra lại trạng thái để set scroll
+    if (tab === 'profile' && window.authModule) {
+        window.authModule.checkAuthState();
+    } else if (tab !== 'profile') {
+        // Các tab khác luôn cho phép scroll (Reset toàn bộ)
+        document.documentElement.style.overflow = '';
+        document.body.style.overflow = '';
+        const scrollContent = document.querySelector('.scroll-content');
+        if (scrollContent) scrollContent.style.overflow = '';
     }
 
     // Cập nhật tab hiện tại
@@ -2361,17 +2381,50 @@ function initFooter() {
 }
 
 /**
- * Load warranty content (hardcoded to avoid CORS issues with file://)
+ * Load warranty content with user data synchronization
  */
-function loadWarrantyContent() {
+async function loadWarrantyContent() {
     const warrantyPlaceholder = document.getElementById('warranty-content-placeholder');
 
     // Only load if not already loaded
     if (warrantyPlaceholder && warrantyPlaceholder.innerHTML.trim() === '') {
+        // Get user data from auth system
+        let userName = 'Khách hàng';
+        let userEmail = '';
+        let userPhone = '';
+        let memberTier = 'Đồng';
+
+        if (api && api.isAuthenticated()) {
+            try {
+                const response = await api.getMe();
+                if (response.success && response.data) {
+                    userName = response.data.fullName || response.data.username;
+                    userEmail = response.data.email || '';
+                    userPhone = response.data.phone || '';
+                    memberTier = response.data.memberTier || 'Đồng';
+                }
+            } catch (error) {
+                console.log('Could not fetch user data for warranty page');
+            }
+        }
+
         const warrantyHTML = `
             <div class="warranty-page">
+                <!-- User Info Header -->
+                <div class="warranty-user-info">
+                    <div class="warranty-user-header">
+                        <i class="icon ion-person"></i>
+                        <div class="warranty-user-details">
+                            <h3>${userName}</h3>
+                            <span class="warranty-user-tier">${memberTier} <i class="icon ion-ribbon-b"></i></span>
+                        </div>
+                    </div>
+                    ${userEmail ? `<p class="warranty-contact"><i class="icon ion-email"></i> ${userEmail}</p>` : ''}
+                    ${userPhone ? `<p class="warranty-contact"><i class="icon ion-ios-telephone"></i> ${userPhone}</p>` : ''}
+                </div>
+
                 <div class="warranty-header">
-                    <h2>Trang Bảo Hành</h2>
+                    <h2>Sản phẩm đang bảo hành</h2>
                 </div>
                 <div class="warranty-table-container">
                     <table class="warranty-table">
@@ -2410,6 +2463,10 @@ function loadWarrantyContent() {
                             </tr>
                         </tbody>
                     </table>
+                </div>
+                
+                <div class="warranty-footer-note">
+                    <p><i class="icon ion-information-circled"></i> Liên hệ hotline <strong>0263 999979</strong> để được hỗ trợ bảo hành</p>
                 </div>
             </div>
         `;

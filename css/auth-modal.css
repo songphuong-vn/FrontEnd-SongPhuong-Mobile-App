@@ -1,0 +1,593 @@
+/* Authentication Modal Styles */
+.auth-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.auth-modal.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.auth-modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.auth-modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 450px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border-radius: 24px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    padding: 40px 35px;
+    animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -45%);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+}
+
+.auth-modal-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: #666;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+}
+
+.auth-modal-close:hover {
+    background: #e60000;
+    color: white;
+    transform: rotate(90deg);
+}
+
+/* Auth Header */
+.auth-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.auth-logo {
+    width: 80px;
+    height: auto;
+    margin-bottom: 15px;
+}
+
+.auth-header h2 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 8px;
+}
+
+.auth-header p {
+    font-size: 14px;
+    color: #666;
+}
+
+/* Auth Form */
+.auth-form-container {
+    transition: opacity 0.3s ease;
+}
+
+.auth-form-container.hidden {
+    display: none;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.form-group label i {
+    font-size: 16px;
+    color: #e60000;
+}
+
+.form-group input {
+    padding: 14px 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    font-size: 15px;
+    transition: all 0.2s ease;
+    background: white;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #e60000;
+    box-shadow: 0 0 0 3px rgba(230, 0, 0, 0.1);
+}
+
+.form-group input::placeholder {
+    color: #999;
+}
+
+/* Form Options */
+.form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 8px 0;
+    font-size: 14px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    color: #666;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #e60000;
+}
+
+.forgot-password {
+    color: #e60000;
+    text-decoration: none;
+    font-weight: 600;
+    transition: opacity 0.2s;
+}
+
+.forgot-password:hover {
+    opacity: 0.8;
+    text-decoration: underline;
+}
+
+/* Auth Buttons */
+.auth-btn {
+    padding: 16px 24px;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+    margin-top: 8px;
+}
+
+.auth-btn.primary {
+    background: linear-gradient(135deg, #e60000 0%, #c00000 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(230, 0, 0, 0.3);
+}
+
+.auth-btn.primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(230, 0, 0, 0.4);
+}
+
+.auth-btn.primary:active {
+    transform: translateY(0);
+}
+
+/* Divider */
+.auth-divider {
+    text-align: center;
+    position: relative;
+    margin: 24px 0 16px;
+}
+
+.auth-divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: #e0e0e0;
+}
+
+.auth-divider span {
+    position: relative;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    padding: 0 15px;
+    color: #999;
+    font-size: 13px;
+}
+
+/* Social Login */
+.social-login {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.social-btn {
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    background: white;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
+
+.social-btn i {
+    font-size: 18px;
+}
+
+.social-btn.facebook {
+    color: #1877f2;
+    border-color: #1877f2;
+}
+
+.social-btn.facebook:hover {
+    background: #1877f2;
+    color: white;
+}
+
+.social-btn.google {
+    color: #db4437;
+    border-color: #db4437;
+}
+
+.social-btn.google:hover {
+    background: #db4437;
+    color: white;
+}
+
+/* Auth Switch */
+.auth-switch {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+    color: #666;
+}
+
+.auth-switch a {
+    color: #e60000;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.auth-switch a:hover {
+    text-decoration: underline;
+}
+
+/* Loading Overlay */
+.auth-loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(5px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    border-radius: 24px;
+    z-index: 20;
+}
+
+.auth-loading.hidden {
+    display: none;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f0f0f0;
+    border-top-color: #e60000;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.auth-loading p {
+    font-size: 15px;
+    color: #666;
+    font-weight: 600;
+}
+
+/* Login Button in Header - Mobile */
+.login-button-header {
+    background: linear-gradient(135deg, #e60000 0%, #c00000 100%);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 2px 8px rgba(230, 0, 0, 0.3);
+    transition: all 0.2s ease;
+}
+
+.login-button-header:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(230, 0, 0, 0.4);
+}
+
+.login-button-header i {
+    font-size: 16px;
+}
+
+/* =========================================
+   LOGIN FORM - COMPACT & CENTERED (User Template)
+   ========================================= */
+
+/* Container chính đóng vai trò như thẻ <main> trong mẫu */
+.profile-login-container {
+    /* Đảm bảo chiếm toàn bộ không gian giữa Header và Footer */
+    min-height: calc(100vh - 110px);
+    /* Trừ header (~50px) và tabs (~60px) */
+    display: flex;
+    align-items: center;
+    /* Căn giữa dọc */
+    justify-content: center;
+    /* Căn giữa ngang */
+    padding: 20px;
+    background-color: #f8f9fa;
+    /* Màu nền nhạt chuẩn mẫu */
+    overflow: hidden;
+    /* Triệt tiêu scroll bar */
+}
+
+/* Wrapper form - tương ứng class .login-form */
+.login-wrapper {
+    width: 100%;
+    max-width: 360px;
+    /* Chuẩn mẫu */
+    text-align: center;
+    background: transparent;
+    /* Frameless */
+    box-shadow: none;
+    border: none;
+    padding: 0;
+}
+
+/* Tiêu đề Form */
+.login-brand {
+    margin-bottom: 25px;
+}
+
+.login-brand h2 {
+    font-size: 24px;
+    color: #333;
+    font-weight: 700;
+    margin: 0;
+}
+
+/* Form Container */
+.profile-auth-form {
+    width: 100%;
+    text-align: left;
+}
+
+/* Nhóm Input - tương ứng class .input-group */
+.form-group {
+    margin-bottom: 15px;
+    text-align: left;
+    display: block;
+    /* Đảm bảo block display */
+}
+
+/* Label Style */
+.profile-auth-form label {
+    display: block;
+    /* Xuống dòng */
+    font-size: 14px;
+    margin-bottom: 5px;
+    color: #666;
+    font-weight: normal;
+    /* Mẫu dùng font thường, dễ đọc */
+}
+
+/* Icon trong label */
+.profile-auth-form label i {
+    margin-right: 5px;
+    color: #2e308a;
+    /* Màu xanh Song Phương */
+}
+
+/* Input Style - tương ứng .input-group input */
+.profile-auth-form input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    outline: none;
+    transition: 0.3s;
+    background: white;
+    font-size: 14px;
+    height: auto;
+    /* Reset height cứng nếu có */
+}
+
+.profile-auth-form input:focus {
+    border-color: #2e308a;
+    /* Border focus xanh */
+    box-shadow: 0 0 5px rgba(46, 48, 138, 0.25);
+    /* Shadow xanh */
+}
+
+/* Button Style - tương ứng class .btn-login */
+.auth-submit-btn {
+    width: 100%;
+    padding: 12px;
+    background: #2e308a;
+    /* Màu nền xanh đặc trưng (Solid) */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: all 0.3s;
+    display: block;
+    /* Block để full width */
+    box-shadow: 0 4px 6px rgba(46, 48, 138, 0.3);
+}
+
+.auth-submit-btn:hover {
+    background: #25277a;
+    /* Màu hover đậm hơn chút */
+    transform: translateY(-1px);
+    box-shadow: 0 6px 8px rgba(46, 48, 138, 0.4);
+}
+
+/* Footer Link - tương ứng class .footer-link */
+.auth-switch-text {
+    margin-top: 15px;
+    font-size: 14px;
+    color: #666;
+    text-align: center;
+}
+
+.auth-switch-text a {
+    color: #2e308a;
+    /* Link màu xanh */
+    text-decoration: none;
+    font-weight: 600;
+    margin-left: 5px;
+}
+
+.auth-switch-text a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.auth-switch-text a:hover {
+    text-decoration: underline;
+}
+
+/* Loading State */
+.auth-loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.95);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    border-radius: 20px;
+    z-index: 10;
+}
+
+.auth-loading-overlay.hidden {
+    display: none;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .login-wrapper {
+        padding: 30px 20px;
+    }
+
+    .login-brand h2 {
+        font-size: 20px;
+    }
+
+    .login-logo {
+        width: 60px;
+    }
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .auth-modal-content {
+        padding: 30px 25px;
+        max-width: 95%;
+        max-height: 95vh;
+    }
+
+    .auth-header h2 {
+        font-size: 24px;
+    }
+
+    .auth-logo {
+        width: 60px;
+    }
+
+    .social-login {
+        grid-template-columns: 1fr;
+    }
+}
