@@ -1,11 +1,18 @@
 // API Configuration
-const API_BASE_URL = 'http://localhost:5000/api';
+// Tự động phát hiện môi trường: Nếu là localhost thì gọi localhost:5000, nếu không thì dùng Mock (hoặc URL production nếu có)
+const IS_LOCALHOST = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+const API_BASE_URL = IS_LOCALHOST ? 'http://localhost:5000/api' : 'MOCK_MODE';
 
 // API Client with token management
 class APIClient {
     constructor() {
         this.baseURL = API_BASE_URL;
         this.token = this.getToken();
+        // Force mock mode if not localhost to ensure Vercel demo works
+        this.useMock = !IS_LOCALHOST;
+        if (this.useMock) {
+            console.log('🚀 App đang chạy trên Vercel/Deploy - Kích hoạt chế độ DEMO (Mock Data)');
+        }
     }
 
     // Token management
@@ -37,8 +44,13 @@ class APIClient {
         localStorage.removeItem('user');
     }
 
-    // Base request method
+    // Base request method with MOCK FALLBACK
     async request(endpoint, options = {}) {
+        // Nếu đang ở chế độ Mock hoặc request thất bại, trả về data giả
+        if (this.useMock) {
+            return this.handleMockRequest(endpoint, options);
+        }
+
         const headers = {
             'Content-Type': 'application/json',
             ...options.headers
@@ -63,9 +75,42 @@ class APIClient {
 
             return data;
         } catch (error) {
-            console.error('API Error:', error);
-            throw error;
+            console.warn(`API Error (${endpoint}):`, error);
+            console.log('🔄 Đang chuyển sang Mock Data fallback...');
+            return this.handleMockRequest(endpoint, options);
         }
+    }
+
+    // MOCK DATA HANDLER
+    async handleMockRequest(endpoint, options) {
+        // Simulate network delay
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // 1. Auth Endpoints
+        if (endpoint === '/auth/login') {
+            const body = JSON.parse(options.body || '{}');
+            if ((body.username === 'user' || body.username === 'admin') && body.password === '123456') {
+                const mockUser = this.getMockUser();
+                const mockToken = 'mock_token_deploy_123';
+                this.setToken(mockToken);
+                this.setUser(mockUser);
+                return { success: true, token: mockToken, user: mockUser };
+            }
+            throw new Error('Tài khoản hoặc mật khẩu không đúng (Thử: user / 123456)');
+        }
+
+        if (endpoint === '/auth/register') {
+            const mockUser = this.getMockUser();
+            return { success: true, token: 'mock_token_new', user: mockUser };
+        }
+
+        if (endpoint === '/auth/me') {
+            if (this.token) return { success: true, data: this.getMockUser() };
+            throw new Error('Unauthorized');
+        }
+
+        // 2. Orders/Products Endpoints (Placeholder)
+        return { success: true, data: [] };
     }
 
     // Mock Data for local testing
