@@ -39,43 +39,20 @@ class AuthModule {
         const loginState = document.getElementById('profile-login-state');
         const loggedState = document.getElementById('profile-logged-state');
 
-        // Kiểm tra xem tab Profile có đang active không
-        const isProfileActive = document.getElementById('profile-view')?.classList.contains('active');
-
         if (!loginState || !loggedState) return;
 
         if (api.isAuthenticated()) {
             // User is logged in - show profile
             loginState.style.display = 'none';
             loggedState.style.display = 'block';
-
-            // Luôn mở scroll khi đã login
-            this.enableScroll();
-
             this.loadUserProfile();
         } else {
             // User is not logged in - show login form
             loginState.style.display = 'flex';
             loggedState.style.display = 'none';
-
-            // CHỈ khóa scroll nếu đang ở tab Profile (Tránh khóa nhầm Home)
-            if (isProfileActive) {
-                this.disableScroll();
-            } else {
-                // Nếu đang ở tab khác (vd reload trang ở Home), đảm bảo scroll mở
-                this.enableScroll();
-            }
         }
-    }
 
-    disableScroll() {
-        document.documentElement.style.overflow = 'hidden';
-        document.body.style.overflow = 'hidden';
-        const scrollContent = document.querySelector('.scroll-content');
-        if (scrollContent) scrollContent.style.overflow = 'hidden';
-    }
-
-    enableScroll() {
+        // LUÔN LUÔN reset scroll để tránh bị kẹt
         document.documentElement.style.overflow = '';
         document.body.style.overflow = '';
         const scrollContent = document.querySelector('.scroll-content');

@@ -2448,36 +2448,42 @@ async function loadWarrantyContent() {
     const warrantyPlaceholder = document.getElementById('warranty-content-placeholder');
     if (!warrantyPlaceholder) return;
 
-    // Chỉ load lại user info mỗi lần vào để đảm bảo đúng dữ liệu
-    // 1. Get User Data (with fallback)
-    let user = { fullName: 'Khách hàng', memberTier: 'Đồng', email: '', phone: '' };
+    // Luôn clear nội dung cũ để tránh duplicate
+    warrantyPlaceholder.innerHTML = '';
 
-    try {
-        if (api && api.isAuthenticated()) {
+    // 1. Prepare User Data (Default Fallback)
+    let user = {
+        fullName: 'Khách hàng',
+        memberTier: 'Đồng',
+        email: '',
+        phone: ''
+    };
+
+    // Try to get real user data, but don't block render if fails
+    if (typeof api !== 'undefined' && api.isAuthenticated()) {
+        try {
             const res = await api.getMe();
-            if (res.success) user = res.data;
+            if (res.success && res.data) user = res.data;
+        } catch (e) {
+            console.log('Using layout fallback for warranty page');
         }
-    } catch (e) {
-        console.warn('API getMe failed, using fallback data');
     }
 
-    // 2. Render Mock Warranty Data (vì chưa có API Products thật)
+    // 2. Mock Warranty Products (Luôn hiển thị để demo)
     const mockProducts = [
         { name: 'Laptop Dell XPS 13 Plus', serial: 'XPS-9320-1122', date: '15/01/2024', end: '15/01/2026', status: 'active', label: 'Còn bảo hành' },
         { name: 'Chuột Logitech MX Master 3S', serial: 'MX-3S-8899', date: '20/11/2023', end: '20/11/2024', status: 'warning', label: 'Sắp hết hạn' },
         { name: 'Bàn phím Keychron K2 Pro', serial: 'K2-PRO-5566', date: '10/01/2022', end: '10/01/2023', status: 'expired', label: 'Hết hạn' }
     ];
 
-    // 3. Update HTML
-    // Chúng ta sẽ render lại toàn bộ nội dung placeholder để đảm bảo data mới nhất
-    warrantyPlaceholder.innerHTML = `
+    // 3. Render HTML Direct (No complex conditions)
+    const html = `
         <div class="warranty-page">
-            <!-- User Info Header -->
             <div class="warranty-user-info">
                 <div class="warranty-user-header">
                     <i class="icon ion-person"></i>
                     <div class="warranty-user-details">
-                        <h3>${user.fullName || user.username}</h3>
+                        <h3>${user.fullName || user.username || 'Khách hàng'}</h3>
                         <span class="warranty-badge badge-${getTierClass(user.memberTier)}">${user.memberTier}</span>
                     </div>
                 </div>
@@ -2494,8 +2500,8 @@ async function loadWarrantyContent() {
                     <thead>
                         <tr>
                             <th class="stt-col">STT</th>
-                            <th class="product-col">Sản phẩm / Serial</th>
-                            <th>Ngày mua / Hết hạn</th>
+                            <th class="product-col">Sản phẩm</th>
+                            <th>Thời hạn</th>
                             <th>Trạng thái</th>
                         </tr>
                     </thead>
@@ -2504,15 +2510,15 @@ async function loadWarrantyContent() {
                         <tr>
                             <td class="stt-cell center">${index + 1}</td>
                             <td>
-                                <div style="font-weight:600; color:#333;">${p.name}</div>
-                                <div style="font-size:12px; color:#888;">S/N: ${p.serial}</div>
+                                <div style="font-weight:600; color:#333; margin-bottom:2px;">${p.name}</div>
+                                <div style="font-size:11px; color:#888;">S/N: ${p.serial}</div>
                             </td>
                             <td>
-                                <div>${p.date}</div>
-                                <div style="font-size:12px; color:#666;">--> ${p.end}</div>
+                                <div style="font-size:12px; white-space:nowrap;">${p.date}</div>
+                                <div style="font-size:12px; color:#666; white-space:nowrap;">➝ ${p.end}</div>
                             </td>
                             <td class="status-cell">
-                                <span class="status-${p.status}">${p.label}</span>
+                                <span class="status-${p.status}" style="font-size:10px; white-space:nowrap;">${p.label}</span>
                             </td>
                         </tr>
                         `).join('')}
@@ -2521,16 +2527,18 @@ async function loadWarrantyContent() {
             </div>
             
             <div class="warranty-footer-note">
-                <p><i class="icon ion-information-circled"></i> Liên hệ hotline <strong>0263 999979</strong> để được hỗ trợ bảo hành</p>
+                <p><i class="icon ion-information-circled"></i> Hotline hỗ trợ: <strong>0263 999979</strong></p>
             </div>
         </div>
     `;
+
+    warrantyPlaceholder.innerHTML = html;
 }
 
 // Helper: Get tier class
 function getTierClass(tier) {
     if (!tier) return 'bronze';
-    const t = tier.toLowerCase();
+    const t = String(tier).toLowerCase(); // Ensure string
     if (t.includes('kim cương') || t.includes('diamond')) return 'diamond';
     if (t.includes('vàng') || t.includes('gold')) return 'gold';
     if (t.includes('bạc') || t.includes('silver')) return 'silver';
