@@ -1,0 +1,170 @@
+/* ================================
+    FOOTER - Reusable Component
+    ================================ */
+
+/* Ensure footer uses app font even on standalone pages */
+.profile-footer,
+.profile-footer * {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.profile-footer {
+    padding: 12px 0 4px;
+    background: #f8f8f8;
+    border-top: 3px solid var(--profile-primary);
+}
+
+/* Footer Credits */
+.footer-credits {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 12px 4px;
+    font-size: 9px;
+    color: #888;
+    border-top: 1px solid #e5e5e5;
+    margin-top: 6px;
+    align-items: center;
+}
+
+.credit-left {
+    text-align: left;
+    max-width: 60%;
+    line-height: 1.3;
+}
+
+.credit-left strong {
+    color: #555;
+    font-weight: 700;
+}
+
+.credit-right {
+    text-align: right;
+    max-width: 35%;
+}
+
+/* Policy Icons Row */
+.footer-policies {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 8px;
+    padding: 16px 12px;
+    background: white;
+    border-radius: 0;
+}
+
+.policy-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 8px;
+}
+
+.policy-icon {
+    width: 48px;
+    height: 48px;
+    background: var(--profile-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 22px;
+}
+
+.policy-label {
+    font-size: 9px;
+    font-weight: 700;
+    color: #1a1a1a;
+    line-height: 1.2;
+    text-transform: uppercase;
+    max-width: 70px;
+}
+
+.policy-desc {
+    display: none;
+}
+
+/* Grouped Sections Container */
+.footer-sections {
+    margin-top: 0;
+    background: white;
+    border-radius: 0;
+    padding: 8px 12px;
+    margin-bottom: 8px;
+}
+
+.footer-sections:last-child {
+    margin-bottom: 0;
+}
+
+.footer-section {
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.footer-section:last-child {
+    border-bottom: none;
+}
+
+.footer-section-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    background: transparent;
+    border: none;
+    font-size: 12px;
+    font-weight: 800;
+    color: #1a1a1a;
+    cursor: pointer;
+    text-align: left;
+    letter-spacing: 0.3px;
+}
+
+.footer-section-header .icon {
+    font-size: 16px;
+    transition: transform 0.3s ease;
+    color: var(--profile-primary);
+    font-weight: 700;
+}
+
+.footer-section-header.active .icon {
+    transform: rotate(180deg);
+}
+
+.footer-section-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    background: #fafafa;
+}
+
+.footer-section-content.active {
+    max-height: 500px;
+    padding: 8px 12px 12px;
+}
+
+.footer-section-content p {
+    margin: 8px 0;
+    font-size: 12px;
+    color: #444;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    line-height: 1.4;
+    font-weight: 500;
+}
+
+.footer-section-content p .icon {
+    font-size: 15px;
+    color: var(--profile-primary);
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.footer-section-content p strong {
+    font-weight: 700;
+    color: #222;
+}

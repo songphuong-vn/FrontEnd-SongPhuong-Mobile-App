@@ -1,0 +1,150 @@
+<div class="user-profile-container">
+    <!-- Header với Avatar - Glassmorphism Style -->
+    <div class="profile-header">
+        <!-- Settings Button ở góc phải -->
+        <!-- Header Menu System -->
+        <div class="header-menu-container">
+            <div class="header-menu-items" id="headerMenuItems">
+                <button class="menu-item-btn" onclick="editContactInfo()" title="Chỉnh sửa thông tin">
+                    <i class="icon ion-edit"></i>
+                </button>
+                <button class="menu-item-btn" onclick="openCustomerSupport()" title="Chăm sóc khách hàng">
+                    <i class="icon ion-headphone"></i>
+                </button>
+                <button class="menu-item-btn" onclick="openProfileSettings()" title="Cài đặt">
+                    <i class="icon ion-ios-gear"></i>
+                </button>
+            </div>
+            <button class="header-toggle-btn" id="headerToggleBtn" onclick="toggleHeaderMenu()">
+                <i class="icon ion-plus-round"></i>
+            </button>
+        </div>
+
+        <div class="avatar-container">
+            <div class="avatar-wrapper">
+                <div class="avatar-glow"></div>
+                <img src="../icons/user-default.svg" alt="Avatar" class="user-avatar" id="userAvatar">
+                <label for="avatarInput" class="avatar-edit-btn">
+                    <i class="icon ion-camera"></i>
+                </label>
+                <input type="file" id="avatarInput" accept="image/*" style="display: none;"
+                    onchange="updateAvatar(this)">
+            </div>
+            <h2 class="user-name">Nguyễn Văn A <span class="membership-badge gold"><i class="icon ion-trophy"></i>
+                    Vàng</span></h2>
+            <p class="user-email">@nguyenvana</p>
+        </div>
+
+        <!-- Membership Progress -->
+        <div class="membership-progress-container">
+            <div class="membership-info">
+                <span class="current-rank" id="currentRank">Vàng</span>
+                <span class="next-rank" id="nextRank">Bạch Kim</span>
+            </div>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" style="width: 70%;"></div>
+                <span class="progress-text">CÒN 2550 ĐIỂM</span>
+            </div>
+            <div class="spending-text">
+                Đã chi tiêu: <strong>24.500.000 VNĐ</strong>
+                <i class="icon ion-eye" onclick="toggleSpendingVisibility()" id="spendingVisibilityIcon"
+                    title="Hiện/Ẩn"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Cards - Compact Grid -->
+    <div class="profile-dashboard">
+        <div class="order-status-grid">
+            <button class="quick-menu-item" onclick="switchNav('notifications', event); filterNotifications('order')">
+                <div class="icon-badge-container">
+                    <i class="icon ion-ios-box"></i>
+                    <span class="notification-badge">12</span>
+                </div>
+                <span>Đơn hàng</span>
+            </button>
+            <button class="quick-menu-item"
+                onclick="switchNav('notifications', event); filterNotifications('delivery')">
+                <div class="icon-badge-container">
+                    <i class="icon ion-android-car"></i>
+                    <span class="notification-badge">2</span>
+                </div>
+                <span>Đang giao</span>
+            </button>
+            <button class="quick-menu-item" onclick="switchNav('notifications', event); filterNotifications('review')">
+                <div class="icon-badge-container">
+                    <i class="icon ion-ios-star"></i>
+                    <span class="notification-badge">5</span>
+                </div>
+                <span>Đánh giá</span>
+            </button>
+            <button class="quick-menu-item" onclick="switchNav('notifications', event); filterNotifications('all')">
+                <div class="icon-badge-container">
+                    <i class="icon ion-ios-bell"></i>
+                    <span class="notification-badge">2</span>
+                </div>
+                <span>Thông báo</span>
+            </button>
+        </div>
+
+        <div class="dashboard-card full-width info-card">
+            <div class="section-header">
+                <i class="icon ion-person"></i>
+                <span>Thông tin cá nhân</span>
+                <button class="toggle-visibility-btn" onclick="toggleAllContactInfo()" title="Ẩn/Hiện thông tin">
+                    <i class="icon ion-eye-disabled" id="globalVisibilityIcon"></i>
+                </button>
+            </div>
+            <div class="info-list">
+                <div class="info-item">
+                    <div class="info-label">Họ và tên</div>
+                    <div class="info-value">Nguyễn Văn A</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Số điện thoại</div>
+                    <div class="info-value masked-content" data-original="0905 123 456">***********</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Email</div>
+                    <div class="info-value masked-content" data-original="nguyenvana@gmail.com">********************
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Địa chỉ</div>
+                    <div class="info-value masked-content" data-original="123 Nguyễn Văn Linh, Đà Nẵng">
+                        ****************************</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-card full-width recent-orders">
+            <div class="section-header">
+                <i class="icon ion-ios-list"></i>
+                <span>Đơn hàng gần đây</span>
+                <a href="#" class="view-all-link" onclick="switchNav('warranty', event)">Xem tất cả</a>
+            </div>
+            <div class="orders-preview">
+                <div class="order-preview-item">
+                    <div class="order-icon">
+                        <i class="icon ion-checkmark-circled"></i>
+                    </div>
+                    <div class="order-info">
+                        <span class="order-name">VGA RTX 4070 Ti</span>
+                        <span class="order-date">2 ngày trước</span>
+                    </div>
+                    <span class="order-status completed">Hoàn thành</span>
+                </div>
+                <div class="order-preview-item">
+                    <div class="order-icon">
+                        <i class="icon ion-ios-box"></i>
+                    </div>
+                    <div class="order-info">
+                        <span class="order-name">RAM G.Skill 32GB</span>
+                        <span class="order-date">5 ngày trước</span>
+                    </div>
+                    <span class="order-status shipping">Đang giao</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
