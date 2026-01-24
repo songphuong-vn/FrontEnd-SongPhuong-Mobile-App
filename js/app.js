@@ -1105,51 +1105,112 @@ function updateCartBadge() {
 function renderCart() {
     const list = document.getElementById('cart-items');
     const empty = document.getElementById('cart-empty');
+    if (!list || !empty) return;
+
+    // Elements tổng tiền
     const subtotalEl = document.getElementById('cart-subtotal');
     const shippingEl = document.getElementById('cart-shipping');
     const totalEl = document.getElementById('cart-total');
-    if (!list || !empty || !subtotalEl || !shippingEl || !totalEl) return;
 
     list.innerHTML = '';
-    if (!cartItems.length) {
-        empty.style.display = 'block';
+
+    if (!cartItems.length || cartItems.length === 0) {
+        empty.style.display = 'flex'; // Flex để căn giữa icon và text
+        // Có thể ẩn phần summary hoặc disable button thanh toán nếu muốn
+        if (subtotalEl) {
+            subtotalEl.textContent = '0đ';
+            shippingEl.textContent = '0đ';
+            totalEl.textContent = '0đ';
+        }
     } else {
         empty.style.display = 'none';
+
         cartItems.forEach(item => {
             const row = document.createElement('div');
             row.className = 'cart-item';
+            // Layout mới: Image - Info - Actions (Qty + Trash)
             row.innerHTML = `
-                <img src="${item.image}" alt="${item.name}">
-                <div class="cart-item__info">
-                    <div class="cart-item__name">${item.name}</div>
-                    <div class="cart-item__price">${formatCurrency(item.price)}</div>
+                <div class="cart-item__image-wrapper">
+                    <img src="${item.image}" alt="${item.name}" onerror="this.src='images/no-image.png'">
                 </div>
-                <div class="qty-controls">
-                    <button class="qty-button" onclick="changeCartQty('${item.id}', -1)">-</button>
-                    <span>${item.qty}</span>
-                    <button class="qty-button" onclick="changeCartQty('${item.id}', 1)">+</button>
+                <div class="cart-item__content">
+                    <div class="cart-item__info">
+                        <div class="cart-item__name">${item.name}</div>
+                        <div class="cart-item__price">${formatCurrency(item.price)}</div>
+                    </div>
+                    <div class="cart-item__actions">
+                        <div class="qty-controls">
+                            <button class="qty-button" onclick="changeCartQty('${item.id}', -1)">
+                                <i class="icon ion-minus"></i>
+                            </button>
+                            <span class="qty-value">${item.qty}</span>
+                            <button class="qty-button" onclick="changeCartQty('${item.id}', 1)">
+                                <i class="icon ion-plus"></i>
+                            </button>
+                        </div>
+                        <button class="remove-item-btn" onclick="removeFromCart('${item.id}')">
+                            <i class="icon ion-ios-trash-outline"></i>
+                        </button>
+                    </div>
                 </div>
             `;
             list.appendChild(row);
         });
-    }
 
-    const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.qty, 0);
-    const shipping = cartItems.length ? 30000 : 0;
-    const total = subtotal + shipping;
-    subtotalEl.textContent = formatCurrency(subtotal);
-    shippingEl.textContent = formatCurrency(shipping);
-    totalEl.textContent = formatCurrency(total);
+        // Tính toán lại tổng tiền
+        const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.qty, 0);
+        // Free ship nếu hóa đơn trên 5 triệu, ngược lại 30k
+        const shipping = subtotal > 5000000 ? 0 : 30000;
+        const total = subtotal + shipping;
+
+        if (subtotalEl) {
+            subtotalEl.textContent = formatCurrency(subtotal);
+            shippingEl.textContent = shipping === 0 ? 'Miễn phí' : formatCurrency(shipping);
+            totalEl.textContent = formatCurrency(total);
+        }
+    }
 }
 
 function changeCartQty(id, delta) {
-    cartItems = cartItems.map(item => item.id === id ? { ...item, qty: Math.max(0, item.qty + delta) } : item)
-        .filter(item => item.qty > 0);
-    updateCartBadge();
-    renderCart();
+    const itemIndex = cartItems.findIndex(item => item.id === id);
+    if (itemIndex === -1) return;
+
+    const newQty = cartItems[itemIndex].qty + delta;
+
+    if (newQty <= 0) {
+        // Nếu giảm xuống 0 -> Xác nhận xóa
+        removeFromCart(id);
+    } else {
+        cartItems[itemIndex].qty = newQty;
+        saveCartToStorage(); // Cần đảm bảo có hàm này hoặc tương đương
+        updateCartBadge();
+        renderCart();
+    }
+}
+
+function removeFromCart(id) {
+    // Show confirm dialog (optional) or just remove
+    // Dùng native confirm cho nhanh, sau đổi sang modal đẹp sau
+    if (confirm('Bạn có chắc muốn xóa sản phẩm này khỏi giỏ hàng?')) {
+        cartItems = cartItems.filter(item => item.id !== id);
+        saveCartToStorage();
+        updateCartBadge();
+        renderCart();
+        showNotification('Đã xóa sản phẩm', 'info');
+    }
+}
+
+function saveCartToStorage() {
+    localStorage.setItem('cartItems', JSON.stringify(cartItems));
 }
 
 function openCart() {
+    // Load cart from storage to be sure
+    const storedCart = localStorage.getItem('cartItems');
+    if (storedCart) {
+        cartItems = JSON.parse(storedCart);
+    }
+
     renderCart();
     updateCartBadge();
     const overlay = document.getElementById('cart-overlay');
@@ -2385,93 +2446,95 @@ function initFooter() {
  */
 async function loadWarrantyContent() {
     const warrantyPlaceholder = document.getElementById('warranty-content-placeholder');
+    if (!warrantyPlaceholder) return;
 
-    // Only load if not already loaded
-    if (warrantyPlaceholder && warrantyPlaceholder.innerHTML.trim() === '') {
-        // Get user data from auth system
-        let userName = 'Khách hàng';
-        let userEmail = '';
-        let userPhone = '';
-        let memberTier = 'Đồng';
+    // Chỉ load lại user info mỗi lần vào để đảm bảo đúng dữ liệu
+    // 1. Get User Data (with fallback)
+    let user = { fullName: 'Khách hàng', memberTier: 'Đồng', email: '', phone: '' };
 
+    try {
         if (api && api.isAuthenticated()) {
-            try {
-                const response = await api.getMe();
-                if (response.success && response.data) {
-                    userName = response.data.fullName || response.data.username;
-                    userEmail = response.data.email || '';
-                    userPhone = response.data.phone || '';
-                    memberTier = response.data.memberTier || 'Đồng';
-                }
-            } catch (error) {
-                console.log('Could not fetch user data for warranty page');
-            }
+            const res = await api.getMe();
+            if (res.success) user = res.data;
         }
-
-        const warrantyHTML = `
-            <div class="warranty-page">
-                <!-- User Info Header -->
-                <div class="warranty-user-info">
-                    <div class="warranty-user-header">
-                        <i class="icon ion-person"></i>
-                        <div class="warranty-user-details">
-                            <h3>${userName}</h3>
-                            <span class="warranty-user-tier">${memberTier} <i class="icon ion-ribbon-b"></i></span>
-                        </div>
-                    </div>
-                    ${userEmail ? `<p class="warranty-contact"><i class="icon ion-email"></i> ${userEmail}</p>` : ''}
-                    ${userPhone ? `<p class="warranty-contact"><i class="icon ion-ios-telephone"></i> ${userPhone}</p>` : ''}
-                </div>
-
-                <div class="warranty-header">
-                    <h2>Sản phẩm đang bảo hành</h2>
-                </div>
-                <div class="warranty-table-container">
-                    <table class="warranty-table">
-                        <thead>
-                            <tr>
-                                <th class="stt-col">STT</th>
-                                <th class="product-col">Tên sản phẩm</th>
-                                <th>Ngày mua</th>
-                                <th>Hạn bảo hành</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="stt-cell">1</td>
-                                <td>RTX 4060 Ti</td>
-                                <td>15/11/2023</td>
-                                <td class="status-cell"><span class="status-active">18 tháng</span></td>
-                            </tr>
-                            <tr>
-                                <td class="stt-cell">2</td>
-                                <td>Intel Core i7-13700K</td>
-                                <td>15/11/2023</td>
-                                <td class="status-cell"><span class="status-active">18 tháng</span></td>
-                            </tr>
-                            <tr>
-                                <td class="stt-cell">3</td>
-                                <td>RAM Kingston 32GB DDR5</td>
-                                <td>20/12/2023</td>
-                                <td class="status-cell"><span class="status-warning">6 tháng</span></td>
-                            </tr>
-                            <tr>
-                                <td class="stt-cell">4</td>
-                                <td>Samsung 980 Pro 1TB NVMe</td>
-                                <td>10/06/2024</td>
-                                <td class="status-cell"><span class="status-expired">Hết hạn</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                
-                <div class="warranty-footer-note">
-                    <p><i class="icon ion-information-circled"></i> Liên hệ hotline <strong>0263 999979</strong> để được hỗ trợ bảo hành</p>
-                </div>
-            </div>
-        `;
-        warrantyPlaceholder.innerHTML = warrantyHTML;
+    } catch (e) {
+        console.warn('API getMe failed, using fallback data');
     }
+
+    // 2. Render Mock Warranty Data (vì chưa có API Products thật)
+    const mockProducts = [
+        { name: 'Laptop Dell XPS 13 Plus', serial: 'XPS-9320-1122', date: '15/01/2024', end: '15/01/2026', status: 'active', label: 'Còn bảo hành' },
+        { name: 'Chuột Logitech MX Master 3S', serial: 'MX-3S-8899', date: '20/11/2023', end: '20/11/2024', status: 'warning', label: 'Sắp hết hạn' },
+        { name: 'Bàn phím Keychron K2 Pro', serial: 'K2-PRO-5566', date: '10/01/2022', end: '10/01/2023', status: 'expired', label: 'Hết hạn' }
+    ];
+
+    // 3. Update HTML
+    // Chúng ta sẽ render lại toàn bộ nội dung placeholder để đảm bảo data mới nhất
+    warrantyPlaceholder.innerHTML = `
+        <div class="warranty-page">
+            <!-- User Info Header -->
+            <div class="warranty-user-info">
+                <div class="warranty-user-header">
+                    <i class="icon ion-person"></i>
+                    <div class="warranty-user-details">
+                        <h3>${user.fullName || user.username}</h3>
+                        <span class="warranty-badge badge-${getTierClass(user.memberTier)}">${user.memberTier}</span>
+                    </div>
+                </div>
+                ${user.email ? `<p class="warranty-contact"><i class="icon ion-email"></i> ${user.email}</p>` : ''}
+                ${user.phone ? `<p class="warranty-contact"><i class="icon ion-ios-telephone"></i> ${user.phone}</p>` : ''}
+            </div>
+
+            <div class="warranty-header">
+                <h2>Sản phẩm đang bảo hành</h2>
+            </div>
+            
+            <div class="warranty-table-container">
+                <table class="warranty-table">
+                    <thead>
+                        <tr>
+                            <th class="stt-col">STT</th>
+                            <th class="product-col">Sản phẩm / Serial</th>
+                            <th>Ngày mua / Hết hạn</th>
+                            <th>Trạng thái</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${mockProducts.map((p, index) => `
+                        <tr>
+                            <td class="stt-cell center">${index + 1}</td>
+                            <td>
+                                <div style="font-weight:600; color:#333;">${p.name}</div>
+                                <div style="font-size:12px; color:#888;">S/N: ${p.serial}</div>
+                            </td>
+                            <td>
+                                <div>${p.date}</div>
+                                <div style="font-size:12px; color:#666;">--> ${p.end}</div>
+                            </td>
+                            <td class="status-cell">
+                                <span class="status-${p.status}">${p.label}</span>
+                            </td>
+                        </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="warranty-footer-note">
+                <p><i class="icon ion-information-circled"></i> Liên hệ hotline <strong>0263 999979</strong> để được hỗ trợ bảo hành</p>
+            </div>
+        </div>
+    `;
+}
+
+// Helper: Get tier class
+function getTierClass(tier) {
+    if (!tier) return 'bronze';
+    const t = tier.toLowerCase();
+    if (t.includes('kim cương') || t.includes('diamond')) return 'diamond';
+    if (t.includes('vàng') || t.includes('gold')) return 'gold';
+    if (t.includes('bạc') || t.includes('silver')) return 'silver';
+    return 'bronze';
 }
 
 /**

@@ -39,6 +39,9 @@ class AuthModule {
         const loginState = document.getElementById('profile-login-state');
         const loggedState = document.getElementById('profile-logged-state');
 
+        // Kiểm tra xem tab Profile có đang active không
+        const isProfileActive = document.getElementById('profile-view')?.classList.contains('active');
+
         if (!loginState || !loggedState) return;
 
         if (api.isAuthenticated()) {
@@ -46,11 +49,8 @@ class AuthModule {
             loginState.style.display = 'none';
             loggedState.style.display = 'block';
 
-            // Enable scrolling for user profile
-            document.documentElement.style.overflow = '';
-            document.body.style.overflow = '';
-            const scrollContent = document.querySelector('.scroll-content');
-            if (scrollContent) scrollContent.style.overflow = '';
+            // Luôn mở scroll khi đã login
+            this.enableScroll();
 
             this.loadUserProfile();
         } else {
@@ -58,14 +58,28 @@ class AuthModule {
             loginState.style.display = 'flex';
             loggedState.style.display = 'none';
 
-            // Disable scrolling for login screen (LOCK EVERYTHING)
-            document.documentElement.style.overflow = 'hidden';
-            document.body.style.overflow = 'hidden';
-
-            // Tìm và khóa container scroll chính nếu có
-            const scrollContent = document.querySelector('.scroll-content');
-            if (scrollContent) scrollContent.style.overflow = 'hidden';
+            // CHỈ khóa scroll nếu đang ở tab Profile (Tránh khóa nhầm Home)
+            if (isProfileActive) {
+                this.disableScroll();
+            } else {
+                // Nếu đang ở tab khác (vd reload trang ở Home), đảm bảo scroll mở
+                this.enableScroll();
+            }
         }
+    }
+
+    disableScroll() {
+        document.documentElement.style.overflow = 'hidden';
+        document.body.style.overflow = 'hidden';
+        const scrollContent = document.querySelector('.scroll-content');
+        if (scrollContent) scrollContent.style.overflow = 'hidden';
+    }
+
+    enableScroll() {
+        document.documentElement.style.overflow = '';
+        document.body.style.overflow = '';
+        const scrollContent = document.querySelector('.scroll-content');
+        if (scrollContent) scrollContent.style.overflow = '';
     }
 
     async handleProfileLogin(form) {
