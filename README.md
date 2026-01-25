@@ -132,17 +132,3 @@ The app auto-detects environment:
 3. Run `npm run lint` and `npm run format`
 4. Commit with clear message
 5. Create Pull Request
-
-## 📞 Support
-
-- **Hotline**: 0263 999979
-- **Email**: support@songphuong.com
-
-## 📄 License
-
-MIT License - See LICENSE file for details
-
----
-
-**Version**: 1.0.0  
-**Last Updated**: 2026-01-25

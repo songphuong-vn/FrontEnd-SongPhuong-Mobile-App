@@ -1,0 +1,15 @@
+# Dependencies
+node_modules/
+
+# Large data files
+js/products-data.js
+js/category-product-mapping.js
+
+# Vendor libraries
+js/jquery.min.js
+js/bootstrap.bundle.min.js
+
+# Build outputs
+dist/
+build/
+*.min.js
