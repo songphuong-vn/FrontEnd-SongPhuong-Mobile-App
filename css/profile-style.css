@@ -399,6 +399,60 @@
     width: 100%;
 }
 
+/* ====== Layout fixes to ensure profile view fits viewport without bottom gap ====== */
+html, body {
+    height: 100%;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* Make main app/view a column flex container so scroll-content can fill remaining space */
+.ion-app, .view {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Scrollable content area should grow and scroll internally */
+.scroll-content {
+    flex: 1 1 auto;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Profile container uses flex column so header stays fixed and dashboard fills space */
+.user-profile-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+}
+
+.profile-header {
+    flex: 0 0 auto;
+}
+
+.profile-dashboard {
+    flex: 1 1 auto;
+    overflow: auto;
+    padding-bottom: 20px; /* small breathing room for last items */
+}
+
+/* Prevent extra bottom spacing from last child margins */
+.profile-dashboard > *:last-child,
+.notifications-list > *:last-child,
+.notifications-empty {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+/* If you have a fixed footer, add body.with-footer and adjust padding-bottom accordingly */
+body.with-footer {
+    padding-bottom: 56px; /* adjust to your footer height */
+}
+
+/* End layout fixes */
+
 .dashboard-value {
     font-size: 15px;
     font-weight: 800;
