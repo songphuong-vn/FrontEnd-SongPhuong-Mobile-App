@@ -24,6 +24,41 @@ lockOrientation();
 // GLOBAL STATE & HELPERS
 // ===========================
 let cartItems = []; // Global cart items
+// Load cart from localStorage into `cartItems` on startup
+function loadCartFromStorage() {
+    try {
+        const stored = localStorage.getItem('cartItems');
+        if (stored) {
+            cartItems = JSON.parse(stored) || [];
+            return;
+        }
+        const legacy = localStorage.getItem('sp_cart');
+        if (legacy) {
+            // convert legacy format (id, qty) to cartItems shape
+            const parsed = JSON.parse(legacy) || [];
+            cartItems = parsed.map(i => ({ id: i.id || i.productId || null, qty: i.qty || i.quantity || 1, price: i.price || 0 }));
+        }
+    } catch (e) {
+        console.warn('loadCartFromStorage failed', e);
+        cartItems = [];
+    }
+}
+
+// Clear static/sample notifications injected into markup so the app starts clean
+function clearNotificationsOnLoad() {
+    try {
+        const list = document.getElementById('notificationsList');
+        if (list) list.innerHTML = '';
+        // Hide any small notification badges in profile/quick-menu
+        const badges = document.querySelectorAll('.notification-badge, .unread-badge');
+        badges.forEach(b => { b.textContent = ''; b.style.display = 'none'; });
+        // If there's a notifications empty placeholder, show it
+        const empty = document.getElementById('notifications-empty');
+        if (empty) empty.style.display = 'block';
+    } catch (e) {
+        console.warn('clearNotificationsOnLoad failed', e);
+    }
+}
 let currentCategoryFilter = null; // Global category filter for home rendering
 
 // Helper: Format Currency
@@ -32,7 +67,26 @@ function formatCurrency(amount) {
 }
 
 // Helper: Show Notification
+let notificationsEnabled = false; // Disabled globally by default per request
+
+function clearNotificationContainer() {
+    try {
+        const container = document.getElementById('notification-container');
+        if (container) container.remove();
+        const toasts = document.querySelectorAll('.notification-toast');
+        toasts.forEach(t => t.remove());
+    } catch (e) {
+        console.warn('clearNotificationContainer failed', e);
+    }
+}
+
+function disableNotificationsGlobally() {
+    notificationsEnabled = false;
+    clearNotificationContainer();
+}
+
 function showNotification(message, type = 'info') {
+    if (!notificationsEnabled) return; // Short-circuit when globally disabled
     let container = document.getElementById('notification-container');
     if (!container) {
         container = document.createElement('div');
@@ -59,7 +113,7 @@ function showNotification(message, type = 'info') {
     setTimeout(() => {
         toast.classList.remove('show');
         setTimeout(() => toast.remove(), 300);
-    }, 3000);
+    }, 3500);
 }
 
 /**
@@ -778,6 +832,24 @@ function setupCategoryNavClickHandlers() {
  * @param {string} tab - The tab name to switch to (home, build-pc, warranty, profile, notifications)
  * @param {Event} evt - Optional event object to prevent default behavior
  */
+// Defensive reset for scroll lock state. Call on load and before switching views.
+function resetScrollLock() {
+    try {
+        document.documentElement.style.overflow = '';
+        document.body.style.overflow = '';
+        document.body.style.position = '';
+        document.body.style.width = '';
+        const scrollContent = document.querySelector('.scroll-content');
+        if (scrollContent) scrollContent.style.overflow = '';
+    } catch (e) {
+        console.warn('resetScrollLock failed', e);
+    }
+}
+
+// Ensure reset runs on initial load/pageshow
+document.addEventListener('DOMContentLoaded', resetScrollLock);
+window.addEventListener('pageshow', resetScrollLock);
+
 function switchNav(tab, evt) {
     // Prevent default behavior
     if (evt && evt.preventDefault) {
@@ -1098,8 +1170,31 @@ function syncActionBadges() {
 function updateCartBadge() {
     const badge = document.querySelector('.cart-badge');
     if (!badge) return;
-    const totalQty = cartItems.reduce((sum, item) => sum + item.qty, 0);
+    // Prefer in-memory cartItems if available, otherwise try localStorage keys
+    let totalQty = 0;
+    try {
+        if (Array.isArray(cartItems) && cartItems.length) {
+            totalQty = cartItems.reduce((sum, item) => sum + (item.qty || 0), 0);
+        } else {
+            // Try legacy keys
+            const stored = localStorage.getItem('cartItems');
+            if (stored) {
+                const parsed = JSON.parse(stored);
+                totalQty = Array.isArray(parsed) ? parsed.reduce((s, it) => s + (it.qty || 0), 0) : 0;
+            } else {
+                const sp = localStorage.getItem('sp_cart');
+                if (sp) {
+                    const parsed2 = JSON.parse(sp);
+                    totalQty = Array.isArray(parsed2) ? parsed2.reduce((s, it) => s + (it.qty || 0), 0) : 0;
+                }
+            }
+        }
+    } catch (e) {
+        console.warn('updateCartBadge error', e);
+        totalQty = 0;
+    }
     badge.textContent = totalQty;
+    badge.style.display = totalQty > 0 ? 'flex' : 'none';
 }
 
 function renderCart() {
@@ -2702,18 +2797,7 @@ function addToCartId(productId, qty = 1) {
     updateCartBadge();
 }
 
-function updateCartBadge() {
-    const badge = document.querySelector('.cart-badge');
-    if (!badge) return;
-    const cart = getCart();
-    const total = cart.reduce((s, item) => s + (item.qty || 0), 0);
-    badge.textContent = total;
-}
-
-// Ensure badge shows current cart count on load
-document.addEventListener('DOMContentLoaded', function () {
-    updateCartBadge();
-});
+// duplicate cart badge updater removed; unified `updateCartBadge` is used instead
 
 /**
  * Initialize product click events
@@ -2822,6 +2906,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof initFooter === 'function') {
         initFooter();
     }
+    // Load persisted cart and clear sample notifications so app starts clean
+    if (typeof loadCartFromStorage === 'function') loadCartFromStorage();
+    if (typeof updateCartBadge === 'function') updateCartBadge();
+    if (typeof clearNotificationsOnLoad === 'function') clearNotificationsOnLoad();
+    // Disable and clear toast notifications globally
+    if (typeof disableNotificationsGlobally === 'function') disableNotificationsGlobally();
     // Switch to home view by default
     if (typeof switchNav === 'function') {
         switchNav('home');

@@ -5,7 +5,11 @@
   "trailingSlash": false,
   "rewrites": [
     {
-      "source": "/",
+      "source": "/pages/:page",
+      "destination": "/pages/:page.html"
+    },
+    {
+      "source": "/(.*)",
       "destination": "/index.html"
     }
   ],
