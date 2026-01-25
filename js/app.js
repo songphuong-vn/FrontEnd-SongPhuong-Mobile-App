@@ -797,23 +797,6 @@ function setupCategoryNavClickHandlers() {
  * @param {string} tab - The tab name to switch to (home, build-pc, warranty, profile, notifications)
  * @param {Event} evt - Optional event object to prevent default behavior
  */
-// Defensive reset for scroll lock state. Call on load and before switching views.
-function resetScrollLock() {
-    try {
-        document.documentElement.style.overflow = '';
-        document.body.style.overflow = '';
-        document.body.style.position = '';
-        document.body.style.width = '';
-        const scrollContent = document.querySelector('.scroll-content');
-        if (scrollContent) scrollContent.style.overflow = '';
-    } catch (e) {
-        console.warn('resetScrollLock failed', e);
-    }
-}
-
-// Ensure reset runs on initial load/pageshow
-document.addEventListener('DOMContentLoaded', resetScrollLock);
-window.addEventListener('pageshow', resetScrollLock);
 
 function switchNav(tab, evt) {
     // Prevent default behavior

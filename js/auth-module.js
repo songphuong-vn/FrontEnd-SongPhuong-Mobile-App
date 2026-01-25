@@ -36,12 +36,6 @@ class AuthModule {
     }
 
     checkAuthState() {
-        // LUÔN LUÔN reset scroll ngay lập tức để tránh bị kẹt
-        document.documentElement.style.overflow = '';
-        document.body.style.overflow = '';
-        const scrollContent = document.querySelector('.scroll-content');
-        if (scrollContent) scrollContent.style.overflow = '';
-
         const loginState = document.getElementById('profile-login-state');
         const loggedState = document.getElementById('profile-logged-state');
 
