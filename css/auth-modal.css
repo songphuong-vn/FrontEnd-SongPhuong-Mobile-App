@@ -401,8 +401,7 @@
     padding: 20px;
     background-color: #f8f9fa;
     /* Màu nền nhạt chuẩn mẫu */
-    overflow: hidden;
-    /* Triệt tiêu scroll bar */
+    overflow: auto;
 }
 
 /* Wrapper form - tương ứng class .login-form */
