@@ -138,92 +138,107 @@ class AuthModule {
     }
 
     updateUIWithUserData(userData) {
-        // Update profile name
+        // Normalize possible user field names from various API responses
+        const fullName = userData.fullName || userData.name || userData.displayName || userData.full_name || (userData.firstName && userData.lastName ? `${userData.firstName} ${userData.lastName}` : null) || 'User';
+        const username = userData.username || userData.handle || userData.userName || (userData.email ? userData.email.split('@')[0] : '') || '';
+        const memberTier = userData.memberTier || userData.tier || userData.rank || 'Thành viên';
+        const totalSpending = Number(userData.totalSpending || userData.spending || userData.spent || 0) || 0;
+        const pointsToNextTier = userData.pointsToNextTier || userData.points_to_next || userData.nextPoints || 0;
+        const avatar = userData.avatar || userData.avatarUrl || userData.photo || 'icons/user-default.svg';
+
+        // Primary ID-based updates (shell + other pages may contain these IDs)
         const nameEl = document.getElementById('profileUserName');
-        if (nameEl) nameEl.textContent = userData.fullName || 'User';
+        if (nameEl) nameEl.textContent = fullName;
 
-        // Update username
         const usernameEl = document.getElementById('profileUsername');
-        if (usernameEl) usernameEl.textContent = `@${userData.username}`;
+        if (usernameEl) usernameEl.textContent = `@${username}`;
 
-        // Update member badge
         const badgeEl = document.getElementById('profileMemberBadge');
-        if (badgeEl) {
-            badgeEl.innerHTML = `${userData.memberTier} <i class="icon ion-ribbon-b"></i>`;
-        }
+        if (badgeEl) badgeEl.innerHTML = `${memberTier} <i class="icon ion-ribbon-b"></i>`;
 
-        // Update spending
         const spendingEl = document.getElementById('spendingAmount');
-        if (spendingEl) {
-            spendingEl.textContent = userData.totalSpending.toLocaleString('vi-VN');
-        }
+        if (spendingEl) spendingEl.textContent = totalSpending.toLocaleString('vi-VN');
 
-        // Update tier labels
-        const currentTierEl = document.getElementById('currentTierLabel');
-        if (currentTierEl) currentTierEl.textContent = userData.memberTier;
+        const currentTierEl = document.getElementById('currentTierLabel') || document.getElementById('currentRank');
+        if (currentTierEl) currentTierEl.textContent = memberTier;
 
-        // Calculate next tier
-        const nextTier = this.getNextTier(userData.memberTier);
-        const nextTierEl = document.getElementById('nextTierLabel');
+        const nextTier = this.getNextTier(memberTier);
+        const nextTierEl = document.getElementById('nextTierLabel') || document.getElementById('nextRank');
         if (nextTierEl) nextTierEl.textContent = nextTier;
 
-        // Update progress bar
-        const progressPercent = this.calculateTierProgress(userData.totalSpending, userData.memberTier);
-        const progressBar = document.getElementById('progressBarFill');
-        if (progressBar) {
-            progressBar.style.width = progressPercent + '%';
+        const progressPercent = this.calculateTierProgress(totalSpending, memberTier);
+        const progressBar = document.getElementById('progressBarFill') || document.querySelector('.progress-bar-fill');
+        if (progressBar) progressBar.style.width = progressPercent + '%';
+
+        const progressText = document.getElementById('progressText') || document.querySelector('.progress-text');
+        if (progressText) {
+            if (memberTier === 'Kim Cương') progressText.textContent = 'Đã đạt cấp tối đa';
+            else progressText.textContent = `Còn ${Number(pointsToNextTier || 0).toLocaleString('vi-VN')} điểm`;
         }
 
-        // Update progress text
-        const progressText = document.getElementById('progressText');
-        if (progressText && userData.pointsToNextTier !== undefined) {
-            if (userData.memberTier === 'Kim Cương') {
-                progressText.textContent = 'Đã đạt cấp tối đa';
-            } else {
-                progressText.textContent = `Còn ${userData.pointsToNextTier.toLocaleString('vi-VN')} điểm`;
-            }
-        }
-
-        // Update avatar if available
-        if (userData.avatar && userData.avatar !== 'icons/user-default.svg') {
-            const avatarEl = document.getElementById('userAvatar');
-            if (avatarEl) avatarEl.src = userData.avatar;
-        }
-
-        // Also update alternative/profile page elements that use class-based selectors
+        // Avatar: support both #userAvatar and .user-avatar selectors
         try {
-            // Update any .user-name elements (preserve inner membership badge if present)
+            const avatarEls = document.querySelectorAll('#userAvatar, .user-avatar, img.user-avatar');
+            avatarEls.forEach(img => { if (img && avatar) img.src = avatar; });
+        } catch (e) { /* ignore */ }
+
+        // Class-based fallbacks and bulk updates
+        try {
+            // Update display name in elements using .user-name
             const nameNodes = document.querySelectorAll('.user-name');
             nameNodes.forEach(node => {
                 const badge = node.querySelector('.membership-badge');
-                const badgeHtml = badge ? badge.outerHTML : '';
-                node.innerHTML = `${userData.fullName || 'User'} ${badgeHtml}`;
+                const badgeHtml = badge ? badge.outerHTML : ` <span class="membership-badge">${memberTier} <i class="icon ion-ribbon-b"></i></span>`;
+                node.innerHTML = `${fullName} ${badgeHtml}`;
             });
 
-            // Update username-like elements (.user-email or .user-username)
-            const emailNodes = document.querySelectorAll('.user-email, .user-username, .user-handle');
-            emailNodes.forEach(n => { n.textContent = `@${userData.username || ''}`; });
+            // Update username/email-like elements
+            const handleNodes = document.querySelectorAll('.user-email, .user-username, .user-handle');
+            handleNodes.forEach(n => { n.textContent = `@${username}`; });
 
-            // Update membership badge display
+            // Update membership badges anywhere
             const mbNodes = document.querySelectorAll('.membership-badge');
-            mbNodes.forEach(m => { m.innerHTML = `${userData.memberTier || 'Thành viên'} <i class="icon ion-ribbon-b"></i>`; });
+            mbNodes.forEach(m => { m.innerHTML = `${memberTier} <i class="icon ion-ribbon-b"></i>`; });
 
-            // Update spending display if present
+            // Update spending wherever present
             const spendingNodes = document.querySelectorAll('.spending-text strong, #spendingAmount');
-            spendingNodes.forEach(n => { n.textContent = (userData.totalSpending || 0).toLocaleString('vi-VN'); });
+            spendingNodes.forEach(n => { n.textContent = totalSpending.toLocaleString('vi-VN'); });
 
-            // Update progress bar and text
+            // Update progress fills and texts
             const progFills = document.querySelectorAll('.progress-bar-fill, #progressBarFill');
-            const progressPercent = this.calculateTierProgress(userData.totalSpending || 0, userData.memberTier);
             progFills.forEach(p => { p.style.width = progressPercent + '%'; });
             const progTexts = document.querySelectorAll('.progress-text, #progressText');
             progTexts.forEach(pt => {
-                if (userData.memberTier === 'Kim Cương') pt.textContent = 'Đã đạt cấp tối đa';
-                else pt.textContent = `Còn ${userData.pointsToNextTier ? userData.pointsToNextTier.toLocaleString('vi-VN') : 0} điểm`;
+                if (memberTier === 'Kim Cương') pt.textContent = 'Đã đạt cấp tối đa';
+                else pt.textContent = `Còn ${Number(pointsToNextTier || 0).toLocaleString('vi-VN')} điểm`;
+            });
+
+            // Update masked contact fields using their data-original attributes if present
+            const phoneNodes = document.querySelectorAll('.masked-content[data-original]');
+            phoneNodes.forEach(node => {
+                const original = node.getAttribute('data-original') || '';
+                // try to infer which field this is by label nearby
+                const parent = node.closest('.info-item');
+                if (parent) {
+                    const label = parent.querySelector('.info-label');
+                    if (label && /Số điện thoại|Phone/i.test(label.textContent)) {
+                        node.setAttribute('data-original', userData.phone || userData.phoneNumber || '');
+                    } else if (label && /Email/i.test(label.textContent)) {
+                        node.setAttribute('data-original', userData.email || '');
+                    } else if (label && /Địa chỉ|Address/i.test(label.textContent)) {
+                        node.setAttribute('data-original', userData.address || '');
+                    }
+                }
             });
         } catch (err) {
             console.warn('Fallback UI updates failed', err);
         }
+
+        // Emit a global event so other modules can react to auth changes
+        try {
+            const evt = new CustomEvent('auth:updated', { detail: { user: userData } });
+            window.dispatchEvent(evt);
+        } catch (e) { /* ignore */ }
     }
 
     getNextTier(currentTier) {
