@@ -1,15 +1,13 @@
-# .gitignore - Ionic Mobile App
-
 # Dependencies
 node_modules/
-npm-debug.log
-yarn-error.log
+package-lock.json
+yarn.lock
 
 # Build outputs
 dist/
 build/
-www/
-.tmp/
+*.min.js
+*.min.css
 
 # IDE
 .vscode/
@@ -17,31 +15,19 @@ www/
 *.swp
 *.swo
 *~
-.DS_Store
-*.sublime-workspace
-*.sublime-project
 
 # OS
-Thumbs.db
 .DS_Store
-
-# Environment
-.env
-.env.local
-
-# Cordova
-platforms/
-plugins/
+Thumbs.db
 
 # Logs
 *.log
+npm-debug.log*
 
-# Testing
-coverage/
-.nyc_output/
-
-# Cache
+# Temporary files
+*.tmp
 .cache/
 
-# Data
-database-product/
+# Test coverage
+coverage/
+.nyc_output/

@@ -1,6 +1,6 @@
 (function () {
     function unlockScroll() {
-        console.log('🔓 Unlocking scroll interaction...');
+        // console.log('🔓 Unlocking scroll interaction...');
         document.body.style.overflow = '';
         document.documentElement.style.overflow = '';
 
@@ -10,6 +10,10 @@
 
         const views = document.querySelectorAll('.view');
         views.forEach(v => v.style.overflow = '');
+
+        // Fix wrappers
+        const wrappers = document.querySelectorAll('.page-content-wrapper');
+        wrappers.forEach(w => w.style.overflowY = 'auto');
     }
 
     // Run immediately
@@ -21,13 +25,21 @@
     // Run on fully loaded
     window.addEventListener('load', () => {
         setTimeout(unlockScroll, 200);
-        setTimeout(unlockScroll, 1000); // Retry later logic overrides
+        setTimeout(unlockScroll, 1000);
     });
 
-    // Run when clicking body (fallback for stuck state)
-    document.body.addEventListener('click', () => {
-        if (document.body.style.overflow === 'hidden') {
-            unlockScroll();
-        }
-    }, { once: true });
+    // Run periodically for next 5 seconds to fight race conditions
+    let checks = 0;
+    const interval = setInterval(() => {
+        unlockScroll();
+        checks++;
+        if (checks > 25) clearInterval(interval); // 5 seconds
+    }, 200);
+
+    // Unlock on any first interaction (touch/click)
+    ['touchstart', 'click', 'scroll', 'mousedown'].forEach(evt => {
+        window.addEventListener(evt, () => {
+            if (document.body.style.overflow === 'hidden') unlockScroll();
+        }, { once: true, passive: true });
+    });
 })();

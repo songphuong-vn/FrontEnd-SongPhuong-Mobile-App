@@ -59,15 +59,11 @@ function clearNotificationsOnLoad() {
         console.warn('clearNotificationsOnLoad failed', e);
     }
 }
+
 let currentCategoryFilter = null; // Global category filter for home rendering
 
-// Helper: Format Currency
-function formatCurrency(amount) {
-    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
-}
-
-// Helper: Show Notification
-let notificationsEnabled = false; // Disabled globally by default per request
+// Notifications control (ui-helpers.js provides showNotification)
+let notificationsEnabled = false; // Disabled globally by default
 
 function clearNotificationContainer() {
     try {
@@ -83,37 +79,6 @@ function clearNotificationContainer() {
 function disableNotificationsGlobally() {
     notificationsEnabled = false;
     clearNotificationContainer();
-}
-
-function showNotification(message, type = 'info') {
-    if (!notificationsEnabled) return; // Short-circuit when globally disabled
-    let container = document.getElementById('notification-container');
-    if (!container) {
-        container = document.createElement('div');
-        container.id = 'notification-container';
-        container.className = 'notification-toast-container';
-        document.body.appendChild(container);
-    }
-
-    const toast = document.createElement('div');
-    toast.className = `notification-toast ${type}`;
-    toast.innerHTML = `
-        <div class="toast-content">
-            <i class="icon ion-${type === 'success' ? 'checkmark-circled' : (type === 'error' ? 'alert-circled' : 'information-circled')}"></i>
-            <span>${message}</span>
-        </div>
-    `;
-
-    container.appendChild(toast);
-
-    // Trigger animation
-    requestAnimationFrame(() => toast.classList.add('show'));
-
-    // Auto remove
-    setTimeout(() => {
-        toast.classList.remove('show');
-        setTimeout(() => toast.remove(), 300);
-    }, 3500);
 }
 
 /**
@@ -2004,21 +1969,35 @@ document.head.appendChild(style);
  */
 let spendingVisible = true;
 function toggleSpendingVisibility() {
-    const valueElement = document.getElementById('spendingValue');
-    const iconElement = document.getElementById('spendingEyeIcon');
+    // Support multiple possible markup variants: #spendingValue, .spending-text strong, #spendingAmount
+    const valueElement = document.getElementById('spendingValue') || document.querySelector('.spending-text strong') || document.getElementById('spendingAmount');
+    const iconElement = document.getElementById('spendingEyeIcon') || document.getElementById('spendingVisibilityIcon');
 
     if (!valueElement || !iconElement) return;
 
-    if (spendingVisible) {
-        // Hide spending
-        valueElement.textContent = '••••••';
-        iconElement.className = 'icon ion-eye-disabled';
-        spendingVisible = false;
-    } else {
-        // Show spending
-        valueElement.textContent = '24.5M';
-        iconElement.className = 'icon ion-eye';
+    // Ensure original value is saved so we can restore it
+    if (!valueElement.hasAttribute('data-original')) {
+        valueElement.setAttribute('data-original', valueElement.textContent.trim());
+    }
+
+    const original = valueElement.getAttribute('data-original') || '';
+
+    // Use icon class to determine visible/hidden state
+    const isHidden = iconElement.classList.contains('ion-eye-disabled') || !spendingVisible;
+
+    if (isHidden) {
+        // Show the real spending value
+        valueElement.textContent = original;
+        iconElement.classList.remove('ion-eye-disabled');
+        iconElement.classList.add('ion-eye');
         spendingVisible = true;
+    } else {
+        // Mask the value using dots with approximate length
+        const mask = original.replace(/./g, '•');
+        valueElement.textContent = mask || '••••••';
+        iconElement.classList.remove('ion-eye');
+        iconElement.classList.add('ion-eye-disabled');
+        spendingVisible = false;
     }
 }
 
