@@ -1,12 +1,19 @@
 // API Configuration
-// Production API URL - Cập nhật URL backend thật của bạn ở đây
-const API_BASE_URL = 'http://localhost:5000/api'; // TODO: Thay bằng URL production khi deploy
+// Use APP_CONFIG if available (from config.js), otherwise fallback to localhost
+const API_BASE_URL = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.API_BASE_URL)
+    ? APP_CONFIG.API_BASE_URL
+    : 'http://localhost:5000/api';
 
 // API Client with token management
 class APIClient {
     constructor() {
         this.baseURL = API_BASE_URL;
         this.token = this.getToken();
+
+        // Log API URL in development
+        if (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.ENABLE_DEBUG) {
+            console.log('🔌 API Client initialized with URL:', this.baseURL);
+        }
     }
 
     // Token management
@@ -86,6 +93,22 @@ class APIClient {
     }
 
     async login(credentials) {
+        // MOCK LOGIN for Localhost Testing
+        if (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.ENABLE_MOCK_DATA) {
+            console.warn('⚠️ Using Mock Login');
+            if (credentials.username === 'user' && credentials.password === '123456') {
+                const mockUser = this.getMockUser();
+
+                // Return success immediately
+                const response = { success: true, token: mockUser.token, user: mockUser };
+
+                this.setToken(response.token);
+                this.setUser(response.user);
+                return response;
+            }
+            throw new Error('Sai tên đăng nhập hoặc mật khẩu (Mock: user/123456)');
+        }
+
         const data = await this.request('/auth/login', {
             method: 'POST',
             body: JSON.stringify(credentials)
@@ -97,6 +120,21 @@ class APIClient {
         }
 
         return data;
+    }
+
+    // Helper: Mock User Data for testing without backend
+    getMockUser() {
+        return {
+            id: 1,
+            username: 'user',
+            fullName: 'Khách hàng Test',
+            email: 'test@example.com',
+            phone: '0909123456',
+            memberTier: 'Vàng',
+            point: 2450,
+            totalSpending: 15000000,
+            token: 'mock-jwt-token-123456-local-only'
+        };
     }
 
     async getMe() {

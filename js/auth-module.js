@@ -189,6 +189,41 @@ class AuthModule {
             const avatarEl = document.getElementById('userAvatar');
             if (avatarEl) avatarEl.src = userData.avatar;
         }
+
+        // Also update alternative/profile page elements that use class-based selectors
+        try {
+            // Update any .user-name elements (preserve inner membership badge if present)
+            const nameNodes = document.querySelectorAll('.user-name');
+            nameNodes.forEach(node => {
+                const badge = node.querySelector('.membership-badge');
+                const badgeHtml = badge ? badge.outerHTML : '';
+                node.innerHTML = `${userData.fullName || 'User'} ${badgeHtml}`;
+            });
+
+            // Update username-like elements (.user-email or .user-username)
+            const emailNodes = document.querySelectorAll('.user-email, .user-username, .user-handle');
+            emailNodes.forEach(n => { n.textContent = `@${userData.username || ''}`; });
+
+            // Update membership badge display
+            const mbNodes = document.querySelectorAll('.membership-badge');
+            mbNodes.forEach(m => { m.innerHTML = `${userData.memberTier || 'Thành viên'} <i class="icon ion-ribbon-b"></i>`; });
+
+            // Update spending display if present
+            const spendingNodes = document.querySelectorAll('.spending-text strong, #spendingAmount');
+            spendingNodes.forEach(n => { n.textContent = (userData.totalSpending || 0).toLocaleString('vi-VN'); });
+
+            // Update progress bar and text
+            const progFills = document.querySelectorAll('.progress-bar-fill, #progressBarFill');
+            const progressPercent = this.calculateTierProgress(userData.totalSpending || 0, userData.memberTier);
+            progFills.forEach(p => { p.style.width = progressPercent + '%'; });
+            const progTexts = document.querySelectorAll('.progress-text, #progressText');
+            progTexts.forEach(pt => {
+                if (userData.memberTier === 'Kim Cương') pt.textContent = 'Đã đạt cấp tối đa';
+                else pt.textContent = `Còn ${userData.pointsToNextTier ? userData.pointsToNextTier.toLocaleString('vi-VN') : 0} điểm`;
+            });
+        } catch (err) {
+            console.warn('Fallback UI updates failed', err);
+        }
     }
 
     getNextTier(currentTier) {
@@ -232,7 +267,19 @@ class AuthModule {
     }
 
     showSuccess(message) {
-        alert('✅ ' + message);
+        if (typeof showNotification === 'function') {
+            showNotification(message, 'success');
+        } else {
+            alert('✅ ' + message);
+        }
+    }
+
+    showError(message) {
+        if (typeof showNotification === 'function') {
+            showNotification(message, 'error');
+        } else {
+            alert('❌ ' + message);
+        }
     }
 }
 

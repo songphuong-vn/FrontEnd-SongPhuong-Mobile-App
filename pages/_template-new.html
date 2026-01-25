@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>{{PAGE_TITLE}} - Song Phương Mobile</title>
+
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+
+    <!-- Main Styles - ABSOLUTE PATHS from root -->
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/{{PAGE_STYLE}}.css">
+    <link rel="stylesheet" href="/css/auth-modal.css">
+    <link rel="stylesheet" href="/css/notifications-toast.css">
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        .page-standalone {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .page-header-bar {
+            background: linear-gradient(135deg, #2e308a 0%, #4a4edb 100%);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .back-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .page-header-bar h1 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .page-content-wrapper {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page-standalone">
+        <!-- Header -->
+        <div class="page-header-bar">
+            <button class="back-button" onclick="goBack()">
+                <i class="icon ion-ios-arrow-left" style="font-size: 24px;"></i>
+            </button>
+            <h1>{{PAGE_HEADER}}</h1>
+        </div>
+
+        <!-- Content -->
+        <div class="page-content-wrapper">
+            <div id="{{CONTENT_ID}}"></div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container"></div>
+
+    <!-- Scripts - ABSOLUTE PATHS from root -->
+    <script src="/js/config.js"></script>
+    <script src="/js/api-client.js"></script>
+    <script src="/js/{{PAGE_LOADER}}.js"></script>
+
+    <script>
+        // Initialize API client
+        const api = new APIClient();
+
+        // Back button handler
+        function goBack() {
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = '/index.html';
+            }
+        }
+
+        // Load content on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            { { INIT_FUNCTION } } ();
+        });
+
+        // Toast notification system
+        function showNotification(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+
+            const icon = type === 'success' ? 'ion-checkmark-circled' :
+                type === 'error' ? 'ion-close-circled' :
+                    'ion-information-circled';
+
+            toast.innerHTML = `
+                <i class="icon ${icon}"></i>
+                <span>${message}</span>
+            `;
+
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+    </script>
+</body>
+
+</html>

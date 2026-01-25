@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Suite - Song Phương Mobile</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #2e308a;
+            margin-bottom: 30px;
+        }
+
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .test-section h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        button {
+            background: #2e308a;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+
+        button:hover {
+            background: #4a4edb;
+        }
+
+        button.danger {
+            background: #e74c3c;
+        }
+
+        button.danger:hover {
+            background: #c0392b;
+        }
+
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        .result.success {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .result.error {
+            background: #f8d7da;
+            color: #842029;
+        }
+
+        .result.info {
+            background: #cfe2ff;
+            color: #084298;
+        }
+
+        code {
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="test-container">
+        <h1>🧪 Test Suite - Song Phương Mobile App</h1>
+
+        <!-- Cart Badge Tests -->
+        <div class="test-section">
+            <h2>1. Cart Badge Tests</h2>
+            <p>Kiểm tra badge hiển thị/ẩn đúng khi thêm/xóa sản phẩm</p>
+            <button onclick="testClearCart()">Clear Cart (localStorage)</button>
+            <button onclick="testCheckBadge()">Check Badge Status</button>
+            <button onclick="testAddItem()">Add Test Item</button>
+            <button onclick="testRemoveItem()">Remove Item</button>
+            <div id="badgeResult" class="result" style="display:none;"></div>
+        </div>
+
+        <!-- Cart Overlay Tests -->
+        <div class="test-section">
+            <h2>2. Cart Overlay Tests</h2>
+            <p>Kiểm tra z-index và khả năng click vào cart</p>
+            <button onclick="testOpenCart()">Open Cart Overlay</button>
+            <button onclick="testCheckZIndex()">Check Z-Index</button>
+            <div id="overlayResult" class="result" style="display:none;"></div>
+        </div>
+
+        <!-- Login Tests -->
+        <div class="test-section">
+            <h2>3. Login Flow Tests</h2>
+            <p>Kiểm tra login và notification hiển thị</p>
+            <button onclick="testLoginCredentials()">Test Login (user/123456)</button>
+            <button onclick="testLogout()">Test Logout</button>
+            <button onclick="testCheckAuth()">Check Auth Status</button>
+            <div id="loginResult" class="result" style="display:none;"></div>
+        </div>
+
+        <!-- Notification Tests -->
+        <div class="test-section">
+            <h2>4. Notification System Tests</h2>
+            <p>Kiểm tra toast notifications</p>
+            <button onclick="testNotificationSuccess()">Test Success</button>
+            <button onclick="testNotificationError()">Test Error</button>
+            <button onclick="testNotificationInfo()">Test Info</button>
+            <div id="notifResult" class="result" style="display:none;"></div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="test-section">
+            <h2>📋 Test Instructions</h2>
+            <ol>
+                <li>Mở <code>index.html</code> trong browser</li>
+                <li>Mở DevTools Console (F12)</li>
+                <li>Chạy từng test và quan sát kết quả</li>
+                <li>Kiểm tra badge, overlay, notifications</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        // Test Cart Badge
+        function testClearCart() {
+            localStorage.removeItem('cartItems');
+            localStorage.removeItem('sp_cart');
+            showResult('badgeResult', 'Cart cleared from localStorage', 'success');
+            console.log('✅ Cart cleared');
+        }
+
+        function testCheckBadge() {
+            const badge = document.querySelector('.cart-badge');
+            if (!badge) {
+                showResult('badgeResult', 'Badge element not found! Open index.html first', 'error');
+                return;
+            }
+
+            const isVisible = badge.classList.contains('visible');
+            const count = badge.textContent;
+            const display = window.getComputedStyle(badge).display;
+
+            showResult('badgeResult',
+                `Badge visible: ${isVisible}, Count: ${count}, Display: ${display}`,
+                isVisible ? 'success' : 'info'
+            );
+            console.log('Badge status:', { isVisible, count, display });
+        }
+
+        function testAddItem() {
+            const testItem = {
+                id: 'test-' + Date.now(),
+                name: 'Test Product',
+                price: 100000,
+                qty: 1
+            };
+
+            let cart = JSON.parse(localStorage.getItem('cartItems') || '[]');
+            cart.push(testItem);
+            localStorage.setItem('cartItems', JSON.stringify(cart));
+
+            showResult('badgeResult', `Added test item. Cart now has ${cart.length} items`, 'success');
+            console.log('✅ Item added:', testItem);
+        }
+
+        function testRemoveItem() {
+            let cart = JSON.parse(localStorage.getItem('cartItems') || '[]');
+            if (cart.length > 0) {
+                cart.pop();
+                localStorage.setItem('cartItems', JSON.stringify(cart));
+                showResult('badgeResult', `Removed item. Cart now has ${cart.length} items`, 'success');
+            } else {
+                showResult('badgeResult', 'Cart is empty', 'info');
+            }
+        }
+
+        // Test Cart Overlay
+        function testOpenCart() {
+            if (typeof openCart === 'function') {
+                openCart();
+                showResult('overlayResult', 'openCart() called successfully', 'success');
+            } else {
+                showResult('overlayResult', 'openCart() function not found! Open index.html', 'error');
+            }
+        }
+
+        function testCheckZIndex() {
+            const overlay = document.querySelector('.cart-overlay');
+            if (!overlay) {
+                showResult('overlayResult', 'Cart overlay not found', 'error');
+                return;
+            }
+
+            const zIndex = window.getComputedStyle(overlay).zIndex;
+            const isActive = overlay.classList.contains('active');
+
+            showResult('overlayResult',
+                `Z-Index: ${zIndex}, Active: ${isActive}`,
+                parseInt(zIndex) >= 2000 ? 'success' : 'error'
+            );
+            console.log('Overlay z-index:', zIndex);
+        }
+
+        // Test Login
+        function testLoginCredentials() {
+            showResult('loginResult',
+                'Please test login manually in index.html with: user / 123456',
+                'info'
+            );
+            console.log('Test credentials: user / 123456');
+        }
+
+        function testLogout() {
+            if (typeof api !== 'undefined') {
+                api.removeToken();
+                api.removeUser();
+                showResult('loginResult', 'Logged out successfully', 'success');
+            } else {
+                showResult('loginResult', 'API client not found', 'error');
+            }
+        }
+
+        function testCheckAuth() {
+            if (typeof api !== 'undefined') {
+                const isAuth = api.isAuthenticated();
+                const user = api.getUserFromToken();
+                showResult('loginResult',
+                    `Authenticated: ${isAuth}, User: ${user ? user.username : 'None'}`,
+                    isAuth ? 'success' : 'info'
+                );
+            } else {
+                showResult('loginResult', 'API client not found', 'error');
+            }
+        }
+
+        // Test Notifications
+        function testNotificationSuccess() {
+            if (typeof showNotification === 'function') {
+                showNotification('This is a success message!', 'success');
+                showResult('notifResult', 'Success notification triggered', 'success');
+            } else {
+                showResult('notifResult', 'showNotification() not found', 'error');
+            }
+        }
+
+        function testNotificationError() {
+            if (typeof showNotification === 'function') {
+                showNotification('This is an error message!', 'error');
+                showResult('notifResult', 'Error notification triggered', 'success');
+            } else {
+                showResult('notifResult', 'showNotification() not found', 'error');
+            }
+        }
+
+        function testNotificationInfo() {
+            if (typeof showNotification === 'function') {
+                showNotification('This is an info message!', 'info');
+                showResult('notifResult', 'Info notification triggered', 'success');
+            } else {
+                showResult('notifResult', 'showNotification() not found', 'error');
+            }
+        }
+
+        // Helper function
+        function showResult(elementId, message, type) {
+            const el = document.getElementById(elementId);
+            el.textContent = message;
+            el.className = `result ${type}`;
+            el.style.display = 'block';
+        }
+
+        // Auto-check on load
+        window.addEventListener('load', function () {
+            console.log('🧪 Test Suite Loaded');
+            console.log('Open index.html in another tab to run full tests');
+        });
+    </script>
+</body>
+
+</html>

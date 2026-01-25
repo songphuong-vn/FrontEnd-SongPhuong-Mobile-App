@@ -208,10 +208,10 @@ function hideSearchResults() {
 }
 
 // ===========================
-// MOCK DATA FOR ORDERS/DELIVERIES/REVIEWS
+// DATA STORES
 // ===========================
-const mockOrders = [];
-const mockReviews = [];
+let orders = [];
+let reviews = [];
 
 // ===========================
 // INFINITE SCROLL HOME FEED
@@ -1028,13 +1028,25 @@ function handleProductClick(sku) {
 
 // RENDER UI SECTIONS
 // ===========================
-function renderOrders() {
+async function renderOrders() {
     const list = document.getElementById('orders-list');
     const empty = document.getElementById('orders-empty');
     if (!list || !empty) return;
 
     list.innerHTML = '';
-    if (!mockOrders.length) {
+
+    // Fetch orders from API if authenticated
+    if (typeof api !== 'undefined' && api.isAuthenticated()) {
+        try {
+            // TODO: Uncomment when backend endpoint is ready
+            // const res = await api.request('/orders');
+            // orders = res.data || [];
+        } catch (e) {
+            console.warn('Failed to fetch orders', e);
+        }
+    }
+
+    if (!orders.length) {
         empty.style.display = 'block';
         return;
     }
@@ -1046,7 +1058,7 @@ function renderOrders() {
         'Chờ xử lý': 'status-warning',
     };
 
-    mockOrders.forEach(order => {
+    orders.forEach(order => {
         const card = document.createElement('div');
         card.className = 'order-card';
         card.innerHTML = `
@@ -1064,19 +1076,27 @@ function renderOrders() {
             </div>
             <div class="order-actions">
                 <button class="outline-button" onclick="openDeliveries()">Theo dõi</button>
-                <button class="primary-button" onclick="showNotification('Chi tiết đơn hàng demo', 'info')">Xem chi tiết</button>
+                <button class="primary-button" onclick="showNotification('Tính năng đang phát triển', 'info')">Xem chi tiết</button>
             </div>
         `;
         list.appendChild(card);
     });
 }
 
-function renderDeliveries() {
+async function renderDeliveries() {
     const list = document.getElementById('deliveries-list');
     const empty = document.getElementById('deliveries-empty');
     if (!list || !empty) return;
     list.innerHTML = '';
-    const delivering = mockOrders.filter(o => o.status === 'Đang giao');
+
+    // Ensure orders are loaded (if not already)
+    if (!orders.length && typeof api !== 'undefined' && api.isAuthenticated()) {
+        try {
+            // await renderOrders(); // re-fetch if needed
+        } catch (e) { }
+    }
+
+    const delivering = orders.filter(o => o.status === 'Đang giao');
     if (!delivering.length) {
         empty.style.display = 'block';
         return;
@@ -1108,23 +1128,30 @@ function renderDeliveries() {
     });
 }
 
-function renderReviews() {
+async function renderReviews() {
     const list = document.getElementById('reviews-list');
     const empty = document.getElementById('reviews-empty');
     if (!list || !empty) return;
     list.innerHTML = '';
 
-    if (!mockReviews.length) {
+    // Fetch if needed
+    if (!reviews.length && typeof api !== 'undefined' && api.isAuthenticated()) {
+        try {
+            // await fetchReviews();
+        } catch (e) { }
+    }
+
+    if (!reviews.length) {
         empty.style.display = 'block';
         return;
     }
     empty.style.display = 'none';
 
-    mockReviews.forEach(review => {
+    reviews.forEach(review => {
         const card = document.createElement('div');
         card.className = 'review-card';
         card.innerHTML = `
-            <div class="review-card__header">
+             <div class="review-card__header">
                 <div class="delivery-meta">
                     <strong>${review.product}</strong>
                     <span>${review.hint}</span>
@@ -1132,7 +1159,7 @@ function renderReviews() {
                 <span class="status-badge status-muted">Chờ đánh giá</span>
             </div>
             <div class="review-body">
-                <div class="star-row">
+                 <div class="star-row">
                     <i class="icon ion-ios-star-outline"></i>
                     <i class="icon ion-ios-star-outline"></i>
                     <i class="icon ion-ios-star-outline"></i>
@@ -1141,8 +1168,8 @@ function renderReviews() {
                 </div>
                 <textarea class="review-textarea" placeholder="Chia sẻ cảm nhận của bạn..."></textarea>
                 <div class="review-actions">
-                    <button class="outline-button" onclick="showNotification('Bỏ qua tạm thời', 'info')">Để sau</button>
-                    <button class="primary-button" onclick="showNotification('Gửi đánh giá demo', 'success')">Gửi đánh giá</button>
+                    <button class="outline-button" onclick="showNotification('Bỏ qua', 'info')">Để sau</button>
+                    <button class="primary-button" onclick="showNotification('Tính năng đang phát triển', 'info')">Gửi đánh giá</button>
                 </div>
             </div>
         `;
@@ -1159,10 +1186,10 @@ function setBadgeValue(selector, value) {
 }
 
 function syncActionBadges() {
-    setBadgeValue('#ordersBadge', mockOrders.length);
-    const delivering = mockOrders.filter(o => o.status === 'Đang giao').length;
+    setBadgeValue('#ordersBadge', orders.length);
+    const delivering = orders.filter(o => o.status === 'Đang giao').length;
     setBadgeValue('#deliveriesBadge', delivering);
-    setBadgeValue('#reviewsBadge', mockReviews.length);
+    setBadgeValue('#reviewsBadge', reviews.length);
 }
 
 // CART UI
@@ -1194,7 +1221,12 @@ function updateCartBadge() {
         totalQty = 0;
     }
     badge.textContent = totalQty;
-    badge.style.display = totalQty > 0 ? 'flex' : 'none';
+    // Use class instead of inline style
+    if (totalQty > 0) {
+        badge.classList.add('visible');
+    } else {
+        badge.classList.remove('visible');
+    }
 }
 
 function renderCart() {
@@ -2048,17 +2080,19 @@ function calculateMembership(currentPoints) {
     };
 }
 
+// Membership Data Initialization
 function initMembershipData() {
-    // Simulated User Points (Example: 2450)
-    // Note: Based on new tiers: Gold is 3000. So 2450 is Silver.
-    // Let's adjust points to match the user's "Vàng" status in mockup or adjust tiers.
-    // User mockup shows 2450 and "Vàng". So maybe Gold starts at 2000?
-    // Let's override for now to match visual expectation of "Vàng"
+    let userPoints = 0;
 
-    // Custom logic to match user request visuals
-    const userPoints = 2450;
+    // Get real user points if authenticated
+    if (typeof api !== 'undefined') {
+        const user = api.getUserFromToken();
+        if (user) {
+            userPoints = user.point || user.totalSpending || 0; // Adjust based on your data model logic
+        }
+    }
 
-    // Let's use tiers: Dong(0), Bac(1000), Vang(2000), Bach Kim(5000), Kim Cuong(10000)
+    // Default Tiers (can be moved to config or constant)
     const ADJUSTED_TIERS = [
         { name: 'Đồng', threshold: 0 },
         { name: 'Bạc', threshold: 1000 },
@@ -2564,14 +2598,20 @@ async function loadWarrantyContent() {
         }
     }
 
-    // 2. Mock Warranty Products (Luôn hiển thị để demo)
-    const mockProducts = [
-        { name: 'Laptop Dell XPS 13 Plus', serial: 'XPS-9320-1122', date: '15/01/2024', end: '15/01/2026', status: 'active', label: 'Còn bảo hành' },
-        { name: 'Chuột Logitech MX Master 3S', serial: 'MX-3S-8899', date: '20/11/2023', end: '20/11/2024', status: 'warning', label: 'Sắp hết hạn' },
-        { name: 'Bàn phím Keychron K2 Pro', serial: 'K2-PRO-5566', date: '10/01/2022', end: '10/01/2023', status: 'expired', label: 'Hết hạn' }
-    ];
+    // 2. Fetch Warranty Products from API
+    let products = [];
+    if (typeof api !== 'undefined' && api.isAuthenticated()) {
+        try {
+            const res = await api.request('/warranty/products');
+            if (res.success && Array.isArray(res.data)) {
+                products = res.data;
+            }
+        } catch (e) {
+            console.warn('Cannot fetch warranty products', e);
+        }
+    }
 
-    // 3. Render HTML Direct (No complex conditions)
+    // 3. Render HTML
     const html = `
         <div class="warranty-page">
             <div class="warranty-user-info">
@@ -2601,7 +2641,7 @@ async function loadWarrantyContent() {
                         </tr>
                     </thead>
                     <tbody>
-                        ${mockProducts.map((p, index) => `
+                        ${products.length > 0 ? products.map((p, index) => `
                         <tr>
                             <td class="stt-cell center">${index + 1}</td>
                             <td>
@@ -2616,7 +2656,13 @@ async function loadWarrantyContent() {
                                 <span class="status-${p.status}" style="font-size:10px; white-space:nowrap;">${p.label}</span>
                             </td>
                         </tr>
-                        `).join('')}
+                        `).join('') : `
+                        <tr>
+                            <td colspan="4" style="text-align:center; padding: 20px; color: #999;">
+                                Không có sản phẩm đang bảo hành
+                            </td>
+                        </tr>
+                        `}
                     </tbody>
                 </table>
             </div>
