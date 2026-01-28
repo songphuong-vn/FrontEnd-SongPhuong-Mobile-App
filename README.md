@@ -26,7 +26,7 @@ python -m http.server 8080
 
 Open `http://localhost:8080` in your browser.
 
-### Login (Localhost Only)
+### Login
 - Username: `user`
 - Password: `123456`
 
