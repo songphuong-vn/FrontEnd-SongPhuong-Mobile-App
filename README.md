@@ -1,4 +1,4 @@
-# 📱 Song Phương Mobile - Customer Management App
+# 📱 Song Phương Mobile
 
 Modern Single Page Application (SPA) for customer management and e-commerce.
 
