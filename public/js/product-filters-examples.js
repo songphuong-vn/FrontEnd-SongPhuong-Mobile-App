@@ -486,3 +486,4 @@ if (typeof window !== 'undefined') {
         comparePrice: compareProductPrices
     };
 }
+// Đã xóa file này vì không còn sử dụng.

@@ -125,3 +125,4 @@ products.forEach(p => {
 Object.entries(parentCounts).sort((a,b) => b[1] - a[1]).forEach(([parent, count]) => {
     console.log(`${count.toString().padStart(5)} - ${parent}`);
 });
+// Đã xóa file này vì không còn sử dụng.

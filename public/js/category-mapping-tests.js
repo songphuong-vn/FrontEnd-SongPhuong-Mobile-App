@@ -553,3 +553,4 @@ window.CategoryMappingTests = {
 console.log("✅ Test suite loaded. Run CategoryMappingTests.runAll() to start all tests.");
 console.log("   Or run individual tests:");
 console.log("   - CategoryMappingTests.test1() through test8()");
+// Đã xóa file này vì không còn sử dụng.

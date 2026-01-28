@@ -136,3 +136,4 @@ main().catch(err => {
   console.error(err);
   process.exit(1);
 });
+// Đã xóa file này vì không còn sử dụng.

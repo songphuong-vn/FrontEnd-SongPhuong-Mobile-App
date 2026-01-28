@@ -51,3 +51,4 @@ itemsToCopy.forEach(item => {
 });
 
 console.log('Build completed! All files copied to public/');
+// Đã xóa file này vì không còn sử dụng.

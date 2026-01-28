@@ -1,9 +1,9 @@
-(function(){
+(function () {
   // Provide safe global functions if app.js failed to define them
-  
+
   // Fallback toggleSidebar
   if (typeof window.toggleSidebar !== 'function') {
-    window.toggleSidebar = function() {
+    window.toggleSidebar = function () {
       try {
         var sidebar = document.getElementById('sidebarContainer');
         var overlay = document.getElementById('sidebarOverlay');
@@ -23,7 +23,7 @@
           overlay.classList.add('active');
           document.body.style.overflow = 'hidden';
         }
-      } catch(err) {
+      } catch (err) {
         console.error('Fallback toggleSidebar error:', err);
       }
     };
@@ -32,7 +32,7 @@
 
   // Fallback closeSidebar
   if (typeof window.closeSidebar !== 'function') {
-    window.closeSidebar = function() {
+    window.closeSidebar = function () {
       try {
         var sidebar = document.getElementById('sidebarContainer');
         var overlay = document.getElementById('sidebarOverlay');
@@ -41,7 +41,7 @@
         document.body.style.overflow = '';
         document.body.style.position = '';
         document.body.style.width = '';
-      } catch(err) {
+      } catch (err) {
         console.error('Fallback closeSidebar error:', err);
       }
     };
@@ -50,7 +50,7 @@
 
   // Fallback switchNav
   if (typeof window.switchNav !== 'function') {
-    window.switchNav = function(tab, evt) {
+    window.switchNav = function (tab, evt) {
       try {
         if (evt && evt.preventDefault) evt.preventDefault();
         // Close sidebar if open
@@ -65,16 +65,16 @@
         }
         // Active state for bottom nav
         var navItems = document.querySelectorAll('.nav-item');
-        navItems.forEach(function(item){ item.classList.remove('active'); });
-        navItems.forEach(function(item){
+        navItems.forEach(function (item) { item.classList.remove('active'); });
+        navItems.forEach(function (item) {
           var onclickAttr = item.getAttribute('onclick') || '';
-          if (onclickAttr.indexOf("'"+tab+"'") !== -1) item.classList.add('active');
+          if (onclickAttr.indexOf("'" + tab + "'") !== -1) item.classList.add('active');
           if (tab === 'category' && onclickAttr.indexOf('toggleSidebar') !== -1) item.classList.add('active');
         });
         // Show selected view
         var views = document.querySelectorAll('.app-view');
-        views.forEach(function(view){ view.classList.remove('active'); });
-        var activeView = document.getElementById(tab+'-view');
+        views.forEach(function (view) { view.classList.remove('active'); });
+        var activeView = document.getElementById(tab + '-view');
         if (activeView) {
           activeView.classList.add('active');
           var scrollContent = document.querySelector('.scroll-content');
@@ -83,14 +83,38 @@
         // Toggle search bar visibility
         var searchBar = document.querySelector('.header-search-fixed');
         if (searchBar) searchBar.style.display = (tab === 'home') ? 'flex' : 'none';
+
+        // CRITICAL: Always reset scroll when switching tabs to prevent scroll lock
+        document.documentElement.style.overflow = '';
+        document.body.style.overflow = '';
+        document.body.style.position = '';
+        document.body.style.width = '';
+        var scrollContentEl = document.querySelector('.scroll-content');
+        if (scrollContentEl) scrollContentEl.style.overflow = '';
+
         // Render home products on first load if needed
         if (tab === 'home' && window.renderHomeProducts) {
           renderHomeProducts({ reset: true, reason: 'fallback-nav' });
         }
-      } catch(err) {
+      } catch (err) {
         console.error('Fallback switchNav error:', err);
       }
     };
     console.log('⚠️ Loaded fallback switchNav');
   }
+
+  // SAFETY: Reset scroll on page load to handle reload scenarios
+  // This prevents scroll being locked forever if user reloads while modal/sidebar is open
+  document.addEventListener('DOMContentLoaded', function () {
+    // Small delay to ensure it runs after other scripts
+    setTimeout(function () {
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+      var scrollContent = document.querySelector('.scroll-content');
+      if (scrollContent) scrollContent.style.overflow = '';
+      console.log('✅ Scroll safety reset completed');
+    }, 100);
+  });
 })();

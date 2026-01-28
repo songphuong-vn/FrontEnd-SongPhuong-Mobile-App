@@ -44,3 +44,4 @@ files.forEach(file => {
 });
 
 console.log(`Finished. Updated ${count} files.`);
+// Đã xóa file này vì không còn sử dụng.
