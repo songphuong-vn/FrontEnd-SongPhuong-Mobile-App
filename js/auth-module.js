@@ -71,9 +71,23 @@ class AuthModule {
             const response = await api.login(credentials);
 
             if (response.success) {
+                // Sync with legacy app logic
+                if (response.user) {
+                    const legacyContact = {
+                        name: response.user.fullName || response.user.username,
+                        phone: response.user.phone || '',
+                        email: response.user.email || '',
+                        address: response.user.address || ''
+                    };
+                    localStorage.setItem('userContactInfo', JSON.stringify(legacyContact));
+                    // Trigger storage event to update UI elsewhere if needed
+                    window.dispatchEvent(new Event('storage'));
+                }
+
                 this.showSuccess('Đăng nhập thành công!');
                 setTimeout(() => {
                     this.checkAuthState();
+                    // Nếu đang có cờ redirect hoặc open cart, có thể handle ở đây
                 }, 800);
             }
         } catch (error) {

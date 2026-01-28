@@ -3041,6 +3041,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     initBannerSlider();
 
+    // Check URL params for openCart
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('openCart') === 'true' && typeof openCart === 'function') {
+        setTimeout(openCart, 500);
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
     const initProducts = () => {
         if (window.ProductManager && ProductManager.isLoaded) {
             console.log('✅ ProductManager ready, rendering products...');

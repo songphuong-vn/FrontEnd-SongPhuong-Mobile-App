@@ -158,6 +158,7 @@ class APIClient {
     logout() {
         this.removeToken();
         this.removeUser();
+        localStorage.removeItem('userContactInfo'); // Sync legacy
         window.location.href = '/';
     }
 

@@ -2735,6 +2735,25 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof initFooter === 'function') {
         initFooter();
     }
+
+    // Load Cart from Storage
+    try {
+        const stored = localStorage.getItem('cartItems');
+        if (stored) {
+            cartItems = JSON.parse(stored);
+            if (typeof updateCartBadge === 'function') updateCartBadge();
+        }
+    } catch (e) {
+        console.error('Error loading cart:', e);
+        cartItems = [];
+    }
+
+    // Check URL params for openCart
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('openCart') === 'true' && typeof openCart === 'function') {
+        setTimeout(openCart, 500);
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
     // Switch to home view by default
     if (typeof switchNav === 'function') {
         switchNav('home');

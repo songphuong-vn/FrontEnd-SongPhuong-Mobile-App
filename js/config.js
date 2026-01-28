@@ -42,7 +42,7 @@
 
         // Features
         ENABLE_DEBUG: IS_LOCALHOST,
-        ENABLE_MOCK_DATA: IS_LOCALHOST, // Enable Mock Data ONLY on Localhost for testing
+        ENABLE_MOCK_DATA: IS_LOCALHOST || IS_STAGING, // Enable Mock Data on Localhost AND Vercel Demo
         ENABLE_ANALYTICS: !IS_LOCALHOST,
 
         // UI

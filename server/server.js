@@ -14,11 +14,28 @@ connectDB();
 // Security middleware
 app.use(helmet());
 
-// CORS
-app.use(cors({
-    origin: process.env.CORS_ORIGIN || 'http://localhost:8000',
-    credentials: true
-}));
+// CORS - hỗ trợ danh sách origin (CORS_ORIGIN có thể là một origin hoặc danh sách cách nhau bằng dấu ,)
+{
+    const raw = process.env.CORS_ORIGIN || 'http://localhost:8000,https://song-phuong-mobile-app.vercel.app';
+    const allowedOrigins = raw.split(',').map(s => s.trim()).filter(Boolean);
+
+    // If wildcard '*' present, allow all origins but do not set credentials
+    const hasWildcard = allowedOrigins.includes('*');
+
+    const corsOptions = {
+        origin: function(origin, callback) {
+            // Allow non-browser requests (like curl, server-to-server) where origin is undefined
+            if (!origin) return callback(null, true);
+            if (hasWildcard) return callback(null, true);
+            if (allowedOrigins.indexOf(origin) !== -1) return callback(null, true);
+            return callback(new Error('Not allowed by CORS'));
+        },
+        credentials: !hasWildcard,
+        allowedHeaders: ['Content-Type', 'Authorization', 'Accept']
+    };
+
+    app.use(cors(corsOptions));
+}
 
 // Rate limiting
 const limiter = rateLimit({
