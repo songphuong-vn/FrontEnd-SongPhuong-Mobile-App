@@ -1099,7 +1099,7 @@ function renderCart() {
             const row = document.createElement('div');
             row.className = 'cart-item';
             row.innerHTML = `
-                <img src="${item.image}" alt="${item.name}">
+                <img src="${item.image || 'icons/product-default-logo.jpg'}" alt="${item.name}" onerror="this.src='icons/product-default-logo.jpg'">
                 <div class="cart-item__info">
                     <div class="cart-item__name">${item.name}</div>
                     <div class="cart-item__price">${formatCurrency(item.price)}</div>
@@ -1123,7 +1123,7 @@ function renderCart() {
 }
 
 function changeCartQty(id, delta) {
-    cartItems = cartItems.map(item => item.id === id ? { ...item, qty: Math.max(0, item.qty + delta) } : item)
+    cartItems = cartItems.map(item => String(item.id) === String(id) ? { ...item, qty: Math.max(0, item.qty + delta) } : item)
         .filter(item => item.qty > 0);
     updateCartBadge();
     renderCart();

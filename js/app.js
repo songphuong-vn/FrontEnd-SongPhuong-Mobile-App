@@ -1238,8 +1238,11 @@ function renderCart() {
             const displayName = item.name || product?.name || 'Sản phẩm không tồn tại';
             const displayPrice = item.price || 0;
             // Xử lý ảnh: item.image -> product image -> default
-            let displayImage = item.image || 'images/no-image.png';
-            if (displayImage.includes('undefined')) displayImage = 'images/no-image.png';
+            // FIX: Sử dụng đúng file default đã có trong folder icons
+            let displayImage = item.image || 'icons/product-default-logo.jpg';
+            if (displayImage.includes('undefined') || displayImage.includes('no-image.png')) {
+                displayImage = 'icons/product-default-logo.jpg';
+            }
 
             return {
                 ...item,
@@ -1303,7 +1306,8 @@ function renderCart() {
 }
 
 function changeCartQty(id, delta) {
-    const itemIndex = cartItems.findIndex(item => item.id === id);
+    // FIX: So sánh String để tìm đúng item
+    const itemIndex = cartItems.findIndex(item => String(item.id) === String(id));
     if (itemIndex === -1) return;
 
     const newQty = cartItems[itemIndex].qty + delta;
@@ -1323,7 +1327,8 @@ function removeFromCart(id) {
     // Show confirm dialog (optional) or just remove
     // Dùng native confirm cho nhanh, sau đổi sang modal đẹp sau
     if (confirm('Bạn có chắc muốn xóa sản phẩm này khỏi giỏ hàng?')) {
-        cartItems = cartItems.filter(item => item.id !== id);
+        // FIX: So sánh String để đảm bảo xóa đúng dù id là số hay chuỗi
+        cartItems = cartItems.filter(item => String(item.id) !== String(id));
         saveCartToStorage();
         updateCartBadge();
         renderCart();
