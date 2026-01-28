@@ -29,18 +29,27 @@ function loadCartFromStorage() {
     try {
         const stored = localStorage.getItem('cartItems');
         if (stored) {
-            cartItems = JSON.parse(stored) || [];
-            return;
+            const parsed = JSON.parse(stored);
+            // Validate: Only accept array with valid items
+            if (Array.isArray(parsed)) {
+                cartItems = parsed.filter(i => i.id && i.qty > 0);
+            } else {
+                cartItems = [];
+            }
+        } else {
+            // New user or cleared validation - start empty
+            cartItems = [];
         }
-        const legacy = localStorage.getItem('sp_cart');
-        if (legacy) {
-            // convert legacy format (id, qty) to cartItems shape
-            const parsed = JSON.parse(legacy) || [];
-            cartItems = parsed.map(i => ({ id: i.id || i.productId || null, qty: i.qty || i.quantity || 1, price: i.price || 0 }));
+
+        // Remove legacy 'sp_cart' loading to prevent auto-loading sample/old data
+        // Explicitly clear legacy data to avoid confusion
+        if (localStorage.getItem('sp_cart')) {
+            localStorage.removeItem('sp_cart');
         }
     } catch (e) {
-        console.warn('loadCartFromStorage failed', e);
+        console.warn('loadCartFromStorage failed - resetting cart', e);
         cartItems = [];
+        localStorage.removeItem('cartItems');
     }
 }
 
@@ -1189,9 +1198,8 @@ function renderCart() {
 
     list.innerHTML = '';
 
-    if (!cartItems.length || cartItems.length === 0) {
+    if (!cartItems || cartItems.length === 0) {
         empty.style.display = 'flex'; // Flex để căn giữa icon và text
-        // Có thể ẩn phần summary hoặc disable button thanh toán nếu muốn
         if (subtotalEl) {
             subtotalEl.textContent = '0đ';
             shippingEl.textContent = '0đ';
@@ -1200,18 +1208,66 @@ function renderCart() {
     } else {
         empty.style.display = 'none';
 
-        cartItems.forEach(item => {
+        // SYNC: Cập nhật thông tin mới nhất từ ProductManager nếu có
+        // Điều này fix lỗi undefined name/image nếu cart cũ chỉ lưu ID
+        let cartHasUpdates = false;
+
+        const renderedItems = cartItems.map(item => {
+            // Lookup product info
+            let product = null;
+            if (window.ProductManager && window.ProductManager.isLoaded) {
+                product = ProductManager.getProductById(item.id);
+            }
+
+            // Nếu tìm thấy product, update lại thông tin trong cart item để lần sau đỡ lỗi
+            if (product) {
+                // Check if we need up update cached info
+                if (item.name !== product.name || item.price !== product.displayPrice || !item.image) {
+                    item.name = product.name;
+                    item.price = product.displayPrice;
+                    // Giả sử logic lấy ảnh: ưu tiên ảnh từ product data hoặc default
+                    // Nếu ProductManager không lưu URL ảnh, ta dùng logic ảnh mặc định hoặc URL từ product object nếu có
+                    // (Hiện tại ProductManager data structure không thấy field image rõ ràng, thường build bằng id/sku)
+                    // Tạm thời set image placeholder nếu chưa có
+                    if (!item.image) item.image = `images/products/${product.sku}.jpg`;
+                    cartHasUpdates = true;
+                }
+            }
+
+            // Fallback values if product not found or item info missing
+            const displayName = item.name || product?.name || 'Sản phẩm không tồn tại';
+            const displayPrice = item.price || 0;
+            // Xử lý ảnh: item.image -> product image -> default
+            let displayImage = item.image || 'images/no-image.png';
+            if (displayImage.includes('undefined')) displayImage = 'images/no-image.png';
+
+            return {
+                ...item,
+                displayName,
+                displayPrice,
+                displayImage
+            };
+        });
+
+        if (cartHasUpdates) {
+            saveCartToStorage();
+        }
+
+        renderedItems.forEach(item => {
             const row = document.createElement('div');
             row.className = 'cart-item';
-            // Layout mới: Image - Info - Actions (Qty + Trash)
+
+            // Ngăn lỗi hình ảnh bằng onerrror
+            const imgHtml = `<img src="${item.displayImage}" alt="${item.displayName}" onerror="this.src='icons/product-default-logo.jpg'">`;
+
             row.innerHTML = `
                 <div class="cart-item__image-wrapper">
-                    <img src="${item.image}" alt="${item.name}" onerror="this.src='images/no-image.png'">
+                    ${imgHtml}
                 </div>
                 <div class="cart-item__content">
                     <div class="cart-item__info">
-                        <div class="cart-item__name">${item.name}</div>
-                        <div class="cart-item__price">${formatCurrency(item.price)}</div>
+                        <div class="cart-item__name">${item.displayName}</div>
+                        <div class="cart-item__price">${formatCurrency(item.displayPrice)}</div>
                     </div>
                     <div class="cart-item__actions">
                         <div class="qty-controls">
@@ -1232,10 +1288,10 @@ function renderCart() {
             list.appendChild(row);
         });
 
-        // Tính toán lại tổng tiền
-        const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.qty, 0);
-        // Free ship nếu hóa đơn trên 5 triệu, ngược lại 30k
-        const shipping = subtotal > 5000000 ? 0 : 30000;
+        // Tính toán lại tổng tiền dựa trên giá (có thể đã update)
+        const subtotal = renderedItems.reduce((sum, item) => sum + item.displayPrice * item.qty, 0);
+        // Free ship nếu hóa đơn trên 5 triệu, ngược lại 30k (chỉ tính ship nếu có hàng)
+        const shipping = (subtotal > 0 && subtotal < 5000000) ? 30000 : 0;
         const total = subtotal + shipping;
 
         if (subtotalEl) {
