@@ -1099,7 +1099,7 @@ function renderCart() {
             const row = document.createElement('div');
             row.className = 'cart-item';
             row.innerHTML = `
-                <img src="${item.image || 'icons/product-default-logo.jpg'}" alt="${item.name}" onerror="this.src='icons/product-default-logo.jpg'">
+                <img src="${item.image || 'icons/product-default-logo.jpg'}" alt="${item.name}" onerror="this.onerror=null;this.src='icons/product-default-logo.jpg'">
                 <div class="cart-item__info">
                     <div class="cart-item__name">${item.name}</div>
                     <div class="cart-item__price">${formatCurrency(item.price)}</div>
@@ -1133,7 +1133,48 @@ function openCart() {
     renderCart();
     updateCartBadge();
     const overlay = document.getElementById('cart-overlay');
-    if (overlay) overlay.classList.add('active');
+    if (overlay) {
+        overlay.classList.add('active');
+        initCheckoutGuard();
+    }
+}
+
+function initCheckoutGuard() {
+    const overlay = document.getElementById('cart-overlay');
+    if (!overlay) return;
+
+    // Tìm nút thanh toán
+    const btns = Array.from(overlay.querySelectorAll('button, a'));
+    const checkoutBtn = btns.find(b => b.innerText && b.innerText.toLowerCase().includes('thanh toán'))
+        || overlay.querySelector('.checkout-btn')
+        || overlay.querySelector('.btn-primary');
+
+    if (checkoutBtn && !checkoutBtn.hasAttribute('data-guarded')) {
+        checkoutBtn.setAttribute('data-guarded', 'true');
+        const originalClick = checkoutBtn.onclick;
+
+        checkoutBtn.onclick = function (e) {
+            const isLoggedIn = localStorage.getItem('userContactInfo');
+
+            if (!isLoggedIn) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                if (confirm('Bạn cần đăng nhập để thanh toán. Đi đến trang cá nhân ngay?')) {
+                    closeCart();
+                    switchNav('profile');
+                    setTimeout(() => {
+                        showNotification('Vui lòng cập nhật thông tin để tiếp tục', 'info');
+                        if (typeof editContactInfo === 'function') editContactInfo();
+                    }, 800);
+                }
+                return false;
+            }
+
+            if (originalClick) originalClick.call(this, e);
+            else showNotification('Đang chuyển đến cổng thanh toán...', 'success');
+        };
+    }
 }
 
 function closeCart() {

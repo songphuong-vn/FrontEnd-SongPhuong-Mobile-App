@@ -2,7 +2,7 @@ var buildpc_params = {
     "localKey": "oneshop_buildpc",
     "configNum": "3",
     "configName": "Cấu hình",
-    "image": "https://songphuong.vn/Content/themes/oneshop2021/assets/images/no-image.png",
+    "image": "icons/product-default-logo.jpg",
     "title": "Vui lòng chọn sản phẩm",
     "addButton": "chọn",
     "editButton": "<i class=\"fas fa-edit\"></i>",

@@ -1260,8 +1260,8 @@ function renderCart() {
             const row = document.createElement('div');
             row.className = 'cart-item';
 
-            // Ngăn lỗi hình ảnh bằng onerrror
-            const imgHtml = `<img src="${item.displayImage}" alt="${item.displayName}" onerror="this.src='icons/product-default-logo.jpg'">`;
+            // Ngăn lỗi hình ảnh bằng onerrror và onerror=null để tránh loop
+            const imgHtml = `<img src="${item.displayImage}" alt="${item.displayName}" onerror="this.onerror=null;this.src='icons/product-default-logo.jpg'">`;
 
             row.innerHTML = `
                 <div class="cart-item__image-wrapper">
@@ -1350,8 +1350,62 @@ function openCart() {
     renderCart();
     updateCartBadge();
     const overlay = document.getElementById('cart-overlay');
-    if (overlay) overlay.classList.add('active');
+    if (overlay) {
+        overlay.classList.add('active');
+        initCheckoutGuard();
+    }
 }
+
+function initCheckoutGuard() {
+    const overlay = document.getElementById('cart-overlay');
+    if (!overlay) return;
+
+    // Tìm nút thanh toán (nút cuối cùng hoặc nút có class primary/checkout)
+    // Ưu tiên tìm theo text
+    const btns = Array.from(overlay.querySelectorAll('button, a'));
+    const checkoutBtn = btns.find(b => b.innerText && b.innerText.toLowerCase().includes('thanh toán'))
+        || overlay.querySelector('.checkout-btn')
+        || overlay.querySelector('.btn-primary');
+
+    if (checkoutBtn && !checkoutBtn.hasAttribute('data-guarded')) {
+        checkoutBtn.setAttribute('data-guarded', 'true');
+        const originalClick = checkoutBtn.onclick;
+
+        checkoutBtn.onclick = function (e) {
+            // Check login (userContactInfo or userAvatar as proxy for logged in)
+            const isLoggedIn = localStorage.getItem('userContactInfo');
+
+            if (!isLoggedIn) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                // Show custom confirm or native
+                if (confirm('Bạn cần đăng nhập để thanh toán. Đi đến trang cá nhân ngay?')) {
+                    if (typeof closeCart === 'function') closeCart();
+                    else overlay.classList.remove('active');
+
+                    if (typeof switchNav === 'function') switchNav('profile');
+
+                    // Auto open edit modal if needed
+                    setTimeout(() => {
+                        showNotification('Vui lòng cập nhật thông tin để tiếp tục', 'info');
+                        if (typeof editContactInfo === 'function') editContactInfo();
+                    }, 800);
+                }
+                return false;
+            }
+
+            // Logged in -> Proceed
+            if (originalClick) originalClick.call(this, e);
+            else {
+                // Default feedback if no logic exists
+                showNotification('Đang chuyển đến cổng thanh toán...', 'success');
+            }
+        };
+    }
+
+}
+
 
 function closeCart() {
     const overlay = document.getElementById('cart-overlay');
