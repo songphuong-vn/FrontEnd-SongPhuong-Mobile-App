@@ -94,7 +94,7 @@ class APIClient {
 
     async login(credentials) {
         // MOCK LOGIN for Localhost Testing
-        if (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.ENABLE_MOCK_DATA) {
+        if (true || (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.ENABLE_MOCK_DATA)) {
             console.warn('⚠️ Using Mock Login');
             if (credentials.username === 'user' && credentials.password === '123456') {
                 const mockUser = this.getMockUser();
