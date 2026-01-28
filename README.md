@@ -1,134 +1,67 @@
-# 📱 Song Phương Mobile - Customer Management App
+### 📱 Song Phương Mobile - Front-end Client
+Một ứng dụng Single Page Application (SPA) hiện đại, tập trung vào trải nghiệm người dùng (UX) mượt mà cho việc quản lý khách hàng và mua sắm thiết bị di động.
 
-Modern Single Page Application (SPA) for customer management and e-commerce.
+🌟 Tổng quan dự án
+Đây là nền tảng Front-end thuần túy được tối ưu hóa cho tốc độ và khả năng phản hồi. Dự án sử dụng mô hình Modular JavaScript giúp quản lý logic UI tách biệt với dữ liệu.
 
-## 🚀 Quick Start
+Kiến trúc: SPA (Single Page Application) không cần reload trang.
 
-### Prerequisites
-- Node.js 16+ (for development tools)
-- Modern browser (Chrome, Firefox, Safari, Edge)
+Phong cách: Mobile-first, Responsive hoàn toàn trên mọi thiết bị.
 
-### Installation
+Dữ liệu: Tích hợp API linh hoạt với chế độ Mock Data thông minh khi phát triển local.
 
-```bash
-# Clone the repository
+🚀 Hướng dẫn khởi chạy nhanh
+Vì đây là dự án Front-end, bạn chỉ cần một trình duyệt hiện đại.
+
+1. Cài đặt
+Bash
 git clone <repository-url>
 cd SP-MOBILE-APP
+2. Chạy ứng dụng
+Bạn có thể sử dụng bất kỳ công cụ Static Server nào:
 
-# Install dev dependencies (optional)
-npm install
+VS Code: Chuột phải vào index.html -> Open with Live Server.
 
-# Serve locally
-npx serve -s . -p 8080
-# Or use Python
-python -m http.server 8080
-```
+Node.js: npx serve .
 
-Open `http://localhost:8080` in your browser.
+Python: python -m http.server 8080
 
-### Login (Localhost Only)
-- Username: `user`
-- Password: `123456`
+3. Đăng nhập (Chế độ Test)
+Khi chạy trên localhost, hệ thống tự động kích hoạt chế độ Mock Auth:
 
-## 📁 Project Structure
+Username: user | Password: 123456
 
-```
+🛠️ Stack Công nghệ & Cấu trúc
+Core Front-end
+HTML5/CSS3: Sử dụng Flexbox/Grid cho layout.
+
+Vanilla JS (ES6+): Module hóa toàn bộ logic (không phụ thuộc framework nặng nề).
+
+API Client: Xử lý bất đồng bộ (Async/Await) với cơ chế tự động chuyển đổi môi trường.
+
+Cấu trúc thư mục Client-side
+Plaintext
 SP-MOBILE-APP/
-├── index.html          # Main SPA entry
-├── css/                # Stylesheets
-├── js/                 # JavaScript modules
-│   ├── config.js       # Environment configuration
-│   ├── api-client.js   # API communication
-│   ├── ui-helpers.js   # UI utility functions
-│   ├── app.js          # Main application logic
-│   └── ...
-├── pages/              # Standalone pages
-└── icons/              # Assets
-```
+├── index.html          # Entry point duy nhất (SPA container)
+├── css/                # Hệ thống Design System & Layout
+├── js/                 
+│   ├── app.js          # Khởi tạo ứng dụng & Routing chính
+│   ├── ui-helpers.js   # Render linh kiện UI (Table, Modal, Toast)
+│   ├── api-client.js   # Lớp giao tiếp với Server/Mock Data
+│   └── config.js       # Cấu hình UI & Endpoint
+├── pages/              # View-level components cho từng tính năng
+└── icons/              # Tài nguyên hình ảnh & SVG
+✨ Tính năng Front-end nổi bật
+⚡ Smart Rendering: Render danh mục gần 10,000 sản phẩm mà không gây lag nhờ kỹ thuật tối ưu hóa DOM.
 
-## 🛠️ Development
+🌓 Auto Environment Switch: Tự động nhận diện môi trường:
 
-### Code Quality
+Localhost: Bật Mock Data để Dev nhanh không cần Backend.
 
-```bash
-# Format code
-npm run format
+Production: Kết nối thẳng tới API thật.
 
-# Lint JavaScript
-npm run lint
-```
+🛒 Cart Engine: Quản lý giỏ hàng phía Client (LocalStorage) đồng bộ thời gian thực.
 
-### Key Features
+🔍 Advanced Filtering: Bộ lọc sản phẩm thông minh (Search, Category, Price) xử lý ngay trên UI.
 
-- ✅ **Auto Environment Detection**: Localhost vs Production
-- ✅ **Mock Data Mode**: Enabled on localhost for testing
-- ✅ **Responsive Design**: Mobile-first approach
-- ✅ **Product Catalog**: 9,926 products with search & filter
-- ✅ **Shopping Cart**: Full cart management
-- ✅ **User Authentication**: Login/Register system
-- ✅ **Warranty Tracking**: Product warranty information
-
-## 🌐 Deployment
-
-### Vercel (Recommended)
-
-```bash
-# Install Vercel CLI
-npm i -g vercel
-
-# Deploy
-vercel --prod
-```
-
-### Manual Deployment
-
-1. Push to Git repository
-2. Connect to Vercel/Netlify
-3. Auto-deploy on push
-
-## 📝 Configuration
-
-Edit `js/config.js` to change:
-
-- **API URL**: `API_BASE_URL`
-- **Mock Data**: `ENABLE_MOCK_DATA` (auto-set based on environment)
-- **Debug Mode**: `ENABLE_DEBUG`
-
-## 🔧 Environment Variables
-
-The app auto-detects environment:
-
-| Environment | Hostname | Mock Data | Debug |
-|------------|----------|-----------|-------|
-| Development | localhost | ✅ | ✅ |
-| Staging | *.vercel.app | ❌ | ✅ |
-| Production | Custom domain | ❌ | ❌ |
-
-## 📚 Documentation
-
-- **CLEANUP_SUMMARY.md**: Recent code cleanup details
-- **js/types.js**: JSDoc type definitions
-- **js/ui-helpers.js**: Utility functions documentation
-
-## 🐛 Troubleshooting
-
-### Cannot scroll
-- Clear browser cache (Ctrl + Shift + R)
-- Check console for errors
-
-### API errors
-- Verify `API_BASE_URL` in `js/config.js`
-- Check backend is running (localhost:5000)
-- Check browser console for CORS errors
-
-### Mock login not working
-- Only works on localhost
-- Use credentials: `user` / `123456`
-
-## 🤝 Contributing
-
-1. Create feature branch
-2. Make changes
-3. Run `npm run lint` and `npm run format`
-4. Commit with clear message
-5. Create Pull Request
+🛡️ Warranty Lookup: Giao diện tra cứu bảo hành thân thiện.
