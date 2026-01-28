@@ -46,10 +46,14 @@ class AuthModule {
             loginState.style.display = 'none';
             loggedState.style.display = 'block';
             this.loadUserProfile();
+            // Đảm bảo mở lại scroll khi đã đăng nhập
+            document.body.style.overflow = '';
         } else {
             // User is not logged in - show login form
             loginState.style.display = 'flex';
             loggedState.style.display = 'none';
+            // Đảm bảo mở lại scroll khi chưa đăng nhập
+            document.body.style.overflow = '';
         }
     }
 

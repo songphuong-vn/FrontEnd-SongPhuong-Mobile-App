@@ -1,134 +1,100 @@
-# 📱 Song Phương Mobile - Customer Management App
+# 📱 Song Phương Mobile - Frontend Application
 
-Modern Single Page Application (SPA) for customer management and e-commerce.
+A specialized Single Page Application (SPA) focusing on the frontend experience for Song Phương Mobile's customer management and e-commerce platform.
+
+> **Note**: This project is currently in a **Frontend-First** phase. Due to backend instability, the application is optimized to run with **Mock Data** by default to ensure a smooth UI/UX development and testing experience.
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 16+ (for development tools)
-- Modern browser (Chrome, Firefox, Safari, Edge)
+- Node.js 16+ (recommended for development tools)
+- Any modern web browser (Chrome, Edge, Firefox, Safari)
 
-### Installation
+### Installation & Running
+
+Since this is a frontend-focused codebase, you can simply serve the static files:
 
 ```bash
 # Clone the repository
 git clone <repository-url>
 cd SP-MOBILE-APP
 
-# Install dev dependencies (optional)
+# Install dev dependencies (for linting/formatting)
 npm install
 
-# Serve locally
+# Serve locally (Recommended)
 npx serve -s . -p 8080
-# Or use Python
-python -m http.server 8080
 ```
 
 Open `http://localhost:8080` in your browser.
 
-### Login (Localhost Only)
-- Username: `user`
-- Password: `123456`
+### 🔑 Login Credentials (Mock Mode)
+When running in Mock Data mode (default for localhost), use:
+- **Username**: `user`
+- **Password**: `123456`
 
-## 📁 Project Structure
+## � Tech Stack & Structure
+
+The project is built using standard web technologies without heavy framework overhead to ensure maximum performance and easy debugging:
+
+- **Core**: HTML5, CSS3, JavaScript (ES6 Modules)
+- **State Management**: Custom observable patterns/services
+- **Styling**: Native CSS Variables & Flexbox/Grid
+- **Build Tooling**: Minimal (Prettier/ESLint)
 
 ```
 SP-MOBILE-APP/
-├── index.html          # Main SPA entry
-├── css/                # Stylesheets
-├── js/                 # JavaScript modules
-│   ├── config.js       # Environment configuration
-│   ├── api-client.js   # API communication
-│   ├── ui-helpers.js   # UI utility functions
-│   ├── app.js          # Main application logic
-│   └── ...
-├── pages/              # Standalone pages
-└── icons/              # Assets
+├── index.html          # Main Entry Point
+├── css/                # Global Styles & Variables
+├── js/                 # Application Logic
+│   ├── config.js       # configuration (Mock Data toggle)
+│   ├── services/       # Data handling (switches between API/Mock)
+│   ├── components/     # UI Components
+│   └── app.js          # Core initialization
+├── pages/              # Static page templates
+└── icons/              # SVG & Image Assets
 ```
 
-## 🛠️ Development
+## 🛠️ Key Features (Frontend)
 
-### Code Quality
+- **Mock-First Architecture**: Designed to function seamlessly without a live backend.
+- **Responsive Implementation**: Mobile-first design that scales up to desktop.
+- **Product Catalog UI**: Optimized rendering for large lists (virtualization/pagination concepts).
+- **Shopping Cart State**: Client-side cart management with local storage persistence.
+- **Interactive UI**: Custom alerts, toast notifications, and modals (no external huge libraries).
 
-```bash
-# Format code
-npm run format
+## ⚙️ Configuration
 
-# Lint JavaScript
-npm run lint
+The application behavior is controlled via `js/config.js`.
+
+### Forcing Mock Data
+If you encounter API issues, ensure Mock Data is enabled:
+
+```javascript
+// js/config.js
+export const CONFIG = {
+    // ...
+    ENABLE_MOCK_DATA: true, // Set to true to bypass backend
+    // ...
+};
 ```
-
-### Key Features
-
-- ✅ **Auto Environment Detection**: Localhost vs Production
-- ✅ **Mock Data Mode**: Enabled on localhost for testing
-- ✅ **Responsive Design**: Mobile-first approach
-- ✅ **Product Catalog**: 9,926 products with search & filter
-- ✅ **Shopping Cart**: Full cart management
-- ✅ **User Authentication**: Login/Register system
-- ✅ **Warranty Tracking**: Product warranty information
-
-## 🌐 Deployment
-
-### Vercel (Recommended)
-
-```bash
-# Install Vercel CLI
-npm i -g vercel
-
-# Deploy
-vercel --prod
-```
-
-### Manual Deployment
-
-1. Push to Git repository
-2. Connect to Vercel/Netlify
-3. Auto-deploy on push
-
-## 📝 Configuration
-
-Edit `js/config.js` to change:
-
-- **API URL**: `API_BASE_URL`
-- **Mock Data**: `ENABLE_MOCK_DATA` (auto-set based on environment)
-- **Debug Mode**: `ENABLE_DEBUG`
-
-## 🔧 Environment Variables
-
-The app auto-detects environment:
-
-| Environment | Hostname | Mock Data | Debug |
-|------------|----------|-----------|-------|
-| Development | localhost | ✅ | ✅ |
-| Staging | *.vercel.app | ❌ | ✅ |
-| Production | Custom domain | ❌ | ❌ |
-
-## 📚 Documentation
-
-- **CLEANUP_SUMMARY.md**: Recent code cleanup details
-- **js/types.js**: JSDoc type definitions
-- **js/ui-helpers.js**: Utility functions documentation
 
 ## 🐛 Troubleshooting
 
-### Cannot scroll
-- Clear browser cache (Ctrl + Shift + R)
-- Check console for errors
+### API Connection Errors?
+The backend is currently unstable. If you see connection refused or 500 errors:
+1.  Open `js/config.js`.
+2.  Set `ENABLE_MOCK_DATA = true`.
+3.  Refresh the page.
 
-### API errors
-- Verify `API_BASE_URL` in `js/config.js`
-- Check backend is running (localhost:5000)
-- Check browser console for CORS errors
-
-### Mock login not working
-- Only works on localhost
-- Use credentials: `user` / `123456`
+### Layout Issues on Mobile?
+- Hard refresh the browser (`Ctrl + Shift + R` or Clear Cache) to ensure latest CSS is loaded.
 
 ## 🤝 Contributing
 
-1. Create feature branch
-2. Make changes
-3. Run `npm run lint` and `npm run format`
-4. Commit with clear message
-5. Create Pull Request
+Focus is currently on **UI Polish** and **Frontend Logic**.
+
+1.  Create a feature branch.
+2.  Ensure code is formatted: `npm run format`.
+3.  Check for lint errors: `npm run lint`.
+4.  Submit a Pull Request.

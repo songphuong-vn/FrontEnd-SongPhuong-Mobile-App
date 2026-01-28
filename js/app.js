@@ -874,15 +874,15 @@ function switchNav(tab, evt) {
         if (searchBar) searchBar.style.display = 'none';
     }
 
-    // Nếu chuyển sang tab profile, kiểm tra lại trạng thái để set scroll
+    // Luôn mở lại scroll khi chuyển tab (kể cả profile)
+    document.documentElement.style.overflow = '';
+    document.body.style.overflow = '';
+    const scrollContent = document.querySelector('.scroll-content');
+    if (scrollContent) scrollContent.style.overflow = '';
+
+    // Nếu chuyển sang tab profile, kiểm tra lại trạng thái đăng nhập
     if (tab === 'profile' && window.authModule) {
         window.authModule.checkAuthState();
-    } else if (tab !== 'profile') {
-        // Các tab khác luôn cho phép scroll (Reset toàn bộ)
-        document.documentElement.style.overflow = '';
-        document.body.style.overflow = '';
-        const scrollContent = document.querySelector('.scroll-content');
-        if (scrollContent) scrollContent.style.overflow = '';
     }
 
     // Cập nhật tab hiện tại
