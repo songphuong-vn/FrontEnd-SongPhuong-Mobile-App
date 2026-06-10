@@ -12,7 +12,7 @@ Modern Single Page Application (SPA) for customer management and e-commerce.
 
 ```bash
 # Clone the repository
-git clone <repository-url>
+git clone https://github.com/songphuong-vn/FrontEnd-SongPhuong-Mobile-App
 cd SP-MOBILE-APP
 
 # Install dev dependencies (optional)
